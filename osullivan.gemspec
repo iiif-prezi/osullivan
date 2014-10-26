@@ -18,4 +18,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec'
 
   spec.add_dependency 'json'
+  spec.add_dependency 'activesupport', '~> 4.1.6'
 end
