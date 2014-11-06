@@ -76,10 +76,11 @@ module IIIF
         end
       end
 
+      # Array only
       def metadata=(arr)
         self['metadata'] = arr
-      end
 
+      end
       def metadata
         self['metadata'] ||= []
         self['metadata']
@@ -109,12 +110,14 @@ module IIIF
 
       def to_hash
         self.tidy_empties
+        self.validate
         @data
       end
       alias to_h to_hash
 
       def to_json
         self.tidy_empties
+        self.validate
         @data.to_json
       end
 
@@ -123,7 +126,7 @@ module IIIF
       end
 
       def tidy_empties
-        # metadata
+        # metadata TODO: cover all that must be arrays here
         if self.has_key?('metadata')
           if self['metadata'].empty?
             self.delete('metadata')
@@ -133,6 +136,10 @@ module IIIF
             end
           end
         end
+      end
+
+      def validate
+        #TODO
       end
 
       def data=(hsh)
