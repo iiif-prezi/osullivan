@@ -35,10 +35,9 @@ module IIIF
 
       # Static methods and alternative constructors
       class << self
-        # Parse from a file name, string, or existing hash
+        # Parse from a file path, string, or existing hash
         def parse(s)
           new_instance = new()
-          err_message = 
           if s.kind_of?(String) && File.exists?(s)
             new_instance.data = JSON.parse(IO.read(s))
           elsif s.kind_of?(String) && !File.exists?(s)
@@ -57,7 +56,8 @@ module IIIF
         end
       end
 
-      # JSON-LD accessor/mutators, can't have '@' :-(. Consider '_' or something else?
+      # JSON-LD accessor/mutators, can't have '@' :-(. 
+      # Consider '_prop' or something else?
 
       JSON_LD_PROPS.each do |jld_prop|
         # Setters
@@ -85,24 +85,10 @@ module IIIF
         self['metadata']
       end
 
-      # Always a string--are there others?
-      # TODO: should the value be validated based on the class?
       def viewing_hint=(t)
         self['viewingHint'] = t 
       end
       alias setViewingHint viewing_hint=      
-
-      # Many of these can be lists! What happens if, e.g.:
-      # irb(main):005:0> f = 'foo'
-      # => "foo"
-      # irb(main):006:0> f << 'x'
-      # => "foox"
-      # Could assume everything is an Array and then change to
-      # a String or Object when we serialize if there's is only one member.
-      #  * But what are the implications for round-tripping? Every value that isn't
-      # an array would need to become one.
-      #  * Need to override []= and [] with the same behavior
-      # Maybe you should just know your data.
 
       ALLOWED_ANYWHERE_PROPS.each do |anywhere_prop|
         # Setters
@@ -120,11 +106,8 @@ module IIIF
           self.send('[]', "#{anywhere_prop}") 
         end
       end
-      ##
 
       def to_hash
-        # TODO: should there be a list of expected keys so that we can raise 
-        # warnings (force: true ?) when unexpected properties are given?
         self.tidy_empties
         @data
       end

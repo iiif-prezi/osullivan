@@ -23,21 +23,6 @@ module IIIF
         end
       end
 
-      def tidy_arrays
-        ARRAY_KEYS.each do |k|
-          if self.has_key?(k)
-            if self[k].empty?
-              self.delete(k)
-            else
-              unless self[k].all? { |entry| entry.kind_of?(Hash) }
-                raise TypeError, "All entries in the #{k} list must be a type of Hash"
-              end
-            end
-          end
-        end
-        super()
-      end
-
     end
   end
 end
