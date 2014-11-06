@@ -7,7 +7,7 @@ module IIIF
       #  * reject
       #  * replace
 
-      def_delegators :@data, 
+      def_delegators :@data,
         :[],
         :[]=,
         :delete,
@@ -28,8 +28,8 @@ module IIIF
         :values
 
       ###
-      # Methods that take a block and should return an instance (self or a new 
-      # instance) have been overridden to do so, rather than an 
+      # Methods that take a block and should return an instance (self or a new'
+      # instance) have been overridden to do so, rather than an'
       # ActiveSupport::OrderedHash based on the internal hash
 
       SIMPLE_SELF_RETURNERS = %w[delete_if each each_key each_value keep_if]
@@ -37,11 +37,11 @@ module IIIF
       SIMPLE_SELF_RETURNERS.each do |method_name|
         define_method(method_name) do |*arg, &block|
           unless block.nil? # block_given? doesn't seem to work in this context
-            @data.send(method_name, *arg, &block) 
+            @data.send(method_name, *arg, &block)
             return self
           else
             @data.send(method_name)
-          end 
+          end
         end
       end
 
@@ -51,19 +51,19 @@ module IIIF
         return self
       end
 
-      # Returns a new instance of this class containing the contents of 
+      # Returns a new instance of this class containing the contents of'
       # another_obj. The argument can be any object that implements two
       # methods:
       #
       #    obj.each { |k,v| block }
       #    obj.has_key?
       #
-      # If no block is specified, the value for entries with duplicate keys 
-      # will be those of the argument, but at the index of the original; all 
+      # If no block is specified, the value for entries with duplicate keys'
+      # will be those of the argument, but at the index of the original; all'
       # other entries will be appended to the end.
       #
-      # If a block is specified the value for each duplicate key is determined 
-      # by calling the block with the key, its value in hsh and its value in 
+      # If a block is specified the value for each duplicate key is determined'
+      # by calling the block with the key, its value in hsh and its value in'
       # another_obj.
       def merge another_obj
         new_instance =  self.class.new
@@ -80,21 +80,21 @@ module IIIF
           self.each { |k,v| new_instance[k] = v }
           another_obj.each { |k,v| new_instance[k] = v }
         end
-        new_instance  
+        new_instance
       end
 
-      # Adds the entries from another obj to this one. The argument can be any 
+      # Adds the entries from another obj to this one. The argument can be any
       # object that implements two methods:
       #
       #    obj.each { |k,v| block }
       #    obj.has_key?
       #
-      # If no block is specified, the value for entries with duplicate keys 
-      # will be those of the argument, but at the index of the original; all 
+      # If no block is specified, the value for entries with duplicate keys'
+      # will be those of the argument, but at the index of the original; all'
       # other entries will be appended to the end.
       #
-      # If a block is specified the value for each duplicate key is determined 
-      # by calling the block with the key, its value in hsh and its value in 
+      # If a block is specified the value for each duplicate key is determined'
+      # by calling the block with the key, its value in hsh and its value in'
       # another_obj.
       def merge! another_obj
         if block_given?
@@ -109,7 +109,7 @@ module IIIF
           self.each { |k,v| self[k] = v }
           another_obj.each { |k,v| self[k] = v }
         end
-        self  
+        self
       end
       alias update merge!
 
@@ -131,7 +131,7 @@ module IIIF
       end
 
       # Returns a new instance consisting of entries for which the block returns
-      # true. Not that an enumerator is not available for the OrderedHash 
+      # true. Not that an enumerator is not available for the OrderedHash'
       # implementation
       def select
         new_instance = self.class.new
@@ -157,12 +157,7 @@ module IIIF
         self
       end
 
-
-
     end
 
   end
 end
-
-
-

@@ -13,15 +13,15 @@ module IIIF
 
       JSON_LD_PROPS ||= %w{type id context}
       # These types could be anything...right?
-      ALLOWED_ANYWHERE_PROPS ||= %w{label description 
+      ALLOWED_ANYWHERE_PROPS ||= %w{label description
         thumbnail attribution license logo see_also service related within}
 
       CONTEXT ||= 'http://iiif.io/api/presentation/2/context.json'
       INITIALIZABLE_KEYS ||= %w{@id @type}
       # Initialize a Presentation node
-      # @param [Hash] hsh - Anything in this hash will be added to the Object. 
+      # @param [Hash] hsh - Anything in this hash will be added to the Object.'
       #   Order is only guaranteed if an ActiveSupport::OrderedHash is passed.
-      # @param [boolean] include_context (default: false). Pass true if the 
+      # @param [boolean] include_context (default: false). Pass true if the'
       #   context should be included.
       def initialize(hsh={}, include_context=false)
         @data = ActiveSupport::OrderedHash[hsh]
@@ -45,7 +45,7 @@ module IIIF
           elsif s.kind_of?(Hash)
             new_instance.data = ActiveSupport::OrderedHash[s]
           else
-            m = '#parse takes a path to a file, a JSON String, or a Hash, ' 
+            m = '#parse takes a path to a file, a JSON String, or a Hash, '
             m += "argument was a #{s.class}."
             if s.kind_of?(String)
               m+= "If you were trying to point to a file, does it exist?"
@@ -56,23 +56,17 @@ module IIIF
         end
       end
 
-      # JSON-LD accessor/mutators, can't have '@' :-(. 
+      # JSON-LD accessor/mutators, can't have '@' :-(.'
       # Consider '_prop' or something else?
 
       JSON_LD_PROPS.each do |jld_prop|
         # Setters
         define_method("#{jld_prop}=") do |arg|
-          self.send('[]=', "@#{jld_prop}", arg) 
-        end
-        define_method("set_#{jld_prop}".camelize(:lower)) do |arg|
-          self.send('[]=', "@#{jld_prop}", arg) 
+          self.send('[]=', "@#{jld_prop}", arg)
         end
         # Getters
         define_method("#{jld_prop}") do
-          self.send('[]', "@#{jld_prop}") 
-        end
-        define_method("get_#{jld_prop}".camelize(:lower)) do
-          self.send('[]', "@#{jld_prop}") 
+          self.send('[]', "@#{jld_prop}")
         end
       end
 
@@ -87,24 +81,28 @@ module IIIF
       end
 
       def viewing_hint=(t)
-        self['viewingHint'] = t 
+        self['viewingHint'] = t
       end
-      alias setViewingHint viewing_hint=      
+      alias setViewingHint viewing_hint=
 
       ALLOWED_ANYWHERE_PROPS.each do |anywhere_prop|
         # Setters
         define_method("#{anywhere_prop}=") do |arg|
-          self.send('[]=', "#{anywhere_prop}", arg) 
+          self.send('[]=', "#{anywhere_prop}", arg)
         end
-        define_method("set_#{anywhere_prop}".camelize(:lower)) do |arg|
-          self.send('[]=', "#{anywhere_prop}", arg) 
+        if anywhere_prop.camelize(:lower) != anywhere_prop
+          define_method("#{anywhere_prop.camelize(:lower)}=") do |arg|
+            self.send('[]=', "#{anywhere_prop}", arg)
+          end
         end
         # Getters
         define_method("#{anywhere_prop}") do
-          self.send('[]', "#{anywhere_prop}") 
+          self.send('[]', "#{anywhere_prop}")
         end
-        define_method("get_#{anywhere_prop}".camelize(:lower)) do
-          self.send('[]', "#{anywhere_prop}") 
+        if anywhere_prop.camelize(:lower) != anywhere_prop
+          define_method(anywhere_prop.camelize(:lower)) do
+            self.send('[]', "#{anywhere_prop}")
+          end
         end
       end
 
@@ -132,7 +130,7 @@ module IIIF
             self.delete('metadata')
           else
             unless self['metadata'].all? { |entry| entry.kind_of?(Hash) }
-              raise TypeError, 'All entries in the metadata list must be a type of Hash' 
+              raise TypeError, 'All entries in the metadata list must be a type of Hash'
             end
           end
         end

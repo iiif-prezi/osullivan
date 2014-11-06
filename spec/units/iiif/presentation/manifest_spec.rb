@@ -24,11 +24,11 @@ describe IIIF::Presentation::Manifest do
   describe '#metadata' do
     it 'roundtrips' do
       subject.metadata << {
-        'label' => 'Author', 
+        'label' => 'Author',
         'value' => 'Anne Author'
       }
       subject.metadata << {
-        'label' => 'Published', 
+        'label' => 'Published',
         'value' => [
           {'@value'=> 'Paris, circa 1400', '@language'=>'en'},
           {'@value'=> 'Paris, environ 14eme siecle', '@language'=>'fr'}
@@ -67,4 +67,3 @@ describe IIIF::Presentation::Manifest do
     end
   end
 end
-

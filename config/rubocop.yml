@@ -1,0 +1,4 @@
+Style/RedundantSelf:
+  Description: "Don't use self where it's not needed."
+  StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#no-self-unless-required'
+  Enabled: false
