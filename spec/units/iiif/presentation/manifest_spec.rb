@@ -23,6 +23,8 @@ describe IIIF::Presentation::Manifest do
 
   describe '#metadata' do
     it 'roundtrips' do
+      subject['@id'] = 'http://www.example.org/iiif/book1/manifest'
+      subject.label = 'Book 1'
       subject.metadata << {
         'label' => 'Author',
         'value' => 'Anne Author'
@@ -45,7 +47,30 @@ describe IIIF::Presentation::Manifest do
     end
   end
 
-  describe 'JSON LD accessor and mutators' do
+  describe '#required_keys' do
+    it 'accumulates' do
+      expect(subject.required_keys).to eq %w{ @type @id label }
+    end
+  end
+
+  describe '#validate' do
+    it 'raises an error if there is no @id' do
+      subject.label = 'Book 1'
+      expect { subject.to_hash }.to raise_error IIIF::Presentation::MissingRequiredKeyError
+    end
+    it 'raises an error if there is no label' do
+      subject['@id'] = 'http://www.example.org/iiif/book1/manifest'
+      expect { subject.to_hash }.to raise_error IIIF::Presentation::MissingRequiredKeyError
+    end
+    it 'raises an error if there is no @type' do
+      subject.delete('@type')
+      subject.label = 'Book 1'
+      subject['@id'] = 'http://www.example.org/iiif/book1/manifest'
+      expect { subject.to_hash }.to raise_error IIIF::Presentation::MissingRequiredKeyError
+    end
+  end
+
+  describe 'Array key accessor and mutators' do
     IIIF::Presentation::Manifest::ARRAY_KEYS.each do |prop|
       describe "#{prop}=" do
         it "sets #{prop}" do

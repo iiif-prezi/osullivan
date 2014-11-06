@@ -38,7 +38,7 @@ describe IIIF::Presentation::AbstractObject do
   end
 
   let(:abstract_object_subclass) do
-      Class.new(IIIF::Presentation::AbstractObject) do
+    Class.new(IIIF::Presentation::AbstractObject) do
       include IIIF::Presentation::HashBehaviours
       def initialize(hsh={}, include_context=false)
         opts = {
@@ -46,6 +46,9 @@ describe IIIF::Presentation::AbstractObject do
           '@id' => 'http://example.com/prefix/manifest/123',
         }
         super(opts, true)
+      end
+      def required_keys
+        super + %w{ @id }
       end
     end
   end
@@ -88,27 +91,24 @@ describe IIIF::Presentation::AbstractObject do
     end
   end
 
-  describe 'JSON LD accessor and mutators' do
-    IIIF::Presentation::AbstractObject::JSON_LD_PROPS.each do |prop|
-      describe "#{prop}=" do
-        it "sets self['@#{prop}']" do
-          subject.send("#{prop}=", fixed_values[prop])
-          expect(subject["@#{prop}"]).to eq fixed_values[prop]
-        end
-      end
-
-      describe "##{prop}" do
-        it "gets self[@#{prop}]" do
-          expect(subject.send("#{prop}")).to eq fixed_values[prop]
-        end
-      end
-
-    end
-  end
-
+  # describe 'JSON LD accessor and mutators' do
+  #   IIIF::Presentation::AbstractObject::JSON_LD_PROPS.each do |prop|
+  #     describe "#{prop}=" do
+  #       it "sets self['@#{prop}']" do
+  #         subject.send("#{prop}=", fixed_values[prop])
+  #         expect(subject["@#{prop}"]).to eq fixed_values[prop]
+  #       end
+  #     end
+  #     describe "##{prop}" do
+  #       it "gets self[@#{prop}]" do
+  #         expect(subject.send("#{prop}")).to eq fixed_values[prop]
+  #       end
+  #     end
+  #   end
+  # end
 
   describe 'Attributes allowed anywhere' do
-    IIIF::Presentation::AbstractObject::ALLOWED_ANYWHERE_PROPS.each do |prop|
+    IIIF::Presentation::AbstractObject::ALLOWED_ANYWHERE_KEYS.each do |prop|
       describe "##{prop}=" do
         it "sets self['#{prop}']" do
           subject.send("#{prop}=", fixed_values[prop])
@@ -134,7 +134,6 @@ describe IIIF::Presentation::AbstractObject do
           end
         end
       end
-
     end
   end
 
@@ -200,5 +199,15 @@ describe IIIF::Presentation::AbstractObject do
     end
 
   end
+
+  describe '#required_keys' do
+    it 'accumulates' do
+      expect(subject.required_keys).to eq %w{ @type @id }
+    end
+  end
+
+  describe '#validate' do
+  end
+
 
 end
