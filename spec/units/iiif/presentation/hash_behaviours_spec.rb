@@ -1,7 +1,7 @@
 require 'active_support/ordered_hash'
 describe IIIF::Presentation::HashBehaviours do
-  
-  let(:hash_like_class) do 
+
+  let(:hash_like_class) do
     Class.new do
       include IIIF::Presentation::HashBehaviours
       attr_accessor :data # Accessible for easier expects...not sure you'd do this in a real class
@@ -305,7 +305,7 @@ describe IIIF::Presentation::HashBehaviours do
       subject.data.clear
       another.data.clear
       merged.data.clear
-      expect(subject.merge(another).class).to eq subject.class # same class but 
+      expect(subject.merge(another).class).to eq subject.class # same class but'
       expect(merged).to_not be subject # different instance
       expect(merged).to_not be another # different instance
     end
@@ -350,7 +350,7 @@ describe IIIF::Presentation::HashBehaviours do
         subject.data.clear
         another.clear
         merged.data.clear
-        expect(subject.merge(another).class).to eq subject.class # same class but 
+        expect(subject.merge(another).class).to eq subject.class # same class but'
         expect(merged).to_not be subject # different instance
         expect(merged).to_not be another # different instance
       end
@@ -565,3 +565,6 @@ describe IIIF::Presentation::HashBehaviours do
   end
 
 end
+
+
+

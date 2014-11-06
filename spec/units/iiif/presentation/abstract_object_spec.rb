@@ -34,15 +34,15 @@ describe IIIF::Presentation::AbstractObject do
         'format' => 'video/mpeg'
       },
       'within' => 'http://www.example.org/collections/books/',
-   }
+    }
   end
 
-  let(:abstract_object_subclass) do 
-    Class.new(IIIF::Presentation::AbstractObject) do
+  let(:abstract_object_subclass) do
+      Class.new(IIIF::Presentation::AbstractObject) do
       include IIIF::Presentation::HashBehaviours
       def initialize(hsh={}, include_context=false)
         opts = {
-          '@type' => 'a:SubClass', 
+          '@type' => 'a:SubClass',
           '@id' => 'http://example.com/prefix/manifest/123',
         }
         super(opts, true)
@@ -53,7 +53,7 @@ describe IIIF::Presentation::AbstractObject do
   subject { abstract_object_subclass.new }
 
   describe '#initialize' do
-  	it 'raises an error if you try to instantiate AbstractObject' do
+    it 'raises an error if you try to instantiate AbstractObject' do
       expect { IIIF::Presentation::AbstractObject.new }.to raise_error(RuntimeError)
     end
     it 'sets @type' do
@@ -95,18 +95,11 @@ describe IIIF::Presentation::AbstractObject do
           subject.send("#{prop}=", fixed_values[prop])
           expect(subject["@#{prop}"]).to eq fixed_values[prop]
         end
-        it "is aliased as set#{prop.camelize}" do
-          subject.send("set#{prop.camelize}", 'my:NewType')
-          expect(subject["@#{prop}"]).to eq 'my:NewType'
-        end
       end
 
       describe "##{prop}" do
         it "gets self[@#{prop}]" do
           expect(subject.send("#{prop}")).to eq fixed_values[prop]
-        end
-        it "is aliased as get#{prop.camelize}" do
-          expect(subject.send("get#{prop.camelize}")).to eq fixed_values[prop]
         end
       end
 
@@ -121,9 +114,11 @@ describe IIIF::Presentation::AbstractObject do
           subject.send("#{prop}=", fixed_values[prop])
           expect(subject["#{prop}"]).to eq fixed_values[prop]
         end
-        it "is aliased as set#{prop.camelize}" do
-          subject.send("set#{prop.camelize}", fixed_values[prop])
-          expect(subject["#{prop}"]).to eq fixed_values[prop]
+        if prop.camelize(:lower) != prop
+          it "is aliased as ##{prop.camelize(:lower)}=" do
+            subject.send("#{prop.camelize(:lower)}=", fixed_values[prop])
+            expect(subject["#{prop}"]).to eq fixed_values[prop]
+          end
         end
       end
 
@@ -132,9 +127,11 @@ describe IIIF::Presentation::AbstractObject do
           subject.send("[]=", prop, fixed_values[prop])
           expect(subject.send("#{prop}")).to eq fixed_values[prop]
         end
-        it "is aliased as get#{prop.camelize}" do
-          subject.send("[]=", prop, fixed_values[prop])
-          expect(subject.send("get#{prop.camelize}")).to eq fixed_values[prop]
+        if prop.camelize(:lower) != prop
+          it "is aliased as ##{prop.camelize(:lower)}" do
+            subject.send("[]=", prop, fixed_values[prop])
+            expect(subject.send("#{prop.camelize(:lower)}")).to eq fixed_values[prop]
+          end
         end
       end
 
@@ -152,11 +149,11 @@ describe IIIF::Presentation::AbstractObject do
     end
     it 'gets structured as we\'d expect' do
       subject.metadata << {
-        'label' => 'Author', 
+        'label' => 'Author',
         'value' => 'Anne Author'
       }
       subject.metadata << {
-        'label' => 'Published', 
+        'label' => 'Published',
         'value' => [
           {'@value'=> 'Paris, circa 1400', '@language'=>'en'},
           {'@value'=> 'Paris, environ 14eme siecle', '@language'=>'fr'}
@@ -168,11 +165,11 @@ describe IIIF::Presentation::AbstractObject do
     end
     it 'roundtrips' do
       subject.metadata << {
-        'label' => 'Author', 
+        'label' => 'Author',
         'value' => 'Anne Author'
       }
       subject.metadata << {
-        'label' => 'Published', 
+        'label' => 'Published',
         'value' => [
           {'@value'=> 'Paris, circa 1400', '@language'=>'en'},
           {'@value'=> 'Paris, environ 14eme siecle', '@language'=>'fr'}

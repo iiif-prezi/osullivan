@@ -1,7 +1,7 @@
 require 'active_support/ordered_hash'
 describe IIIF::Presentation::UpdateBehaviours do
-  
-  let(:hash_like_class) do 
+
+  let(:hash_like_class) do
     Class.new do
       include IIIF::Presentation::UpdateBehaviours
       attr_accessor :data # Accessible for easier expects
@@ -13,8 +13,8 @@ describe IIIF::Presentation::UpdateBehaviours do
 
   let (:init_data) { [ ['wubble', 'fred'], ['baz', 'qux'], ['grault','garply'] ] }
 
-  subject do 
-    h = hash_like_class.new 
+  subject do
+    h = hash_like_class.new
     init_data.each {|e| h.data[e[0]] = e[1]}
     h
   end
@@ -92,6 +92,5 @@ describe IIIF::Presentation::UpdateBehaviours do
       expect(subject.unshift('thud','wibble')).to be subject
     end
   end
-
-
+  
 end

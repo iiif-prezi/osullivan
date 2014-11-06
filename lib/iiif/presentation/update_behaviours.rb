@@ -6,8 +6,8 @@ module IIIF
       # Insert a new key and value at the suppplied index.
       #
       # Note that this is slightly different from Array#insert in that new
-      # entries must be added one at a time, i.e. insert(n, k, v, k, v...) is not
-      # supported
+      # entries must be added one at a time, i.e. insert(n, k, v, k, v...) is 
+      # not supported.
       #
       # @param [Integer] index
       # @param [Object] key
@@ -16,7 +16,8 @@ module IIIF
         tmp = ActiveSupport::OrderedHash.new
         index = self.data.length + 1 + index if index < 0
         if index < 0
-          raise IndexError, "Index #{index} is too small for current length (#{self.data.length})"
+          m = "Index #{index} is too small for current length (#{data.length})"
+          raise IndexError, m
         end
         if index > 0
           i=0
@@ -34,10 +35,10 @@ module IIIF
         self
       end
 
-      # Insert a key and value before an existing key or the first entry for 
+      # Insert a key and value before an existing key or the first entry for'
       # which the supplied block evaluates to true. The block takes precendence
       # over the supplied key.
-      # Options: 
+      # Options:'
       #  * :existing_key (default: nil). If nil or not supplied then a block is required.
       #  * :new_key (required)
       #  * :value (required)
@@ -54,10 +55,10 @@ module IIIF
         end
       end
 
-      # Insert a key and value after an existing key or the first entry for 
+      # Insert a key and value after an existing key or the first entry for'
       # which the supplied block evaluates to true. The block takes precendence
       # over the supplied key.
-      # Options: 
+      # Options:'
       #  * :existing_key (default: nil). If nil or not supplied then a block is required.
       #  * :new_key (required)
       #  * :value (required)
@@ -90,7 +91,7 @@ module IIIF
           self.data.each_with_index do |(k,v), i|
             if yield(k, v)
               idx = i
-              break 
+              break
             end
           end
           if idx.nil?
@@ -108,7 +109,6 @@ module IIIF
         self.insert(idx, new_key, value)
         self
       end
-
 
     end
   end
