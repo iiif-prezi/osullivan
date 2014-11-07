@@ -5,37 +5,7 @@ describe IIIF::Presentation::AbstractObject do
 
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
-  let(:fixed_values) do
-    {
-      'type' => 'a:SubClass',
-      'id' => 'http://example.com/prefix/manifest/123',
-      'context' => IIIF::Presentation::AbstractObject::CONTEXT,
-      'label' => 'Book 1',
-      'description' => 'A longer description of this example book. It should give some real information.',
-      'thumbnail' => {
-        '@id' => 'http://www.example.org/images/book1-page1/full/80,100/0/default.jpg',
-        'service'=> {
-          '@context' => 'http://iiif.io/api/image/2/context.json',
-          '@id' => 'http://www.example.org/images/book1-page1',
-          'profile' => 'http://iiif.io/api/image/2/level1.json'
-        }
-      },
-      'attribution' => 'Provided by Example Organization',
-      'license' => 'http://www.example.org/license.html',
-      'logo' => 'http://www.example.org/logos/institution1.jpg',
-      'see_also' => 'http://www.example.org/library/catalog/book1.xml',
-      'service' => {
-        '@context' => 'http://example.org/ns/jsonld/context.json',
-        '@id' =>  'http://example.org/service/example',
-        'profile' => 'http://example.org/docs/example-service.html'
-      },
-      'related' => {
-        '@id' => 'http://www.example.org/videos/video-book1.mpg',
-        'format' => 'video/mpeg'
-      },
-      'within' => 'http://www.example.org/collections/books/',
-    }
-  end
+
 
   let(:abstract_object_subclass) do
     Class.new(IIIF::Presentation::AbstractObject) do
@@ -91,53 +61,7 @@ describe IIIF::Presentation::AbstractObject do
     end
   end
 
-  # describe 'JSON LD accessor and mutators' do
-  #   IIIF::Presentation::AbstractObject::JSON_LD_PROPS.each do |prop|
-  #     describe "#{prop}=" do
-  #       it "sets self['@#{prop}']" do
-  #         subject.send("#{prop}=", fixed_values[prop])
-  #         expect(subject["@#{prop}"]).to eq fixed_values[prop]
-  #       end
-  #     end
-  #     describe "##{prop}" do
-  #       it "gets self[@#{prop}]" do
-  #         expect(subject.send("#{prop}")).to eq fixed_values[prop]
-  #       end
-  #     end
-  #   end
-  # end
-
-  describe 'Attributes allowed anywhere' do
-    IIIF::Presentation::AbstractObject::ALLOWED_ANYWHERE_KEYS.each do |prop|
-      describe "##{prop}=" do
-        it "sets self['#{prop}']" do
-          subject.send("#{prop}=", fixed_values[prop])
-          expect(subject["#{prop}"]).to eq fixed_values[prop]
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}=" do
-            subject.send("#{prop.camelize(:lower)}=", fixed_values[prop])
-            expect(subject["#{prop}"]).to eq fixed_values[prop]
-          end
-        end
-      end
-
-      describe "##{prop}" do
-        it "gets self[#{prop}]" do
-          subject.send("[]=", prop, fixed_values[prop])
-          expect(subject.send("#{prop}")).to eq fixed_values[prop]
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}" do
-            subject.send("[]=", prop, fixed_values[prop])
-            expect(subject.send("#{prop.camelize(:lower)}")).to eq fixed_values[prop]
-          end
-        end
-      end
-    end
-  end
-
-  describe '#metadata' do
+  describe 'A nested object (e.g. self[\'metdata\']' do
     it 'returns [] if not set' do
       expect(subject.metadata).to eq([])
     end
@@ -186,18 +110,6 @@ describe IIIF::Presentation::AbstractObject do
       expect(parsed['metadata'][1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
       File.delete('/tmp/osullivan-spec.json')
     end
-
-    describe 'raises a TypeError when parent#to_hash is called if all of its members aren\'t a type of hash' do
-      it 'can be a Hash' do
-      end
-      it 'can be an ActiveSupport::OrderedHash' do
-      end
-      it 'can\'t be, e.g., a String' do
-      end
-      it 'can\'t be, e.g., an Integer' do
-      end
-    end
-
   end
 
   describe '#required_keys' do

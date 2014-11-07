@@ -11,6 +11,38 @@ describe IIIF::Presentation::Manifest do
     end
   end
 
+  let(:fixed_values) do
+    {
+      'type' => 'a:SubClass',
+      'id' => 'http://example.com/prefix/manifest/123',
+      'context' => IIIF::Presentation::AbstractObject::CONTEXT,
+      'label' => 'Book 1',
+      'description' => 'A longer description of this example book. It should give some real information.',
+      'thumbnail' => {
+        '@id' => 'http://www.example.org/images/book1-page1/full/80,100/0/default.jpg',
+        'service'=> {
+          '@context' => 'http://iiif.io/api/image/2/context.json',
+          '@id' => 'http://www.example.org/images/book1-page1',
+          'profile' => 'http://iiif.io/api/image/2/level1.json'
+        }
+      },
+      'attribution' => 'Provided by Example Organization',
+      'license' => 'http://www.example.org/license.html',
+      'logo' => 'http://www.example.org/logos/institution1.jpg',
+      'see_also' => 'http://www.example.org/library/catalog/book1.xml',
+      'service' => {
+        '@context' => 'http://example.org/ns/jsonld/context.json',
+        '@id' =>  'http://example.org/service/example',
+        'profile' => 'http://example.org/docs/example-service.html'
+      },
+      'related' => {
+        '@id' => 'http://www.example.org/videos/video-book1.mpg',
+        'format' => 'video/mpeg'
+      },
+      'within' => 'http://www.example.org/collections/books/',
+    }
+  end
+
   describe '#initialize' do
     it 'sets @type to sc:Manifest by default' do
       expect(subject['@type']).to eq 'sc:Manifest'
@@ -18,32 +50,6 @@ describe IIIF::Presentation::Manifest do
     it 'allows subclasses to override @type' do
       sub = subclass_subject.new
       expect(sub['@type']).to eq 'a:SubClass'
-    end
-  end
-
-  describe '#metadata' do
-    it 'roundtrips' do
-      subject['@id'] = 'http://www.example.org/iiif/book1/manifest'
-      subject.label = 'Book 1'
-      subject.metadata << {
-        'label' => 'Author',
-        'value' => 'Anne Author'
-      }
-      subject.metadata << {
-        'label' => 'Published',
-        'value' => [
-          {'@value'=> 'Paris, circa 1400', '@language'=>'en'},
-          {'@value'=> 'Paris, environ 14eme siecle', '@language'=>'fr'}
-        ]
-      }
-      File.open('/tmp/osullivan-spec.json','w') do |f|
-        f.write(subject.to_pretty_json)
-      end
-      parsed = subject.class.parse('/tmp/osullivan-spec.json')
-      expect(parsed.metadata[0]['label']).to eq('Author')
-      expect(subject.metadata[1]['value'].length).to eq(2)
-      expect(subject.metadata[1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
-      File.delete('/tmp/osullivan-spec.json')
     end
   end
 
@@ -70,17 +76,18 @@ describe IIIF::Presentation::Manifest do
     end
   end
 
-  describe 'Array key accessor and mutators' do
-    IIIF::Presentation::Manifest::ARRAY_KEYS.each do |prop|
+  describe 'Array only key accessor and mutators' do
+    # This is lame, but we can't access subject from here
+    IIIF::Presentation::Manifest.new.array_only_keys.each do |prop|
       describe "#{prop}=" do
         it "sets #{prop}" do
           ex = [{'label' => 'XYZ'}]
           subject.send("#{prop}=", ex)
           expect(subject[prop]).to eq ex
         end
-        # it 'raises an exception when attempting to set it to something other than an Array' do
-        #   expect { subject.send("#{prop}=", 'Foo') }.to raise_error TypeError
-        # end
+        it 'raises an exception when attempting to set it to something other than an Array' do
+          expect { subject.send("#{prop}=", 'Foo') }.to raise_error TypeError
+        end
       end
       describe "#{prop}" do
         it "gets #{prop}" do
@@ -91,4 +98,59 @@ describe IIIF::Presentation::Manifest do
       end
     end
   end
+
+  describe 'String-only key accessor and mutators' do
+    # This is lame, but we can't access subject from here
+    IIIF::Presentation::Manifest.new.string_only_keys.each do |prop|
+      describe "#{prop}=" do
+        it "sets #{prop}" do
+          ex = 'foo'
+          subject.send("#{prop}=", ex)
+          expect(subject[prop]).to eq ex
+        end
+        it 'raises an exception when attempting to set it to something other than a String' do
+          expect { subject.send("#{prop}=", ['Foo']) }.to raise_error TypeError
+        end
+      end
+      describe "#{prop}" do
+        it "gets #{prop}" do
+          ex = 'bar'
+          subject[prop] = ex
+          expect(subject.send(prop)).to eq ex
+        end
+      end
+    end
+  end
+
+  describe 'Attributes allowed anywhere' do
+    IIIF::Presentation::Manifest.new.optional_keys.each do |prop|
+      describe "##{prop}=" do
+        it "sets self['#{prop}']" do
+          subject.send("#{prop}=", fixed_values[prop])
+          expect(subject["#{prop}"]).to eq fixed_values[prop]
+        end
+        if prop.camelize(:lower) != prop
+          it "is aliased as ##{prop.camelize(:lower)}=" do
+            subject.send("#{prop.camelize(:lower)}=", fixed_values[prop])
+            expect(subject["#{prop}"]).to eq fixed_values[prop]
+          end
+        end
+      end
+
+      describe "##{prop}" do
+        it "gets self[#{prop}]" do
+          subject.send("[]=", prop, fixed_values[prop])
+          expect(subject.send("#{prop}")).to eq fixed_values[prop]
+        end
+        if prop.camelize(:lower) != prop
+          it "is aliased as ##{prop.camelize(:lower)}" do
+            subject.send("[]=", prop, fixed_values[prop])
+            expect(subject.send("#{prop.camelize(:lower)}")).to eq fixed_values[prop]
+          end
+        end
+      end
+    end
+  end
+
 end
+
