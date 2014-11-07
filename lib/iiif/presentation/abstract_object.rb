@@ -11,13 +11,17 @@ module IIIF
       include IIIF::Presentation::HashBehaviours
       include IIIF::Presentation::UpdateBehaviours
 
-      JSON_LD_PROPS ||= %w{type id context}
+      # Every subclass should override this, see Manifest for how.
+      def required_keys
+        %w{ @type }
+      end
+
       # These types could be anything...right?
-      ALLOWED_ANYWHERE_PROPS ||= %w{label description
-        thumbnail attribution license logo see_also service related within}
+      ALLOWED_ANYWHERE_KEYS ||= %w{ label description thumbnail attribution 
+        license logo see_also service related within }
 
       CONTEXT ||= 'http://iiif.io/api/presentation/2/context.json'
-      INITIALIZABLE_KEYS ||= %w{@id @type}
+
       # Initialize a Presentation node
       # @param [Hash] hsh - Anything in this hash will be added to the Object.'
       #   Order is only guaranteed if an ActiveSupport::OrderedHash is passed.
@@ -26,7 +30,7 @@ module IIIF
       def initialize(hsh={}, include_context=false)
         @data = ActiveSupport::OrderedHash[hsh]
         unless hsh.has_key?('@context') || !include_context
-          self['@context'] = CONTEXT
+          self.insert(0, '@context', CONTEXT)
         end
         if self.class == IIIF::Presentation::AbstractObject
           raise "#{self.class} is an abstract class. Please use one of its subclasses."
@@ -57,18 +61,20 @@ module IIIF
       end
 
       # JSON-LD accessor/mutators, can't have '@' :-(.'
-      # Consider '_prop' or something else?
+      # Consider '_prop' or something else? 
+      # For now you have to use []/[]=
 
-      JSON_LD_PROPS.each do |jld_prop|
-        # Setters
-        define_method("#{jld_prop}=") do |arg|
-          self.send('[]=', "@#{jld_prop}", arg)
-        end
-        # Getters
-        define_method("#{jld_prop}") do
-          self.send('[]', "@#{jld_prop}")
-        end
-      end
+      # JSON_LD_PROPS ||= %w{@type @id @context}
+      # JSON_LD_PROPS.each do |jld_prop|
+      #   # Setters
+      #   define_method("#{jld_prop}=") do |arg|
+      #     self.send('[]=', "@#{jld_prop}", arg)
+      #   end
+      #   # Getters
+      #   define_method("#{jld_prop}") do
+      #     self.send('[]', "@#{jld_prop}")
+      #   end
+      # end
 
       # Array only
       def metadata=(arr)
@@ -85,7 +91,7 @@ module IIIF
       end
       alias setViewingHint viewing_hint=
 
-      ALLOWED_ANYWHERE_PROPS.each do |anywhere_prop|
+      ALLOWED_ANYWHERE_KEYS.each do |anywhere_prop|
         # Setters
         define_method("#{anywhere_prop}=") do |arg|
           self.send('[]=', "#{anywhere_prop}", arg)
@@ -114,9 +120,7 @@ module IIIF
       alias to_h to_hash
 
       def to_json
-        self.tidy_empties
-        self.validate
-        @data.to_json
+        self.to_hash.to_json
       end
 
       def to_pretty_json
@@ -137,14 +141,23 @@ module IIIF
       end
 
       def validate
-        #TODO
+        self.required_keys.each do |k|
+          unless self.has_key?(k)
+            raise MissingRequiredKeyError, "A(n) #{k} is required for each #{self.class}"
+          end
+        end
       end
 
       def data=(hsh)
         @data = hsh
       end
 
+      def data
+        @data
+      end
     end
+
+    class MissingRequiredKeyError < StandardError; end
   end
 end
 
