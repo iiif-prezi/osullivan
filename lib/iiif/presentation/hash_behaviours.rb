@@ -1,3 +1,5 @@
+require 'forwardable'
+
 module IIIF
   module Presentation
     module HashBehaviours

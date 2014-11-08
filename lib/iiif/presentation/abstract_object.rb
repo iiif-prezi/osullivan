@@ -11,16 +11,25 @@ module IIIF
       include IIIF::Presentation::HashBehaviours
       include IIIF::Presentation::UpdateBehaviours
 
+      CONTEXT ||= 'http://iiif.io/api/presentation/2/context.json'
+
       # Every subclass should override this, see Manifest for how.
       def required_keys
         %w{ @type }
       end
 
-      # These types could be anything...right?
-      ALLOWED_ANYWHERE_KEYS ||= %w{ label description thumbnail attribution 
-        license logo see_also service related within }
+      def optional_keys
+        %w{ label description thumbnail attribution license logo see_also 
+          service related within }
+      end
 
-      CONTEXT ||= 'http://iiif.io/api/presentation/2/context.json'
+      def array_only_keys
+        %w{ metadata }
+      end
+
+      def string_only_keys
+        %w{ viewing_hint } # should any of the optional keys be here?
+      end
 
       # Initialize a Presentation node
       # @param [Hash] hsh - Anything in this hash will be added to the Object.'
@@ -35,6 +44,9 @@ module IIIF
         if self.class == IIIF::Presentation::AbstractObject
           raise "#{self.class} is an abstract class. Please use one of its subclasses."
         end
+        self.define_methods_for_keys(self.optional_keys)
+        self.define_methods_for_array_only_keys(self.array_only_keys)
+        self.define_methods_for_string_only_keys(self.string_only_keys)
       end
 
       # Static methods and alternative constructors
@@ -57,58 +69,6 @@ module IIIF
             raise ArgumentError, m
           end
           new_instance
-        end
-      end
-
-      # JSON-LD accessor/mutators, can't have '@' :-(.'
-      # Consider '_prop' or something else? 
-      # For now you have to use []/[]=
-
-      # JSON_LD_PROPS ||= %w{@type @id @context}
-      # JSON_LD_PROPS.each do |jld_prop|
-      #   # Setters
-      #   define_method("#{jld_prop}=") do |arg|
-      #     self.send('[]=', "@#{jld_prop}", arg)
-      #   end
-      #   # Getters
-      #   define_method("#{jld_prop}") do
-      #     self.send('[]', "@#{jld_prop}")
-      #   end
-      # end
-
-      # Array only
-      def metadata=(arr)
-        self['metadata'] = arr
-
-      end
-      def metadata
-        self['metadata'] ||= []
-        self['metadata']
-      end
-
-      def viewing_hint=(t)
-        self['viewingHint'] = t
-      end
-      alias setViewingHint viewing_hint=
-
-      ALLOWED_ANYWHERE_KEYS.each do |anywhere_prop|
-        # Setters
-        define_method("#{anywhere_prop}=") do |arg|
-          self.send('[]=', "#{anywhere_prop}", arg)
-        end
-        if anywhere_prop.camelize(:lower) != anywhere_prop
-          define_method("#{anywhere_prop.camelize(:lower)}=") do |arg|
-            self.send('[]=', "#{anywhere_prop}", arg)
-          end
-        end
-        # Getters
-        define_method("#{anywhere_prop}") do
-          self.send('[]', "#{anywhere_prop}")
-        end
-        if anywhere_prop.camelize(:lower) != anywhere_prop
-          define_method(anywhere_prop.camelize(:lower)) do
-            self.send('[]', "#{anywhere_prop}")
-          end
         end
       end
 
@@ -148,6 +108,7 @@ module IIIF
         end
       end
 
+      # TODO get these protected
       def data=(hsh)
         @data = hsh
       end
@@ -155,9 +116,69 @@ module IIIF
       def data
         @data
       end
+
+      protected
+      def define_methods_for_keys(keys)
+        keys.each do |key|
+          # Setters
+          define_singleton_method("#{key}=") do |arg|
+            self.send('[]=', "#{key}", arg)
+          end
+          if key.camelize(:lower) != key
+            define_singleton_method("#{key.camelize(:lower)}=") do |arg|
+              self.send('[]=', "#{key}", arg)
+            end
+          end
+          # Getters
+          define_singleton_method("#{key}") do
+            self.send('[]', "#{key}")
+          end
+          if key.camelize(:lower) != key
+            define_singleton_method(key.camelize(:lower)) do
+              self.send('[]', "#{key}")
+            end
+          end
+        end
+      end
+
+      def define_methods_for_array_only_keys(keys)
+        keys.each do |key|
+          # Setter
+          define_singleton_method("#{key}=") do |arg|
+            unless arg.kind_of?(Array)
+              raise TypeError, "#{key} must be an Array."
+            end
+            self.send('[]=', key, arg)
+          end
+          # Getter
+          define_singleton_method(key) do
+            self[key] ||= []
+            self[key]
+          end
+        end
+      end
+
+      def define_methods_for_string_only_keys(keys)
+        keys.each do |key|
+          # Setter
+          define_singleton_method("#{key}=") do |arg|
+            unless arg.kind_of?(String)
+              raise TypeError, "#{key} must be an String."
+            end
+            self.send('[]=', key, arg)
+          end
+          # Getter
+          define_singleton_method(key) do
+            self[key] ||= []
+            self[key]
+          end
+        end
+      end
+
     end
 
     class MissingRequiredKeyError < StandardError; end
+
   end
 end
 

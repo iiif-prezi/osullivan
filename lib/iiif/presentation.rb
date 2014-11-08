@@ -6,3 +6,6 @@ module IIIF
   module Presentation
   end
 end
+
+# p = IIIF::Presentation::Manifest.new
+# puts p.methods
