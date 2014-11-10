@@ -14,7 +14,7 @@ module IIIF
         super + %w{ @id label }
       end
 
-      def optional_keys
+      def any_type_keys
         super + %w{ viewing_direction }
       end
 
@@ -22,14 +22,19 @@ module IIIF
         super + %w{ sequences structures }
       end
 
-      def string_only_keys
-        super + %w{ }
+      def legal_viewing_hint_values
+        %w{individuals paged continuous }
       end
 
       def initialize(hsh={})
-        # make it possible to subclass manifest, possibly with a different @type
+        # make it possible to subclass, possibly with a different @type
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
         super(hsh)
+      end
+
+      def validate
+        # Each sequence must have a label if there is more than one
+        super
       end
 
     end

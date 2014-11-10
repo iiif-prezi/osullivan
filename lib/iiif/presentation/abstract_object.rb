@@ -11,14 +11,12 @@ module IIIF
       include IIIF::Presentation::HashBehaviours
       include IIIF::Presentation::UpdateBehaviours
 
-      CONTEXT ||= 'http://iiif.io/api/presentation/2/context.json'
-
       # Every subclass should override this, see Manifest for how.
       def required_keys
         %w{ @type }
       end
 
-      def optional_keys
+      def any_type_keys
         %w{ label description thumbnail attribution license logo see_also 
           service related within }
       end
@@ -28,7 +26,13 @@ module IIIF
       end
 
       def string_only_keys
-        %w{ viewing_hint } # should any of the optional keys be here?
+        %w{ viewing_hint } # should any of the any type keys be here?
+      end
+
+      # Not every subclass is allowed to have viewingDirect, but when it is,
+      # it must be one of these values
+      def legal_viewing_direction_values
+        %w{ left-to-right right-to-left top-to-bottom bottom-to-top }
       end
 
       # Initialize a Presentation node
@@ -39,12 +43,12 @@ module IIIF
       def initialize(hsh={}, include_context=false)
         @data = ActiveSupport::OrderedHash[hsh]
         unless hsh.has_key?('@context') || !include_context
-          self.insert(0, '@context', CONTEXT)
+          self.insert(0, '@context', IIIF::Presentation::CONTEXT)
         end
         if self.class == IIIF::Presentation::AbstractObject
           raise "#{self.class} is an abstract class. Please use one of its subclasses."
         end
-        self.define_methods_for_keys(self.optional_keys)
+        self.define_methods_for_keys(self.any_type_keys)
         self.define_methods_for_array_only_keys(self.array_only_keys)
         self.define_methods_for_string_only_keys(self.string_only_keys)
       end
@@ -88,22 +92,47 @@ module IIIF
       end
 
       def tidy_empties
-        # metadata TODO: cover all that must be arrays here
-        if self.has_key?('metadata')
-          if self['metadata'].empty?
-            self.delete('metadata')
-          else
-            unless self['metadata'].all? { |entry| entry.kind_of?(Hash) }
-              raise TypeError, 'All entries in the metadata list must be a type of Hash'
-            end
+        # * Delete any keys that are empty arrays
+        self.keys.each do |key|
+          if self[key].kind_of?(Array) && self[key].empty?
+            self.delete(key)
           end
         end
+
+        # TODO:
+        #  * Where possible (i.e. for properties that aren't required to be 
+        #    Arrays) make keys that reference one-member arrays reference that
+        #    the array memebr directly (e.g. foo => [bar] becomes foo => bar)
+
       end
 
       def validate
+        # Required keys
         self.required_keys.each do |k|
           unless self.has_key?(k)
-            raise MissingRequiredKeyError, "A(n) #{k} is required for each #{self.class}"
+            m = "A(n) #{k} is required for each #{self.class}"
+            raise IIIF::Presentation::MissingRequiredKeyError, m
+          end
+        end
+        # Viewing Direction values
+        if self.has_key?('viewing_direction')
+          unless self.legal_viewing_direction_values.include?(self['viewing_direction'])
+            m = "viewingDirection must be one of #{legal_viewing_direction_values}"
+            raise IIIF::Presentation::IllegalValueError, m
+          end
+        end
+        # Viewing Hint values
+        if self.has_key?('viewing_hint')
+          unless self.legal_viewing_hint_values.include?(self['viewing_hint'])
+            m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values}."
+            raise IIIF::Presentation::IllegalValueError, m
+          end
+        end
+        # Metadata is all hashes
+        if self.has_key?('metadata')
+          unless self['metadata'].all? { |entry| entry.kind_of?(Hash) }
+            m = 'All entries in the metadata list must be a type of Hash'
+            raise IIIF::Presentation::IllegalValueError, m
           end
         end
       end
@@ -118,6 +147,7 @@ module IIIF
       end
 
       protected
+
       def define_methods_for_keys(keys)
         keys.each do |key|
           # Setters
@@ -177,7 +207,7 @@ module IIIF
 
     end
 
-    class MissingRequiredKeyError < StandardError; end
+
 
   end
 end
