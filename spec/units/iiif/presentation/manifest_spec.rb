@@ -15,7 +15,7 @@ describe IIIF::Presentation::Manifest do
     {
       'type' => 'a:SubClass',
       'id' => 'http://example.com/prefix/manifest/123',
-      'context' => IIIF::Presentation::AbstractObject::CONTEXT,
+      'context' => IIIF::Presentation::CONTEXT,
       'label' => 'Book 1',
       'description' => 'A longer description of this example book. It should give some real information.',
       'thumbnail' => {
@@ -123,7 +123,7 @@ describe IIIF::Presentation::Manifest do
   end
 
   describe 'Attributes allowed anywhere' do
-    IIIF::Presentation::Manifest.new.optional_keys.each do |prop|
+    IIIF::Presentation::Manifest.new.any_type_keys.each do |prop|
       describe "##{prop}=" do
         it "sets self['#{prop}']" do
           subject.send("#{prop}=", fixed_values[prop])
