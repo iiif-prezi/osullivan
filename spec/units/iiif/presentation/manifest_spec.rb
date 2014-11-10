@@ -85,6 +85,13 @@ describe IIIF::Presentation::Manifest do
           subject.send("#{prop}=", ex)
           expect(subject[prop]).to eq ex
         end
+        if prop.camelize(:lower) != prop
+          it "is aliased as ##{prop.camelize(:lower)}=" do
+            ex = [{'label' => 'XYZ'}]
+            subject.send("#{prop.camelize(:lower)}=", ex)
+            expect(subject[prop]).to eq ex
+          end
+        end
         it 'raises an exception when attempting to set it to something other than an Array' do
           expect { subject.send("#{prop}=", 'Foo') }.to raise_error TypeError
         end
@@ -94,6 +101,13 @@ describe IIIF::Presentation::Manifest do
           ex = [{'label' => 'XYZ'}]
           subject[prop] = ex
           expect(subject.send(prop)).to eq ex
+        end
+        if prop.camelize(:lower) != prop
+          it "is aliased as ##{prop.camelize(:lower)}" do
+            ex = [{'label' => 'XYZ'}]
+            subject[prop] = ex
+            expect(subject.send("#{prop.camelize(:lower)}")).to eq ex
+          end
         end
       end
     end
@@ -108,6 +122,13 @@ describe IIIF::Presentation::Manifest do
           subject.send("#{prop}=", ex)
           expect(subject[prop]).to eq ex
         end
+        if prop.camelize(:lower) != prop
+          it "is aliased as ##{prop.camelize(:lower)}=" do
+            ex = 'foo'
+            subject.send("#{prop.camelize(:lower)}=", ex)
+            expect(subject[prop]).to eq ex
+          end
+        end
         it 'raises an exception when attempting to set it to something other than a String' do
           expect { subject.send("#{prop}=", ['Foo']) }.to raise_error TypeError
         end
@@ -118,6 +139,13 @@ describe IIIF::Presentation::Manifest do
           subject[prop] = ex
           expect(subject.send(prop)).to eq ex
         end
+        if prop.camelize(:lower) != prop
+          it "is aliased as ##{prop.camelize(:lower)}" do
+            ex = 'bar'
+            subject[prop] = ex
+            expect(subject.send("#{prop.camelize(:lower)}")).to eq ex
+          end
+        end
       end
     end
   end
@@ -127,12 +155,12 @@ describe IIIF::Presentation::Manifest do
       describe "##{prop}=" do
         it "sets self['#{prop}']" do
           subject.send("#{prop}=", fixed_values[prop])
-          expect(subject["#{prop}"]).to eq fixed_values[prop]
+          expect(subject[prop]).to eq fixed_values[prop]
         end
         if prop.camelize(:lower) != prop
           it "is aliased as ##{prop.camelize(:lower)}=" do
             subject.send("#{prop.camelize(:lower)}=", fixed_values[prop])
-            expect(subject["#{prop}"]).to eq fixed_values[prop]
+            expect(subject[prop]).to eq fixed_values[prop]
           end
         end
       end

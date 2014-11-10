@@ -180,10 +180,23 @@ module IIIF
             end
             self.send('[]=', key, arg)
           end
+          if key.camelize(:lower) != key
+            define_singleton_method("#{key.camelize(:lower)}=") do |arg|
+              unless arg.kind_of?(Array)
+                raise TypeError, "#{key} must be an Array."
+              end
+              self.send('[]=', "#{key}", arg)
+            end
+          end
           # Getter
           define_singleton_method(key) do
             self[key] ||= []
             self[key]
+          end
+          if key.camelize(:lower) != key
+            define_singleton_method(key.camelize(:lower)) do
+              self.send('[]', "#{key}")
+            end
           end
         end
       end
@@ -197,10 +210,23 @@ module IIIF
             end
             self.send('[]=', key, arg)
           end
+          if key.camelize(:lower) != key
+            define_singleton_method("#{key.camelize(:lower)}=") do |arg|
+              unless arg.kind_of?(String)
+                raise TypeError, "#{key} must be an String."
+              end
+              self.send('[]=', "#{key}", arg)
+            end
+          end
           # Getter
           define_singleton_method(key) do
             self[key] ||= []
             self[key]
+          end
+          if key.camelize(:lower) != key
+            define_singleton_method(key.camelize(:lower)) do
+              self.send('[]', "#{key}")
+            end
           end
         end
       end
