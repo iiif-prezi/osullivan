@@ -92,5 +92,6 @@ describe IIIF::Presentation::UpdateBehaviours do
       expect(subject.unshift('thud','wibble')).to be subject
     end
   end
-  
+
 end
+

@@ -6,7 +6,7 @@ module IIIF
       # Insert a new key and value at the suppplied index.
       #
       # Note that this is slightly different from Array#insert in that new
-      # entries must be added one at a time, i.e. insert(n, k, v, k, v...) is 
+      # entries must be added one at a time, i.e. insert(n, k, v, k, v...) is
       # not supported.
       #
       # @param [Integer] index
@@ -113,3 +113,4 @@ module IIIF
     end
   end
 end
+

@@ -123,3 +123,4 @@ describe IIIF::Presentation::AbstractObject do
 
 
 end
+

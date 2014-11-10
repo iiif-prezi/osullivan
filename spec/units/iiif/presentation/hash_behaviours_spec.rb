@@ -566,5 +566,3 @@ describe IIIF::Presentation::HashBehaviours do
 
 end
 
-
-

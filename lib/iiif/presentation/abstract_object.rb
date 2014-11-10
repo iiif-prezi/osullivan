@@ -17,8 +17,8 @@ module IIIF
       end
 
       def any_type_keys
-        %w{ label description thumbnail attribution license logo see_also 
-          service related within }
+        %w{ label description thumbnail attribution license logo see_also
+        service related within }
       end
 
       def array_only_keys
@@ -100,7 +100,7 @@ module IIIF
         end
 
         # TODO:
-        #  * Where possible (i.e. for properties that aren't required to be 
+        #  * Where possible (i.e. for properties that aren't required to be
         #    Arrays) make keys that reference one-member arrays reference that
         #    the array memebr directly (e.g. foo => [bar] becomes foo => bar)
 
@@ -207,8 +207,5 @@ module IIIF
 
     end
 
-
-
   end
 end
-
