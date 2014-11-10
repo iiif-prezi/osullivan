@@ -72,13 +72,26 @@ module IIIF
             end
             raise ArgumentError, m
           end
-          new_instance
+          self.un_camel(new_instance) # returns new instance
+        end
+
+        # Static since this intended to be used in contructors only (and we 
+        # can't protect it).
+        def un_camel(resource)
+          resource.keys.each_with_index do |key, i|
+            if key != key.underscore
+              resource.insert(i, key.underscore, resource[key])
+              resource.delete(key)
+            end
+          end
+          resource
         end
       end
 
       def to_hash
         self.tidy_empties
         self.validate
+        self.un_snake
         @data
       end
       alias to_h to_hash
@@ -91,22 +104,11 @@ module IIIF
         JSON.pretty_generate(self.to_hash)
       end
 
-      def tidy_empties
-        # * Delete any keys that are empty arrays
-        self.keys.each do |key|
-          if self[key].kind_of?(Array) && self[key].empty?
-            self.delete(key)
-          end
-        end
-
-        # TODO:
-        #  * Where possible (i.e. for properties that aren't required to be
-        #    Arrays) make keys that reference one-member arrays reference that
-        #    the array memebr directly (e.g. foo => [bar] becomes foo => bar)
-
-      end
-
       def validate
+        # TODO:
+        # * Array-only values
+        # * String-only values
+
         # Required keys
         self.required_keys.each do |k|
           unless self.has_key?(k)
@@ -147,6 +149,30 @@ module IIIF
       end
 
       protected
+
+      def tidy_empties
+        # * Delete any keys that are empty arrays
+        self.keys.each do |key|
+          if self[key].kind_of?(Array) && self[key].empty?
+            self.delete(key)
+          end
+        end
+
+        # TODO:
+        #  * Where possible (i.e. for properties that aren't required to be
+        #    Arrays) make keys that reference one-member arrays reference that
+        #    the array memebr directly (e.g. foo => [bar] becomes foo => bar)
+
+      end
+
+      def un_snake
+        self.keys.each_with_index do |key, i|
+          if key != key.camelize(:lower)
+            self.insert(i, key.camelize(:lower), self[key])
+            self.delete(key)
+          end
+        end
+      end
 
       def define_methods_for_keys(keys)
         keys.each do |key|
