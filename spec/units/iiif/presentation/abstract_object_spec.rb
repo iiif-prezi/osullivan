@@ -118,7 +118,66 @@ describe IIIF::Presentation::AbstractObject do
     end
   end
 
-  describe '#validate' do
+  describe '#un_snake' do
+    before(:each) do
+      @uri = 'http://www.example.org/descriptions/book1.xml'
+      @within_uri = 'http://www.example.org/collections/books/'
+      subject.see_also = @uri
+      subject.within = @within_uri
+    end
+    it 'changes snake_case keys to camelCase' do
+      subject.send(:un_snake) # #send gets past protection
+      expect(subject.keys.include?('seeAlso')).to be_truthy
+      expect(subject.keys.include?('see_also')).to be_falsey
+    end
+    it 'keeps the right values' do
+      subject.send(:un_snake)
+      expect(subject['seeAlso']).to eq @uri
+      expect(subject['within']).to eq @within_uri
+    end
+    it 'keeps things in the same position' do
+      see_also_position = subject.keys.index('see_also')
+      within_position = subject.keys.index('within')
+      subject.send(:un_snake)
+      expect(subject.keys[see_also_position]).to eq 'seeAlso'
+      expect(subject.keys[within_position]).to eq 'within'
+    end
+    it 'does its thing when we marshal' do
+      hsh = subject.to_hash
+      expect(hsh.keys.include?('seeAlso')).to be_truthy
+    end
+  end
+
+  describe 'Class#un_camel (static)' do
+    before(:each) do
+      @uri = 'http://www.example.org/descriptions/book1.xml'
+      @within_uri = 'http://www.example.org/collections/books/'
+      subject['seeAlso'] = @uri
+      subject['within'] = @within_uri
+    end
+    it 'changes camelCase keys to snake_case' do
+      subject.class.un_camel(subject)
+      expect(subject.keys.include?('see_also')).to be_truthy
+      expect(subject.keys.include?('seeAlso')).to be_falsey
+    end
+    it 'keeps the right values' do
+      subject.class.un_camel(subject)
+      expect(subject.send('see_also')).to eq @uri
+      expect(subject.send('within')).to eq @within_uri
+    end
+    it 'keeps things in the same position' do
+      see_also_position = subject.keys.index('seeAlso')
+      within_position = subject.keys.index('within')
+      subject.class.un_camel(subject)
+      expect(subject.keys[see_also_position]).to eq 'see_also'
+      expect(subject.keys[within_position]).to eq 'within'
+    end
+    it 'does its thing in constructors' do
+      abs_obj = abstract_object_subclass.parse(manifest_from_spec_path)
+      expect(abs_obj.keys.include?('see_also')).to be_truthy
+      expect(abs_obj.keys.include?('seeAlso')).to be_falsey
+    end
+
   end
 
 
