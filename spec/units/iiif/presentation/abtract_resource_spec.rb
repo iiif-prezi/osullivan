@@ -5,18 +5,18 @@ describe IIIF::Presentation::AbstractResource do
 
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
-
-
   let(:abstract_resource_subclass) do
     Class.new(IIIF::Presentation::AbstractResource) do
       include IIIF::Presentation::HashBehaviours
+
       def initialize(hsh={}, include_context=false)
-        opts = {
-          '@type' => 'a:SubClass',
-          '@id' => 'http://example.com/prefix/manifest/123',
-        }
-        super(opts, true)
+        hsh['@type'] = 'a:SubClass' unless hsh.has_key?('@type')
+        unless hsh.has_key?('@id')
+          hsh['@id'] = 'http://example.com/prefix/manifest/123'
+        end
+        super(hsh, true)
       end
+
       def required_keys
         super + %w{ @id }
       end
@@ -31,6 +31,11 @@ describe IIIF::Presentation::AbstractResource do
     end
     it 'sets @type' do
       expect(subject['@type']).to eq 'a:SubClass'
+    end
+    it 'can take any old hash' do
+      hsh = JSON.parse(IO.read(manifest_from_spec_path))
+      new_instance = abstract_resource_subclass.new(hsh)
+      expect(new_instance['label']).to eq 'Book 1'
     end
   end
 
@@ -118,7 +123,7 @@ describe IIIF::Presentation::AbstractResource do
     end
   end
 
-  describe '#un_snake' do
+  describe '#un_snake (protected)' do
     before(:each) do
       @uri = 'http://www.example.org/descriptions/book1.xml'
       @within_uri = 'http://www.example.org/collections/books/'
@@ -148,7 +153,7 @@ describe IIIF::Presentation::AbstractResource do
     end
   end
 
-  describe 'Class#un_camel (static)' do
+  describe '#un_camel (protected)' do
     before(:each) do
       @uri = 'http://www.example.org/descriptions/book1.xml'
       @within_uri = 'http://www.example.org/collections/books/'
@@ -156,19 +161,19 @@ describe IIIF::Presentation::AbstractResource do
       subject['within'] = @within_uri
     end
     it 'changes camelCase keys to snake_case' do
-      subject.class.un_camel(subject)
+      subject.send(:un_camel)
       expect(subject.keys.include?('see_also')).to be_truthy
       expect(subject.keys.include?('seeAlso')).to be_falsey
     end
     it 'keeps the right values' do
-      subject.class.un_camel(subject)
+      subject.send(:un_camel)
       expect(subject.send('see_also')).to eq @uri
       expect(subject.send('within')).to eq @within_uri
     end
     it 'keeps things in the same position' do
       see_also_position = subject.keys.index('seeAlso')
       within_position = subject.keys.index('within')
-      subject.class.un_camel(subject)
+      subject.send(:un_camel)
       expect(subject.keys[see_also_position]).to eq 'see_also'
       expect(subject.keys[within_position]).to eq 'within'
     end
