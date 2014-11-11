@@ -1,7 +1,5 @@
 describe IIIF::Presentation::Manifest do
 
-  subject { IIIF::Presentation::Manifest.new }
-
   let(:subclass_subject) do
     Class.new(IIIF::Presentation::Manifest) do
       def initialize(hsh={})
@@ -76,108 +74,16 @@ describe IIIF::Presentation::Manifest do
     end
   end
 
-  describe 'Array only key accessor and mutators' do
-    # This is lame, but we can't access subject from here
-    IIIF::Presentation::Manifest.new.array_only_keys.each do |prop|
-      describe "#{prop}=" do
-        it "sets #{prop}" do
-          ex = [{'label' => 'XYZ'}]
-          subject.send("#{prop}=", ex)
-          expect(subject[prop]).to eq ex
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}=" do
-            ex = [{'label' => 'XYZ'}]
-            subject.send("#{prop.camelize(:lower)}=", ex)
-            expect(subject[prop]).to eq ex
-          end
-        end
-        it 'raises an exception when attempting to set it to something other than an Array' do
-          expect { subject.send("#{prop}=", 'Foo') }.to raise_error IIIF::Presentation::IllegalValueError
-        end
-      end
-      describe "#{prop}" do
-        it "gets #{prop}" do
-          ex = [{'label' => 'XYZ'}]
-          subject[prop] = ex
-          expect(subject.send(prop)).to eq ex
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}" do
-            ex = [{'label' => 'XYZ'}]
-            subject[prop] = ex
-            expect(subject.send("#{prop.camelize(:lower)}")).to eq ex
-          end
-        end
-      end
-    end
+  describe "#{described_class}.define_methods_for_array_only_keys" do
+    it_behaves_like 'it has the appropriate methods for array-only keys'
   end
 
-  describe 'String-only key accessor and mutators' do
-    # This is lame, but we can't access subject from here
-    IIIF::Presentation::Manifest.new.string_only_keys.each do |prop|
-      describe "#{prop}=" do
-        it "sets #{prop}" do
-          ex = 'foo'
-          subject.send("#{prop}=", ex)
-          expect(subject[prop]).to eq ex
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}=" do
-            ex = 'foo'
-            subject.send("#{prop.camelize(:lower)}=", ex)
-            expect(subject[prop]).to eq ex
-          end
-        end
-        it 'raises an exception when attempting to set it to something other than a String' do
-          expect { subject.send("#{prop}=", ['Foo']) }.to raise_error IIIF::Presentation::IllegalValueError
-        end
-      end
-      describe "#{prop}" do
-        it "gets #{prop}" do
-          ex = 'bar'
-          subject[prop] = ex
-          expect(subject.send(prop)).to eq ex
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}" do
-            ex = 'bar'
-            subject[prop] = ex
-            expect(subject.send("#{prop.camelize(:lower)}")).to eq ex
-          end
-        end
-      end
-    end
+  describe "#{described_class}.define_methods_for_string_only_keys" do
+    it_behaves_like 'it has the appropriate methods for string-only keys'
   end
 
-  describe 'Attributes allowed anywhere' do
-    IIIF::Presentation::Manifest.new.any_type_keys.each do |prop|
-      describe "##{prop}=" do
-        it "sets self['#{prop}']" do
-          subject.send("#{prop}=", fixed_values[prop])
-          expect(subject[prop]).to eq fixed_values[prop]
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}=" do
-            subject.send("#{prop.camelize(:lower)}=", fixed_values[prop])
-            expect(subject[prop]).to eq fixed_values[prop]
-          end
-        end
-      end
-
-      describe "##{prop}" do
-        it "gets self[#{prop}]" do
-          subject.send("[]=", prop, fixed_values[prop])
-          expect(subject.send("#{prop}")).to eq fixed_values[prop]
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}" do
-            subject.send("[]=", prop, fixed_values[prop])
-            expect(subject.send("#{prop.camelize(:lower)}")).to eq fixed_values[prop]
-          end
-        end
-      end
-    end
+  describe "#{described_class}.define_methods_for_any_type_keys" do
+    it_behaves_like 'it has the appropriate methods for any-type keys'
   end
 
 end

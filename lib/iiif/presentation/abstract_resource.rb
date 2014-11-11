@@ -17,7 +17,7 @@ module IIIF
         %w{ @type }
       end
 
-      def any_type_keys
+      def any_type_keys # these are allowed on all classes
         %w{ label description thumbnail attribution license logo see_also
         service related within }
       end
@@ -53,7 +53,7 @@ module IIIF
         if self.class == IIIF::Presentation::AbstractResource
           raise "#{self.class} is an abstract class. Please use one of its subclasses."
         end
-        self.define_methods_for_keys(self.any_type_keys)
+        self.define_methods_for_any_type_keys(self.any_type_keys)
         self.define_methods_for_array_only_keys(self.array_only_keys)
         self.define_methods_for_string_only_keys(self.string_only_keys)
         self.define_methods_for_int_only_keys(self.int_only_keys)
@@ -181,7 +181,7 @@ module IIIF
         end
       end
 
-      def define_methods_for_keys(keys)
+      def define_methods_for_any_type_keys(keys)
         keys.each do |key|
           # Setters
           define_singleton_method("#{key}=") do |arg|
