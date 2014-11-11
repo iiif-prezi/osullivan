@@ -57,19 +57,19 @@ module IIIF
         self.define_methods_for_array_only_keys(self.array_only_keys)
         self.define_methods_for_string_only_keys(self.string_only_keys)
         self.define_methods_for_int_only_keys(self.int_only_keys)
+        self.un_camel
       end
 
       # Static methods and alternative constructors
       class << self
         # Parse from a file path, string, or existing hash
         def parse(s)
-          new_instance = new()
           if s.kind_of?(String) && File.exists?(s)
-            new_instance.data = JSON.parse(IO.read(s))
+            return new(JSON.parse(IO.read(s)))
           elsif s.kind_of?(String) && !File.exists?(s)
-            new_instance.data = JSON.parse(s)
+            return new(JSON.parse(s))
           elsif s.kind_of?(Hash)
-            new_instance.data = ActiveSupport::OrderedHash[s]
+            return new(ActiveSupport::OrderedHash[s])
           else
             m = '#parse takes a path to a file, a JSON String, or a Hash, '
             m += "argument was a #{s.class}."
@@ -78,19 +78,6 @@ module IIIF
             end
             raise ArgumentError, m
           end
-          self.un_camel(new_instance) # returns new instance
-        end
-
-        # Static since this intended to be used in contructors only (and we 
-        # can't protect it).
-        def un_camel(resource)
-          resource.keys.each_with_index do |key, i|
-            if key != key.underscore
-              resource.insert(i, key.underscore, resource[key])
-              resource.delete(key)
-            end
-          end
-          resource
         end
       end
 
@@ -146,7 +133,9 @@ module IIIF
         end
       end
 
-      # TODO get these protected
+
+      protected
+
       def data=(hsh)
         @data = hsh
       end
@@ -154,8 +143,6 @@ module IIIF
       def data
         @data
       end
-
-      protected
 
       def tidy_empties
         # * Delete any keys that are empty arrays
@@ -179,6 +166,19 @@ module IIIF
             self.delete(key)
           end
         end
+        self
+      end
+
+      # Static since this intended to be used in contructors only (and we 
+      # can't protect it).
+      def un_camel
+        self.keys.each_with_index do |key, i|
+          if key != key.underscore
+            self.insert(i, key.underscore, self[key])
+            self.delete(key)
+          end
+        end
+        self
       end
 
       def define_methods_for_any_type_keys(keys)
