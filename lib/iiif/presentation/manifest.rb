@@ -14,7 +14,7 @@ module IIIF
         super + %w{ @id label }
       end
 
-      def any_type_keys
+      def string_only_keys
         super + %w{ viewing_direction }
       end
 
