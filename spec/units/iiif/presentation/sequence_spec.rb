@@ -91,7 +91,7 @@ describe IIIF::Presentation::Sequence do
           expect(subject[prop]).to eq ex
         end
         it 'raises an exception when attempting to set it to something other than an Array' do
-          expect { subject.send("#{prop}=", 'Foo') }.to raise_error TypeError
+          expect { subject.send("#{prop}=", 'Foo') }.to raise_error IIIF::Presentation::IllegalValueError
         end
       end
       describe "#{prop}" do
@@ -113,7 +113,7 @@ describe IIIF::Presentation::Sequence do
           expect(subject[prop]).to eq ex
         end
         it 'raises an exception when attempting to set it to something other than a String' do
-          expect { subject.send("#{prop}=", ['Foo']) }.to raise_error TypeError
+          expect { subject.send("#{prop}=", ['Foo']) }.to raise_error IIIF::Presentation::IllegalValueError
         end
       end
       describe "#{prop}" do
