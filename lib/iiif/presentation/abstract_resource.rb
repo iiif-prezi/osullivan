@@ -6,7 +6,7 @@ require 'json'
 
 module IIIF
   module Presentation
-    class AbstractObject
+    class AbstractResource
 
       include IIIF::Presentation::HashBehaviours
       include IIIF::Presentation::UpdateBehaviours
@@ -45,7 +45,7 @@ module IIIF
         unless hsh.has_key?('@context') || !include_context
           self.insert(0, '@context', IIIF::Presentation::CONTEXT)
         end
-        if self.class == IIIF::Presentation::AbstractObject
+        if self.class == IIIF::Presentation::AbstractResource
           raise "#{self.class} is an abstract class. Please use one of its subclasses."
         end
         self.define_methods_for_keys(self.any_type_keys)

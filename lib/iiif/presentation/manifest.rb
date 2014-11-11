@@ -6,7 +6,7 @@ end
 
 module IIIF
   module Presentation
-    class Manifest < AbstractObject
+    class Manifest < AbstractResource
 
       TYPE = 'sc:Manifest'
 

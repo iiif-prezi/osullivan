@@ -1,14 +1,14 @@
 require 'active_support/inflector'
 require 'json'
 
-describe IIIF::Presentation::AbstractObject do
+describe IIIF::Presentation::AbstractResource do
 
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
 
 
-  let(:abstract_object_subclass) do
-    Class.new(IIIF::Presentation::AbstractObject) do
+  let(:abstract_resource_subclass) do
+    Class.new(IIIF::Presentation::AbstractResource) do
       include IIIF::Presentation::HashBehaviours
       def initialize(hsh={}, include_context=false)
         opts = {
@@ -23,11 +23,11 @@ describe IIIF::Presentation::AbstractObject do
     end
   end
 
-  subject { abstract_object_subclass.new }
+  subject { abstract_resource_subclass.new }
 
   describe '#initialize' do
-    it 'raises an error if you try to instantiate AbstractObject' do
-      expect { IIIF::Presentation::AbstractObject.new }.to raise_error(RuntimeError)
+    it 'raises an error if you try to instantiate AbstractResource' do
+      expect { IIIF::Presentation::AbstractResource.new }.to raise_error(RuntimeError)
     end
     it 'sets @type' do
       expect(subject['@type']).to eq 'a:SubClass'
@@ -36,26 +36,26 @@ describe IIIF::Presentation::AbstractObject do
 
   describe 'self.parse' do
     it 'works from a file' do
-      abs_obj = abstract_object_subclass.parse(manifest_from_spec_path)
+      abs_obj = abstract_resource_subclass.parse(manifest_from_spec_path)
       expect(abs_obj['label']).to eq 'Book 1'
     end
     it 'works from a string of JSON' do
       file = File.open(manifest_from_spec_path, 'rb')
       json_string = file.read
       file.close
-      abs_obj = abstract_object_subclass.parse(json_string)
+      abs_obj = abstract_resource_subclass.parse(json_string)
       expect(abs_obj['label']).to eq 'Book 1'
     end
     describe 'works from a hash' do
       it 'plain old' do
         h = JSON.parse(IO.read(manifest_from_spec_path))
-        abs_obj = abstract_object_subclass.parse(h)
+        abs_obj = abstract_resource_subclass.parse(h)
         expect(abs_obj['label']).to eq 'Book 1'
       end
       it 'ActiveSupport::OrderedHash' do
         h = JSON.parse(IO.read(manifest_from_spec_path))
         oh = ActiveSupport::OrderedHash[h]
-        abs_obj = abstract_object_subclass.parse(oh)
+        abs_obj = abstract_resource_subclass.parse(oh)
         expect(abs_obj['label']).to eq 'Book 1'
       end
     end
@@ -173,7 +173,7 @@ describe IIIF::Presentation::AbstractObject do
       expect(subject.keys[within_position]).to eq 'within'
     end
     it 'does its thing in constructors' do
-      abs_obj = abstract_object_subclass.parse(manifest_from_spec_path)
+      abs_obj = abstract_resource_subclass.parse(manifest_from_spec_path)
       expect(abs_obj.keys.include?('see_also')).to be_truthy
       expect(abs_obj.keys.include?('seeAlso')).to be_falsey
     end
