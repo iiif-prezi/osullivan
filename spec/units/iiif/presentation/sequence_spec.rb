@@ -82,91 +82,29 @@ describe IIIF::Presentation::Sequence do
     end
   end
 
-  describe 'Array only key accessor and mutators' do
-    IIIF::Presentation::Sequence.new.array_only_keys.each do |prop|
-      describe "#{prop}=" do
-        it "sets #{prop}" do
-          ex = [{'label' => 'XYZ'}]
-          subject.send("#{prop}=", ex)
-          expect(subject[prop]).to eq ex
-        end
-        it 'raises an exception when attempting to set it to something other than an Array' do
-          expect { subject.send("#{prop}=", 'Foo') }.to raise_error TypeError
-        end
-      end
-      describe "#{prop}" do
-        it "gets #{prop}" do
-          ex = [{'label' => 'XYZ'}]
-          subject[prop] = ex
-          expect(subject.send(prop)).to eq ex
-        end
-      end
+  describe "#{described_class}.define_methods_for_array_only_keys" do
+    it_behaves_like 'it has the appropriate methods for array-only keys'
+  end
+
+  describe "#{described_class}.define_methods_for_string_only_keys" do
+    it_behaves_like 'it has the appropriate methods for string-only keys'
+  end
+
+  describe "#{described_class}.define_methods_for_any_type_keys" do
+    it_behaves_like 'it has the appropriate methods for any-type keys'
+  end
+
+  describe '#validate' do
+    it 'raises an error if viewing_hint isn\'t an allowable value' do
+      subject['viewing_hint'] = 'foo'
+      expect { subject.validate }.to raise_error IIIF::Presentation::IllegalValueError
+    end
+    it 'raises an error if viewing_directon isn\'t an allowable value' do
+      subject['viewing_direction'] = 'foo-to-bar'
+      expect { subject.validate }.to raise_error IIIF::Presentation::IllegalValueError
     end
   end
 
-  describe 'String-only key accessor and mutators' do
-    IIIF::Presentation::Sequence.new.string_only_keys.each do |prop|
-      describe "#{prop}=" do
-        it "sets #{prop}" do
-          ex = 'foo'
-          subject.send("#{prop}=", ex)
-          expect(subject[prop]).to eq ex
-        end
-        it 'raises an exception when attempting to set it to something other than a String' do
-          expect { subject.send("#{prop}=", ['Foo']) }.to raise_error TypeError
-        end
-      end
-      describe "#{prop}" do
-        it "gets #{prop}" do
-          ex = 'bar'
-          subject[prop] = ex
-          expect(subject.send(prop)).to eq ex
-        end
-      end
-    end
-  end
-
-  describe 'Attributes allowed anywhere' do
-    IIIF::Presentation::Sequence.new.any_type_keys.each do |prop|
-      describe "##{prop}=" do
-        it "sets self['#{prop}']" do
-          subject.send("#{prop}=", fixed_values[prop])
-          expect(subject["#{prop}"]).to eq fixed_values[prop]
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}=" do
-            subject.send("#{prop.camelize(:lower)}=", fixed_values[prop])
-            expect(subject["#{prop}"]).to eq fixed_values[prop]
-          end
-        end
-      end
-
-      describe "##{prop}" do
-        it "gets self[#{prop}]" do
-          subject.send("[]=", prop, fixed_values[prop])
-          expect(subject.send("#{prop}")).to eq fixed_values[prop]
-        end
-        if prop.camelize(:lower) != prop
-          it "is aliased as ##{prop.camelize(:lower)}" do
-            subject.send("[]=", prop, fixed_values[prop])
-            expect(subject.send("#{prop.camelize(:lower)}")).to eq fixed_values[prop]
-          end
-        end
-      end
-    end
-
-    describe '#validate' do
-      it 'raises an error if viewing_hint isn\'t an allowable value' do
-        subject['viewing_hint'] = 'foo'
-        expect { subject.validate }.to raise_error IIIF::Presentation::IllegalValueError
-      end
-      it 'raises an error if viewing_directon isn\'t an allowable value' do
-        subject['viewing_direction'] = 'foo-to-bar'
-        expect { subject.validate }.to raise_error IIIF::Presentation::IllegalValueError
-      end
-    end
-
-  end
 
 end
 

@@ -6,24 +6,35 @@ end
 
 module IIIF
   module Presentation
-    class Manifest < AbstractResource
+    class Canvas < AbstractResource
 
-      TYPE = 'sc:Manifest'
+      # TODO (?) a simple 'Image Canvas' constructor.
+
+      TYPE = 'sc:Canvas'
 
       def required_keys
-        super + %w{ @id label }
+        super + %w{ @id width height label }
       end
 
-      def string_only_keys
-        super + %w{ viewing_direction }
+      def any_type_keys
+        super + %w{  }
       end
 
       def array_only_keys
-        super + %w{ sequences structures }
+        super + %w{ images other_content }
+      end
+
+      def string_only_keys
+        super + %w{ viewing_hint }
+      end
+
+      # TODO: test and validate
+      def int_only_keys
+        super + %w{ width height }
       end
 
       def legal_viewing_hint_values
-        %w{individuals paged continuous }
+        super + %w{ non-paged }
       end
 
       def initialize(hsh={})
@@ -32,11 +43,6 @@ module IIIF
         super(hsh)
       end
 
-      def validate
-        super
-      end
-
     end
   end
 end
-
