@@ -33,7 +33,6 @@ module IIIF
       end
 
       def validate
-        # Each sequence must have a label if there is more than one
         super
       end
 

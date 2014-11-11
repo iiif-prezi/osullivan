@@ -8,7 +8,7 @@ module IIIF
   module Presentation
     class Canvas < AbstractResource
 
-      # TODO a simple 'Image Canvas' constructor.
+      # TODO (?) a simple 'Image Canvas' constructor.
 
       TYPE = 'sc:Canvas'
 
@@ -41,11 +41,6 @@ module IIIF
         # make it possible to subclass, possibly with a different @type
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
         super(hsh)
-      end
-
-      def validate
-        # Each sequence must have a label if there is more than one
-        super
       end
 
     end

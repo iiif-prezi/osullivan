@@ -31,10 +31,6 @@ module IIIF
         # TODO here:
         # * Must be at least one canvas
         # * All members of canvases must be a kind of Canvas
-
-        # Covered in AbstractResource
-        # * viewingDirection values
-        # * viewingHint values
         super
       end
 

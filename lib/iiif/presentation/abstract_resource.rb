@@ -112,9 +112,9 @@ module IIIF
 
       def validate
         # TODO:
-        # * Array-only values
-        # * String-only values
-        # * Integer-only values
+        # * type check Array-only values
+        # * type check String-only values
+        # * type check Integer-only values
 
         # Required keys
         self.required_keys.each do |k|
