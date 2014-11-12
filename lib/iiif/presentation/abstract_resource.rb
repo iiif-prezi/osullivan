@@ -1,5 +1,5 @@
 require File.join(File.dirname(__FILE__), 'hash_behaviours')
-require File.join(File.dirname(__FILE__), 'update_behaviours')
+require File.join(File.dirname(__FILE__), '../../active_support/ordered_hash')
 require 'active_support/ordered_hash'
 require 'active_support/inflector'
 require 'json'
@@ -9,7 +9,7 @@ module IIIF
     class AbstractResource
 
       include IIIF::Presentation::HashBehaviours
-      include IIIF::Presentation::UpdateBehaviours
+      # include IIIF::Presentation::UpdateBehaviours
 
       # Every subclass should override the following five methods where 
       # appropriate, see Subclasses for how.
@@ -57,7 +57,7 @@ module IIIF
         self.define_methods_for_array_only_keys(self.array_only_keys)
         self.define_methods_for_string_only_keys(self.string_only_keys)
         self.define_methods_for_int_only_keys(self.int_only_keys)
-        self.un_camel
+        self.snakeize_keys
       end
 
       # Static methods and alternative constructors
@@ -81,26 +81,6 @@ module IIIF
         end
       end
 
-      # Options:
-      #  * sort_json_ld_keys: (true|false). Brings all properties starting with 
-      #      '@'. Default: true. to the top of the document and sorts them.
-      #  * include_context: (true|false). Adds the @context to the top of the
-      #      document if it doesn't exist. Default: true.
-      #  * force: (true|false). Skips validations. 
-      def to_ordered_hash(opts={})
-        sort_json_ld_keys = opts.fetch(:sort_json_ld_keys, true)
-        include_context = opts.fetch(:include_context, true)
-        force = opts.fetch(:force, false)
-        #
-
-        # TODO:  these should be protected static methods that operate on a 
-        # plain-old ordered hash
-        self.tidy_empties
-        self.validate # will this inherit if it's static? Also, make an instance alias of this one so that it can be called at other times.
-        self.un_snake
-        @data
-      end
-
       # Options
       #  * pretty: (true|false). Should the JSON be pretty-printed? (default: false)
       #  * All options available in #to_ordered_hash
@@ -119,7 +99,6 @@ module IIIF
         # * type check Array-only values
         # * type check String-only values
         # * type check Integer-only values
-
         # Required keys
         self.required_keys.each do |k|
           unless self.has_key?(k)
@@ -151,51 +130,59 @@ module IIIF
       end
 
 
-      protected
+      # Options:
+      #  * force: (true|false). Skips validations. 
+      #  * include_context: (true|false). Adds the @context to the top of the
+      #      document if it doesn't exist. Default: true.
+      #  * sort_json_ld_keys: (true|false). Brings all properties starting with 
+      #      '@'. Default: true. to the top of the document and sorts them.
+      def to_ordered_hash(opts={})
+        force = opts.fetch(:force, false)
+        include_context = opts.fetch(:include_context, true)
+        sort_json_ld_keys = opts.fetch(:sort_json_ld_keys, true)
 
+        unless force
+          self.validate
+        end
+
+        if include_context && !self.has_key?('@context')
+          self['@context'] = IIIF::Presentation::CONTEXT
+        end
+
+        export_hash = ActiveSupport::OrderedHash.new
+
+        if sort_json_ld_keys
+          self.keys.select { |k| k.start_with?('@') }.sort!.each do |k|
+            export_hash[k] = self.data[k]
+          end
+        end
+
+        self.keys.each do |k|
+          unless sort_json_ld_keys && k.start_with?('@')
+            if self[k].respond_to?(:to_ordered_hash)
+              opts = {
+                include_context: false,
+                sort_json_ld_keys: sort_json_ld_keys,
+                force: force
+              }
+              export_hash[k] = self.data[k].to_ordered_hash(opts)
+            else
+              export_hash[k] = self.data[k]
+            end
+          end
+        end
+        export_hash.remove_empties
+        export_hash.camelize_keys
+        export_hash
+      end
+
+      protected
       def data=(hsh)
         @data = hsh
       end
 
       def data
         @data
-      end
-
-      def tidy_empties
-        # * Delete any keys that are empty arrays
-        self.keys.each do |key|
-          if self[key].kind_of?(Array) && self[key].empty?
-            self.delete(key)
-          end
-        end
-
-        # TODO:
-        #  * Where possible (i.e. for properties that aren't required to be
-        #    Arrays) make keys that reference one-member arrays reference that
-        #    the array memebr directly (e.g. foo => [bar] becomes foo => bar)
-
-      end
-
-      def un_snake
-        self.keys.each_with_index do |key, i|
-          if key != key.camelize(:lower)
-            self.insert(i, key.camelize(:lower), self[key])
-            self.delete(key)
-          end
-        end
-        self
-      end
-
-      # Static since this intended to be used in contructors only (and we 
-      # can't protect it).
-      def un_camel
-        self.keys.each_with_index do |key, i|
-          if key != key.underscore
-            self.insert(i, key.underscore, self[key])
-            self.delete(key)
-          end
-        end
-        self
       end
 
       def define_methods_for_any_type_keys(keys)

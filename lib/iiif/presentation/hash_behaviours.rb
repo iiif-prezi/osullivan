@@ -1,4 +1,5 @@
 require 'forwardable'
+require File.join(File.dirname(__FILE__), '../../active_support/ordered_hash')
 
 module IIIF
   module Presentation
@@ -12,12 +13,16 @@ module IIIF
       def_delegators :@data,
         :[],
         :[]=,
+        :camelize_keys,
         :delete,
         :empty?,
         :fetch,
         :has_key?,
         :has_value?,
         :include?,
+        :insert,
+        :insert_after,
+        :insert_before,
         :key,
         :key?,
         :keys,
@@ -25,7 +30,9 @@ module IIIF
         :member?,
         :shift,
         :size,
+        :snakeize_keys,
         :store,
+        :unshift,
         :value?,
         :values
 

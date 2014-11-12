@@ -3,6 +3,7 @@
 Dir["#{File.dirname(__FILE__)}/*.rb"].each do |f|
   require f
 end
+require File.join(File.dirname(__FILE__), '../../active_support/ordered_hash')
 
 module IIIF
   module Presentation
