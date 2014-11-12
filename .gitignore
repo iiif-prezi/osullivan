@@ -1,1 +1,4 @@
 coverage/
+pkg/
+Gemfile.lock
+

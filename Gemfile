@@ -1,4 +1,2 @@
-source 'https://rubygems.org'
-
-# Please see osullivan.gemspec for dependency information.
+source "https://rubygems.org"
 gemspec
