@@ -18,9 +18,9 @@ module IIIF
         super + %w{ start_canvas viewing_direction }
       end
 
-      def initialize(hsh={})
+      def initialize(hsh={}, include_context=false)
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
-        super(hsh)
+        super(hsh, include_context)
       end
 
       def legal_viewing_hint_values

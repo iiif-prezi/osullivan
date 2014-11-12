@@ -37,10 +37,9 @@ module IIIF
         super + %w{ non-paged }
       end
 
-      def initialize(hsh={})
-        # make it possible to subclass, possibly with a different @type
+      def initialize(hsh={}, include_context=false)
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
-        super(hsh)
+        super(hsh, include_context)
       end
 
     end

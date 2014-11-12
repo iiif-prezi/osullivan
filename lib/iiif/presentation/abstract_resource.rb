@@ -48,7 +48,7 @@ module IIIF
       def initialize(hsh={}, include_context=false)
         @data = ActiveSupport::OrderedHash[hsh]
         unless hsh.has_key?('@context') || !include_context
-          self.insert(0, '@context', IIIF::Presentation::CONTEXT)
+          self.unshift('@context', IIIF::Presentation::CONTEXT)
         end
         if self.class == IIIF::Presentation::AbstractResource
           raise "#{self.class} is an abstract class. Please use one of its subclasses."
@@ -82,14 +82,28 @@ module IIIF
       end
 
       def to_hash
+        # TODO: go all out and really override this (not just return @data)
+        # In the process:
+        #  * insert the context (recursive calls should take include_context: false)
+        #  * get all of the json-ld properties up to the top
+        #  * take a `force: true|false` argument for skipping validatoins
+        #  * not return something that is a part of the object, but a new OrderedHash instance
+        #  * to_json and to_pretty_json should take the same options
+        #     * maybe to_json should also just take pretty: true|false?
+        #
+        # Use self.keys
+        #
+        # Will need to check for respond_to?(to_ordered_hash) (RENAME THE METHOD)
+        # otherwise just copy Strings, Arrays, and Integers over
+        #    
         self.tidy_empties
         self.validate
         self.un_snake
         @data
       end
-      alias to_h to_hash
 
       def to_json
+        # could add context here, after the hash is made
         self.to_hash.to_json
       end
 

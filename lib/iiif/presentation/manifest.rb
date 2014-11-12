@@ -26,10 +26,10 @@ module IIIF
         %w{individuals paged continuous }
       end
 
-      def initialize(hsh={})
+      def initialize(hsh={}, include_context=false)
         # make it possible to subclass, possibly with a different @type
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
-        super(hsh)
+        super(hsh, include_context)
       end
 
       def validate
