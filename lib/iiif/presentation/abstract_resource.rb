@@ -81,34 +81,37 @@ module IIIF
         end
       end
 
-      def to_hash
-        # TODO: go all out and really override this (not just return @data)
-        # In the process:
-        #  * insert the context (recursive calls should take include_context: false)
-        #  * get all of the json-ld properties up to the top
-        #  * take a `force: true|false` argument for skipping validatoins
-        #  * not return something that is a part of the object, but a new OrderedHash instance
-        #  * to_json and to_pretty_json should take the same options
-        #     * maybe to_json should also just take pretty: true|false?
+      # Options:
+      #  * sort_json_ld_keys: (true|false). Brings all properties starting with 
+      #      '@'. Default: true. to the top of the document and sorts them.
+      #  * include_context: (true|false). Adds the @context to the top of the
+      #      document if it doesn't exist. Default: true.
+      #  * force: (true|false). Skips validations. 
+      def to_ordered_hash(opts={})
+        sort_json_ld_keys = opts.fetch(:sort_json_ld_keys, true)
+        include_context = opts.fetch(:include_context, true)
+        force = opts.fetch(:force, false)
         #
-        # Use self.keys
-        #
-        # Will need to check for respond_to?(to_ordered_hash) (RENAME THE METHOD)
-        # otherwise just copy Strings, Arrays, and Integers over
-        #    
+
+        # TODO:  these should be protected static methods that operate on a 
+        # plain-old ordered hash
         self.tidy_empties
-        self.validate
+        self.validate # will this inherit if it's static? Also, make an instance alias of this one so that it can be called at other times.
         self.un_snake
         @data
       end
 
-      def to_json
+      # Options
+      #  * pretty: (true|false). Should the JSON be pretty-printed? (default: false)
+      #  * All options available in #to_ordered_hash
+      def to_json(opts={})
         # could add context here, after the hash is made
-        self.to_hash.to_json
-      end
-
-      def to_pretty_json
-        JSON.pretty_generate(self.to_hash)
+        hsh = self.to_ordered_hash(opts)
+        if opts.fetch(:pretty, false)
+          JSON.pretty_generate(hsh)
+        else
+          hsh.to_json
+        end
       end
 
       def validate

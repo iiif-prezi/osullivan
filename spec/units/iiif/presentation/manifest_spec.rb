@@ -60,17 +60,17 @@ describe IIIF::Presentation::Manifest do
   describe '#validate' do
     it 'raises an error if there is no @id' do
       subject.label = 'Book 1'
-      expect { subject.to_hash }.to raise_error IIIF::Presentation::MissingRequiredKeyError
+      expect { subject.validate }.to raise_error IIIF::Presentation::MissingRequiredKeyError
     end
     it 'raises an error if there is no label' do
       subject['@id'] = 'http://www.example.org/iiif/book1/manifest'
-      expect { subject.to_hash }.to raise_error IIIF::Presentation::MissingRequiredKeyError
+      expect { subject.validate }.to raise_error IIIF::Presentation::MissingRequiredKeyError
     end
     it 'raises an error if there is no @type' do
       subject.delete('@type')
       subject.label = 'Book 1'
       subject['@id'] = 'http://www.example.org/iiif/book1/manifest'
-      expect { subject.to_hash }.to raise_error IIIF::Presentation::MissingRequiredKeyError
+      expect { subject.validate }.to raise_error IIIF::Presentation::MissingRequiredKeyError
     end
   end
 

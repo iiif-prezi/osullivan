@@ -66,14 +66,14 @@ describe IIIF::Presentation::AbstractResource do
     end
   end
 
-  describe 'A nested object (e.g. self[\'metdata\']' do
+  describe 'A nested object (e.g. self[\'metdata\'])' do
     it 'returns [] if not set' do
       expect(subject.metadata).to eq([])
     end
-    it 'is not in #to_hash at all if access it but do not append to it' do
+    it 'is not in #to_ordered_hash at all if we access it but do not append to it' do
       subject.metadata # touch it
       expect(subject.metadata).to eq([])
-      expect(subject.to_hash.has_key?('metadata')).to be_falsey
+      expect(subject.to_ordered_hash.has_key?('metadata')).to be_falsey
     end
     it 'gets structured as we\'d expect' do
       subject.metadata << {
@@ -104,7 +104,7 @@ describe IIIF::Presentation::AbstractResource do
         ]
       }
       File.open('/tmp/osullivan-spec.json','w') do |f|
-        f.write(subject.to_pretty_json)
+        f.write(subject.to_json)
       end
       parsed = subject.class.parse('/tmp/osullivan-spec.json')
       expect(parsed.metadata[0]['label']).to eq('Author')
@@ -148,7 +148,7 @@ describe IIIF::Presentation::AbstractResource do
       expect(subject.keys[within_position]).to eq 'within'
     end
     it 'does its thing when we marshal' do
-      hsh = subject.to_hash
+      hsh = subject.to_ordered_hash
       expect(hsh.keys.include?('seeAlso')).to be_truthy
     end
   end
