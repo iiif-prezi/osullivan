@@ -1,8 +1,7 @@
-# Doing this to make Travis happy. It seems to not always find everything if
-# the tests run in the wrong order
 Dir["#{File.dirname(__FILE__)}/*.rb"].each do |f|
   require f
 end
+require File.join(File.dirname(__FILE__), '../../active_support/ordered_hash')
 
 module IIIF
   module Presentation
@@ -27,7 +26,6 @@ module IIIF
       end
 
       def initialize(hsh={})
-        # make it possible to subclass, possibly with a different @type
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
         super(hsh)
       end

@@ -9,12 +9,12 @@ describe IIIF::Presentation::AbstractResource do
     Class.new(IIIF::Presentation::AbstractResource) do
       include IIIF::Presentation::HashBehaviours
 
-      def initialize(hsh={}, include_context=false)
+      def initialize(hsh={})
         hsh['@type'] = 'a:SubClass' unless hsh.has_key?('@type')
-        unless hsh.has_key?('@id')
-          hsh['@id'] = 'http://example.com/prefix/manifest/123'
-        end
-        super(hsh, true)
+        # unless hsh.has_key?('@id')
+        #   hsh['@id'] = 'http://example.com/prefix/manifest/123'
+        # end
+        super(hsh)
       end
 
       def required_keys
@@ -23,7 +23,11 @@ describe IIIF::Presentation::AbstractResource do
     end
   end
 
-  subject { abstract_resource_subclass.new }
+  subject do
+    instance = abstract_resource_subclass.new 
+    instance['@id'] = 'http://example.com/prefix/manifest/123'
+    instance
+  end
 
   describe '#initialize' do
     it 'raises an error if you try to instantiate AbstractResource' do
@@ -64,16 +68,21 @@ describe IIIF::Presentation::AbstractResource do
         expect(abs_obj['label']).to eq 'Book 1'
       end
     end
+    it 'turns camels to snakes' do
+      abs_obj = abstract_resource_subclass.parse(manifest_from_spec_path)
+      expect(abs_obj.keys.include?('see_also')).to be_truthy
+      expect(abs_obj.keys.include?('seeAlso')).to be_falsey
+    end
   end
 
-  describe 'A nested object (e.g. self[\'metdata\']' do
+  describe 'A nested object (e.g. self[\'metdata\'])' do
     it 'returns [] if not set' do
       expect(subject.metadata).to eq([])
     end
-    it 'is not in #to_hash at all if access it but do not append to it' do
+    it 'is not in #to_ordered_hash at all if we access it but do not append to it' do
       subject.metadata # touch it
       expect(subject.metadata).to eq([])
-      expect(subject.to_hash.has_key?('metadata')).to be_falsey
+      expect(subject.to_ordered_hash.has_key?('metadata')).to be_falsey
     end
     it 'gets structured as we\'d expect' do
       subject.metadata << {
@@ -104,7 +113,7 @@ describe IIIF::Presentation::AbstractResource do
         ]
       }
       File.open('/tmp/osullivan-spec.json','w') do |f|
-        f.write(subject.to_pretty_json)
+        f.write(subject.to_json)
       end
       parsed = subject.class.parse('/tmp/osullivan-spec.json')
       expect(parsed.metadata[0]['label']).to eq('Author')
@@ -123,66 +132,98 @@ describe IIIF::Presentation::AbstractResource do
     end
   end
 
-  describe '#un_snake (protected)' do
-    before(:each) do
-      @uri = 'http://www.example.org/descriptions/book1.xml'
-      @within_uri = 'http://www.example.org/collections/books/'
-      subject.see_also = @uri
-      subject.within = @within_uri
-    end
-    it 'changes snake_case keys to camelCase' do
-      subject.send(:un_snake) # #send gets past protection
-      expect(subject.keys.include?('seeAlso')).to be_truthy
-      expect(subject.keys.include?('see_also')).to be_falsey
-    end
-    it 'keeps the right values' do
-      subject.send(:un_snake)
-      expect(subject['seeAlso']).to eq @uri
-      expect(subject['within']).to eq @within_uri
-    end
-    it 'keeps things in the same position' do
-      see_also_position = subject.keys.index('see_also')
-      within_position = subject.keys.index('within')
-      subject.send(:un_snake)
-      expect(subject.keys[see_also_position]).to eq 'seeAlso'
-      expect(subject.keys[within_position]).to eq 'within'
-    end
-    it 'does its thing when we marshal' do
-      hsh = subject.to_hash
-      expect(hsh.keys.include?('seeAlso')).to be_truthy
-    end
-  end
+  describe '#to_ordered_hash' do
+    let(:logo_uri) { 'http://www.example.org/logos/institution1.jpg' }
+    let(:within_uri) { 'http://www.example.org/collections/books/' }
+    let(:see_also) { 'http://www.example.org/library/catalog/book1.xml' }
 
-  describe '#un_camel (protected)' do
-    before(:each) do
-      @uri = 'http://www.example.org/descriptions/book1.xml'
-      @within_uri = 'http://www.example.org/collections/books/'
-      subject['seeAlso'] = @uri
-      subject['within'] = @within_uri
-    end
-    it 'changes camelCase keys to snake_case' do
-      subject.send(:un_camel)
-      expect(subject.keys.include?('see_also')).to be_truthy
-      expect(subject.keys.include?('seeAlso')).to be_falsey
-    end
-    it 'keeps the right values' do
-      subject.send(:un_camel)
-      expect(subject.send('see_also')).to eq @uri
-      expect(subject.send('within')).to eq @within_uri
-    end
-    it 'keeps things in the same position' do
-      see_also_position = subject.keys.index('seeAlso')
-      within_position = subject.keys.index('within')
-      subject.send(:un_camel)
-      expect(subject.keys[see_also_position]).to eq 'see_also'
-      expect(subject.keys[within_position]).to eq 'within'
-    end
-    it 'does its thing in constructors' do
-      abs_obj = abstract_resource_subclass.parse(manifest_from_spec_path)
-      expect(abs_obj.keys.include?('see_also')).to be_truthy
-      expect(abs_obj.keys.include?('seeAlso')).to be_falsey
+    describe 'runs the validations' do
+      let(:error) { IIIF::Presentation::MissingRequiredKeyError }
+      before(:each) { subject.delete('@id') }
+      it 'raises exceptions' do
+        expect { subject.to_ordered_hash }.to raise_error error
+      end
+      it 'unless you tell it not to' do
+        expect { subject.to_ordered_hash(force: true) }.to_not raise_error
+      end
     end
 
+    describe 'adds the @context' do
+      before(:each) { subject.delete('@context') }
+      it 'by default' do
+        expect(subject.has_key?('@context')).to be_falsey
+        expect(subject.to_ordered_hash.has_key?('@context')).to be_truthy
+      end
+      it 'unless you say not to' do
+        expect(subject.has_key?('@context')).to be_falsey
+        expect(subject.to_ordered_hash(include_context: false).has_key?('@context')).to be_falsey
+      end
+      it 'or it\'s already there' do
+        different_ctxt = 'http://example.org/context'
+        subject['@context'] = different_ctxt
+        oh = subject.to_ordered_hash
+        expect(oh['@context']).to eq different_ctxt
+      end
+    end
+
+    describe 'it puts the json-ld keys at the top' do
+      let(:extra_props) { [ 
+        ['label','foo'], 
+        ['logo','http://example.com/logo.jpg'],
+        ['within','http://example.com/something']
+      ] }
+      let(:sorted_ld_keys) { 
+        subject.keys.select { |k| k.start_with?('@') }.sort!
+      }
+      before(:each) { 
+        extra_props.reverse.each do |k,v| 
+          subject.unshift(k,v) 
+        end
+      }
+
+      it 'by default' do
+        (0..extra_props.length-1).each do |i|
+          expect(subject.keys[i]).to eq(extra_props[i][0])
+        end
+        oh = subject.to_ordered_hash
+        (0..sorted_ld_keys.length-1).each do |i|
+          expect(oh.keys[i]).to eq(sorted_ld_keys[i])
+        end
+      end
+      it 'unless you say not to' do
+        (0..extra_props.length-1).each do |i|
+          expect(subject.keys[i]).to eq(extra_props[i][0])
+        end
+        oh = subject.to_ordered_hash(sort_json_ld_keys: false)
+        (0..extra_props.length-1).each do |i|
+          expect(oh.keys[i]).to eq(extra_props[i][0])
+        end
+      end
+    end
+
+    describe 'removes empty keys' do
+      it 'if they\'re arrays' do
+        subject.logo = logo_uri
+        subject.within = []
+        ordered_hash = subject.to_ordered_hash
+        expect(ordered_hash.has_key?('within')).to be_falsey
+      end
+      it 'if they\'re nil' do
+        subject.logo = logo_uri
+        subject.within = nil
+        ordered_hash = subject.to_ordered_hash
+        expect(ordered_hash.has_key?('within')).to be_falsey
+      end
+    end
+
+    it 'converts snake_case keys to camelCase' do
+      subject['see_also'] = logo_uri
+      subject['within'] = within_uri
+      ordered_hash = subject.to_ordered_hash
+      expect(ordered_hash.keys.include?('seeAlso')).to be_truthy
+    end
+
+    
   end
 
 
