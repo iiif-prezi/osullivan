@@ -81,18 +81,6 @@ module IIIF
         end
       end
 
-      # Options
-      #  * pretty: (true|false). Should the JSON be pretty-printed? (default: false)
-      #  * All options available in #to_ordered_hash
-      def to_json(opts={})
-        # could add context here, after the hash is made
-        hsh = self.to_ordered_hash(opts)
-        if opts.fetch(:pretty, false)
-          JSON.pretty_generate(hsh)
-        else
-          hsh.to_json
-        end
-      end
 
       def validate
         # TODO:
@@ -129,6 +117,18 @@ module IIIF
         end
       end
 
+      # Options
+      #  * pretty: (true|false). Should the JSON be pretty-printed? (default: false)
+      #  * All options available in #to_ordered_hash
+      def to_json(opts={})
+        # could add context here, after the hash is made
+        hsh = self.to_ordered_hash(opts)
+        if opts.fetch(:pretty, false)
+          JSON.pretty_generate(hsh)
+        else
+          hsh.to_json
+        end
+      end
 
       # Options:
       #  * force: (true|false). Skips validations. 

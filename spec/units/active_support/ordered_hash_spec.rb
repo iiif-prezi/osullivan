@@ -136,6 +136,20 @@ describe ActiveSupport::OrderedHash do
         expect(subject.unshift('thud','wibble')).to be subject
       end
     end
+
+    describe '#remove_empties' do
+      it 'if they\'re arrays' do
+        subject[:wubble] = []
+        subject.remove_empties
+        expect(subject.has_key?(:wubble)).to be_falsey
+      end
+      it 'if they\'re nil' do
+        subject[:wubble] = nil
+        subject.remove_empties
+        expect(subject.has_key?(:wubble)).to be_falsey
+      end
+    end
+
   end
 end
 

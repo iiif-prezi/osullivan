@@ -79,7 +79,7 @@ module ActiveSupport
     # Delete any keys that are empty arrays
     def remove_empties
       self.keys.each do |key|
-        if self[key].kind_of?(Array) && self[key].empty?
+        if (self[key].kind_of?(Array) && self[key].empty?) || self[key].nil?
           self.delete(key)
         end
       end

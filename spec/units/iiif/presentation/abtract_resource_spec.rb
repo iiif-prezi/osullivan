@@ -11,9 +11,9 @@ describe IIIF::Presentation::AbstractResource do
 
       def initialize(hsh={}, include_context=false)
         hsh['@type'] = 'a:SubClass' unless hsh.has_key?('@type')
-        unless hsh.has_key?('@id')
-          hsh['@id'] = 'http://example.com/prefix/manifest/123'
-        end
+        # unless hsh.has_key?('@id')
+        #   hsh['@id'] = 'http://example.com/prefix/manifest/123'
+        # end
         super(hsh, true)
       end
 
@@ -23,7 +23,11 @@ describe IIIF::Presentation::AbstractResource do
     end
   end
 
-  subject { abstract_resource_subclass.new }
+  subject do
+    instance = abstract_resource_subclass.new 
+    instance['@id'] = 'http://example.com/prefix/manifest/123'
+    instance
+  end
 
   describe '#initialize' do
     it 'raises an error if you try to instantiate AbstractResource' do
@@ -129,12 +133,97 @@ describe IIIF::Presentation::AbstractResource do
   end
 
   describe '#to_ordered_hash' do
+    let(:logo_uri) { 'http://www.example.org/logos/institution1.jpg' }
+    let(:within_uri) { 'http://www.example.org/collections/books/' }
+    let(:see_also) { 'http://www.example.org/library/catalog/book1.xml' }
+
+    describe 'runs the validations' do
+      let(:error) { IIIF::Presentation::MissingRequiredKeyError }
+      before(:each) { subject.delete('@id') }
+      it 'raises exceptions' do
+        expect { subject.to_ordered_hash }.to raise_error error
+      end
+      it 'unless you tell it not to' do
+        expect { subject.to_ordered_hash(force: true) }.to_not raise_error
+      end
+    end
+
+    describe 'adds the @context' do
+      before(:each) { subject.delete('@context') }
+      it 'by default' do
+        expect(subject.has_key?('@context')).to be_falsey
+        expect(subject.to_ordered_hash.has_key?('@context')).to be_truthy
+      end
+      it 'unless you say not to' do
+        expect(subject.has_key?('@context')).to be_falsey
+        expect(subject.to_ordered_hash(include_context: false).has_key?('@context')).to be_falsey
+      end
+      it 'or it\'s already there' do
+        different_ctxt = 'http://example.org/context'
+        subject['@context'] = different_ctxt
+        oh = subject.to_ordered_hash
+        expect(oh['@context']).to eq different_ctxt
+      end
+    end
+
+    describe 'it puts the json-ld keys at the top' do
+      let(:extra_props) { [ 
+        ['label','foo'], 
+        ['logo','http://example.com/logo.jpg'],
+        ['within','http://example.com/something']
+      ] }
+      let(:sorted_ld_keys) { 
+        subject.keys.select { |k| k.start_with?('@') }.sort!
+      }
+      before(:each) { 
+        extra_props.reverse.each do |k,v| 
+          subject.unshift(k,v) 
+        end
+      }
+
+      it 'by default' do
+        (0..extra_props.length-1).each do |i|
+          expect(subject.keys[i]).to eq(extra_props[i][0])
+        end
+        oh = subject.to_ordered_hash
+        (0..sorted_ld_keys.length-1).each do |i|
+          expect(oh.keys[i]).to eq(sorted_ld_keys[i])
+        end
+      end
+      it 'unless you say not to' do
+        (0..extra_props.length-1).each do |i|
+          expect(subject.keys[i]).to eq(extra_props[i][0])
+        end
+        oh = subject.to_ordered_hash(sort_json_ld_keys: false)
+        (0..extra_props.length-1).each do |i|
+          expect(oh.keys[i]).to eq(extra_props[i][0])
+        end
+      end
+    end
+
+    describe 'removes empty keys' do
+      it 'if they\'re arrays' do
+        subject.logo = logo_uri
+        subject.within = []
+        ordered_hash = subject.to_ordered_hash
+        expect(ordered_hash.has_key?('within')).to be_falsey
+      end
+      it 'if they\'re nil' do
+        subject.logo = logo_uri
+        subject.within = nil
+        ordered_hash = subject.to_ordered_hash
+        expect(ordered_hash.has_key?('within')).to be_falsey
+      end
+    end
+
     it 'converts snake_case keys to camelCase' do
-      subject['see_also'] = @uri
-      subject['within'] = @within_uri
+      subject['see_also'] = logo_uri
+      subject['within'] = within_uri
       ordered_hash = subject.to_ordered_hash
       expect(ordered_hash.keys.include?('seeAlso')).to be_truthy
     end
+
+    
   end
 
 
