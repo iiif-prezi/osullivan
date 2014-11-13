@@ -9,12 +9,12 @@ describe IIIF::Presentation::AbstractResource do
     Class.new(IIIF::Presentation::AbstractResource) do
       include IIIF::Presentation::HashBehaviours
 
-      def initialize(hsh={}, include_context=false)
+      def initialize(hsh={})
         hsh['@type'] = 'a:SubClass' unless hsh.has_key?('@type')
         # unless hsh.has_key?('@id')
         #   hsh['@id'] = 'http://example.com/prefix/manifest/123'
         # end
-        super(hsh, true)
+        super(hsh)
       end
 
       def required_keys

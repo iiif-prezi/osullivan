@@ -45,11 +45,8 @@ module IIIF
       #   Order is only guaranteed if an ActiveSupport::OrderedHash is passed.
       # @param [boolean] include_context (default: false). Pass true if the'
       #   context should be included.
-      def initialize(hsh={}, include_context=false)
+      def initialize(hsh={})
         @data = ActiveSupport::OrderedHash[hsh]
-        unless hsh.has_key?('@context') || !include_context
-          self.unshift('@context', IIIF::Presentation::CONTEXT)
-        end
         if self.class == IIIF::Presentation::AbstractResource
           raise "#{self.class} is an abstract class. Please use one of its subclasses."
         end
@@ -121,7 +118,6 @@ module IIIF
       #  * pretty: (true|false). Should the JSON be pretty-printed? (default: false)
       #  * All options available in #to_ordered_hash
       def to_json(opts={})
-        # could add context here, after the hash is made
         hsh = self.to_ordered_hash(opts)
         if opts.fetch(:pretty, false)
           JSON.pretty_generate(hsh)

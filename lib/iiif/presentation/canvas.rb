@@ -37,9 +37,9 @@ module IIIF
         super + %w{ non-paged }
       end
 
-      def initialize(hsh={}, include_context=false)
+      def initialize(hsh={})
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
-        super(hsh, include_context)
+        super(hsh)
       end
 
     end
