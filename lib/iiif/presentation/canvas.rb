@@ -1,7 +1,5 @@
-Dir["#{File.dirname(__FILE__)}/*.rb"].each do |f|
-  require f
-end
 require File.join(File.dirname(__FILE__), '../../active_support/ordered_hash')
+require File.join(File.dirname(__FILE__), 'abstract_resource')
 
 
 module IIIF
@@ -24,10 +22,6 @@ module IIIF
         super + %w{ images other_content }
       end
 
-      def string_only_keys
-        super + %w{ viewing_hint }
-      end
-
       # TODO: test and validate
       def int_only_keys
         super + %w{ width height }
@@ -40,6 +34,12 @@ module IIIF
       def initialize(hsh={})
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
         super(hsh)
+      end
+
+      def validate
+        # all members of images must be an annotation
+        # all members of otherContent must be an annotation list
+        super
       end
 
     end
