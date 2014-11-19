@@ -1,5 +1,15 @@
-Dir["#{File.join(File.dirname(__FILE__), 'presentation')}/*.rb"].each do |f|
-  require f
+%w{
+service 
+  abstract_resource 
+    annotation 
+    canvas 
+    hash_behaviours  
+    manifest
+    resource 
+      image_resource 
+    sequence 
+}.each do |f|
+  require File.join(File.dirname(__FILE__), 'presentation', f)
 end
 require File.join(File.dirname(__FILE__), '../active_support/ordered_hash')
 
@@ -11,8 +21,3 @@ module IIIF
     class IllegalValueError < StandardError; end
   end
 end
-
-# p = IIIF::Presentation::Manifest.new
-# puts p.methods
-
-

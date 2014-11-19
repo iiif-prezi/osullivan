@@ -1,7 +1,4 @@
-Dir["#{File.dirname(__FILE__)}/*.rb"].each do |f|
-  require f
-end
-require File.join(File.dirname(__FILE__), '../../active_support/ordered_hash')
+require File.join(File.dirname(__FILE__), 'abstract_resource')
 
 module IIIF
   module Presentation
@@ -22,7 +19,7 @@ module IIIF
       end
 
       def legal_viewing_hint_values
-        %w{individuals paged continuous }
+        %w{ individuals paged continuous }
       end
 
       def initialize(hsh={})
@@ -31,6 +28,8 @@ module IIIF
       end
 
       def validate
+        # TODO: check types of sequences and structure members
+
         super
       end
 
