@@ -1,7 +1,8 @@
 %w{
 service 
   abstract_resource 
-    annotation 
+    annotation
+    annotation_list
     canvas 
     hash_behaviours  
     manifest
