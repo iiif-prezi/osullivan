@@ -33,12 +33,13 @@ module IIIF
       class << self
         # Parse from a file path, string, or existing hash
         def parse(s)
+          ordered_hash = nil
           if s.kind_of?(String) && File.exists?(s)
-            return new(JSON.parse(IO.read(s)))
+            ordered_hash = ActiveSupport::OrderedHash[JSON.parse(IO.read(s))]
           elsif s.kind_of?(String) && !File.exists?(s)
-            return new(JSON.parse(s))
+            ordered_hash = ActiveSupport::OrderedHash[JSON.parse(s)]
           elsif s.kind_of?(Hash)
-            return new(ActiveSupport::OrderedHash[s])
+            ordered_hash = ActiveSupport::OrderedHash[s]
           else
             m = '#parse takes a path to a file, a JSON String, or a Hash, '
             m += "argument was a #{s.class}."
@@ -47,6 +48,7 @@ module IIIF
             end
             raise ArgumentError, m
           end
+          return Service.from_ordered_hash(ordered_hash)
         end
       end
 
@@ -125,22 +127,67 @@ module IIIF
         }
         self.keys.each do |k|
           unless sort_json_ld_keys && k.start_with?('@')
-
-            if self.data[k].respond_to?(:to_ordered_hash)
+            if self.data[k].respond_to?(:to_ordered_hash) #.respond_to?(:to_ordered_hash)
               export_hash[k] = self.data[k].to_ordered_hash(sub_opts)
-            elsif self.data[k].kind_of?(Array)
-              export_hash[k] = []
-              self.data[k].each do |member|
-                if member.respond_to?(:to_ordered_hash)
-                  export_hash[k] << member.to_ordered_hash(sub_opts)
+
+            elsif self.data[k].kind_of?(Hash)
+              export_hash[k] = ActiveSupport::OrderedHash.new
+              self.data[k].each do |sub_k, v|
+
+                if v.respond_to?(:to_ordered_hash)
+                  export_hash[k][sub_k] = v.to_ordered_hash(sub_opts)
+
+                elsif v.kind_of?(Array)
+                  export_hash[k][sub_k] = []
+                  v.each do |member|
+                    if member.respond_to?(:to_ordered_hash)
+                      export_hash[k][sub_k] << member.to_ordered_hash(sub_opts)
+                    else
+                      export_hash[k][sub_k] << member
+                    end
+                  end
                 else
-                  export_hash[k] << member
+                  export_hash[k][sub_k] = v
                 end
               end
 
+            elsif self.data[k].kind_of?(Array)
+              export_hash[k] = []
+
+              self.data[k].each do |member|
+                if member.respond_to?(:to_ordered_hash)
+                  export_hash[k] << member.to_ordered_hash(sub_opts)
+
+                elsif member.kind_of?(Hash)
+                  hsh = ActiveSupport::OrderedHash.new
+                  export_hash[k] << hsh
+                  member.each do |sub_k,v|
+
+                    if v.respond_to?(:to_ordered_hash)
+                      hsh[sub_k] = v.to_ordered_hash(sub_opts)
+
+                    elsif v.kind_of?(Array)
+                      hsh[sub_k] = []
+
+                      v.each do |sub_member|
+                        if sub_member.respond_to?(:to_ordered_hash)
+                          hsh[sub_k] << sub_member.to_ordered_hash(sub_opts)
+                        else
+                          hsh[sub_k] << sub_member
+                        end
+                      end
+                    else
+                      hsh[sub_k] = v
+                    end
+                  end
+
+                else
+                  export_hash[k] << member
+                  # there are no nested arrays, right?
+                end
+              end
             else
               export_hash[k] = self.data[k]
-              
             end
 
           end
@@ -150,7 +197,56 @@ module IIIF
         export_hash
       end
 
+      def self.from_ordered_hash(hsh, default_klass=ActiveSupport::OrderedHash)
+        # Create a new object (new_object)
+        type = nil
+        if hsh.has_key?('@type')
+          type = Service.get_descendant_class_by_jld_type(hsh['@type'])
+        end
+        new_object = type.nil? ? default_klass.new : type.new
+
+        hsh.keys.each do |key|
+          new_key = key.underscore == key ? key : key.underscore
+          if new_key == 'service'
+            new_object[new_key] = Service.from_ordered_hash(hsh[key], IIIF::Presentation::Service)
+          elsif new_key == 'resource'
+            new_object[new_key] = Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
+          elsif hsh[key].kind_of?(Hash)
+            new_object[new_key] = Service.from_ordered_hash(hsh[key])
+          elsif hsh[key].kind_of?(Array)
+            new_object[new_key] = []
+            hsh[key].each do |member|
+              if new_key == 'service'
+                new_object[new_key] << Service.from_ordered_hash(member, IIIF::Presentation::Service)
+              elsif member.kind_of?(Hash)
+                new_object[new_key] << Service.from_ordered_hash(member)
+              else
+                new_object[new_key] << member
+                # Again, no nested arrays, right?
+              end
+            end
+          else
+            new_object[new_key] = hsh[key]
+          end
+        end
+        new_object
+      end
+
       protected
+
+      def self.get_descendant_class_by_jld_type(type)
+        Service.all_service_subclasses.select { |klass|
+          klass.const_defined?(:TYPE) && klass.const_get(:TYPE) == type
+        }.first
+      end
+
+      # All known subclasses of service.
+      def self.all_service_subclasses
+        klass = IIIF::Presentation::Service
+        # !c.name.nil? filters out classes that rspec creates for some reason;
+        # this condition isn't necessary when using the API, afaik
+        descendants = ObjectSpace.each_object(Class).select { |c| c < klass && !c.name.nil? }
+      end
 
       def data=(hsh)
         @data = hsh
@@ -318,6 +414,7 @@ module IIIF
     end
   end
 end
+
 
 
 

@@ -4,6 +4,8 @@ module IIIF
   module Presentation
     class ImageResource < Resource
 
+      TYPE = 'dctypes:Image'
+
       def int_only_keys
         super + %w{ width height }
       end

@@ -65,6 +65,7 @@ describe IIIF::Presentation::AbstractResource do
       expect(subject.metadata[1]['value'].length).to eq(2)
       expect(subject.metadata[1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
     end
+
     it 'roundtrips' do
       subject.metadata << {
         'label' => 'Author',
@@ -81,9 +82,6 @@ describe IIIF::Presentation::AbstractResource do
         f.write(subject.to_json)
       end
       parsed = subject.class.parse('/tmp/osullivan-spec.json')
-      expect(parsed.metadata[0]['label']).to eq('Author')
-      expect(parsed.metadata[1]['value'].length).to eq(2)
-      expect(parsed.metadata[1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
       expect(parsed['metadata'][0]['label']).to eq('Author')
       expect(parsed['metadata'][1]['value'].length).to eq(2)
       expect(parsed['metadata'][1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
