@@ -11,10 +11,9 @@ After you've installed the gem (not yet published. Clone and do `rake:install`:
 ```ruby
 require 'iiif/presentation'
 
-
 seed = {
-	'@id' => 'http://example.com/manifest',
-	'label' => 'My Manifest'
+    '@id' => 'http://example.com/manifest',
+    'label' => 'My Manifest'
 }
 # Any options you add are added to the object
 manifest = IIIF::Presentation::Manifest.new(seed)
@@ -39,7 +38,7 @@ puts manifest.to_json(pretty: true)
 
 Methods are generated dynamically, which means `#methods` is your friend:
 
-```
+```ruby
 manifest = IIIF::Presentation::Manifest.new()
 puts manifest.methods(false)
 > label=
@@ -123,7 +122,8 @@ seed = '{
       ]
     }
   ]
-  
+}'
+
 obj = IIIF::Presentation::Service.parse(seed) # can also be a file path or a Hash
 puts obj.class
 puts obj.seeAlso.class
@@ -155,7 +155,6 @@ puts canvas.to_json(pretty: true)
 
 but you can skip this validation by adding `force: true`:
 
-
 ```ruby
 canvas = IIIF::Presentation::Canvas.new('@id' => 'http://example.com/canvas')
 puts canvas.to_json(pretty: true, force: true)
@@ -166,4 +165,4 @@ puts canvas.to_json(pretty: true, force: true)
 >   "@type": "sc:Canvas"
 > }
 ```
-This all needs tidying up.
+This all needs a bit of tidying up, finishing , and refactoring, so expect it to change.
