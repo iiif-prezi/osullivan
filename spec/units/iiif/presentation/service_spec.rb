@@ -1,8 +1,6 @@
 require 'active_support/inflector'
 require 'json'
 
-
-
 describe IIIF::Presentation::Service do
 
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
@@ -38,6 +36,113 @@ describe IIIF::Presentation::Service do
       expect(s.keys.include?('see_also')).to be_truthy
       expect(s.keys.include?('seeAlso')).to be_falsey
     end
+  end
+
+  describe 'self#get_descendant_class_by_jld_type' do
+    it 'gets the right class' do
+      klass = described_class.get_descendant_class_by_jld_type('sc:Canvas')
+      expect(klass).to be IIIF::Presentation::Canvas
+    end
+  end
+
+  describe 'self#from_ordered_hash' do
+    let(:fixture) { JSON.parse('{
+        "@context": "http://iiif.io/api/presentation/2/context.json",
+        "@id": "http://example.com/manifest",
+        "@type": "sc:Manifest",
+        "label": "My Manifest",
+        "service": {
+          "@context": "http://iiif.io/api/image/2/context.json",
+          "@id":"http://www.example.org/images/book1-page1",
+          "profile":"http://iiif.io/api/image/2/profiles/level2.json"
+        },
+        "some_other_thing": {
+          "foo" : "bar"
+        },
+        "seeAlso": {
+          "@id": "http://www.example.org/library/catalog/book1.marc",
+          "format": "application/marc"
+        },
+        "sequences": [
+          {
+            "@id":"http://www.example.org/iiif/book1/sequence/normal",
+            "@type":"sc:Sequence",
+            "label":"Current Page Order",
+
+            "viewingDirection":"left-to-right",
+            "viewingHint":"paged",
+            "startCanvas": "http://www.example.org/iiif/book1/canvas/p2",
+
+            "canvases": [
+              {
+                "@id": "http://example.com/canvas",
+                "@type": "sc:Canvas",
+                "width": 10,
+                "height": 20,
+                "label": "My Canvas",
+                "otherContent": [
+                  {
+                    "@id": "http://example.com/content",
+                    "@type":"sc:AnnotationList",
+                    "motivation": "sc:painting"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }')
+    }
+    it 'doesn\'t raise a NoMethodError when we check the keys' do
+      expect { described_class.from_ordered_hash(fixture) }.to_not raise_error
+    end
+    it 'turns the fixture into a Manifest instance' do
+      expected_klass = IIIF::Presentation::Manifest
+      parsed = described_class.from_ordered_hash(fixture)
+      expect(parsed.class).to be expected_klass
+    end
+    it 'turns keys without "@type" into an OrderedHash' do
+      expected_klass = ActiveSupport::OrderedHash
+      parsed = described_class.from_ordered_hash(fixture)
+      expect(parsed['some_other_thing'].class).to be expected_klass
+    end
+    it 'round-trips' do
+      fp = '/tmp/osullivan-spec.json'
+      parsed = described_class.from_ordered_hash(fixture)
+      File.open(fp,'w') do |f|
+        f.write(parsed.to_json)
+      end
+      from_file = IIIF::Presentation::Service.parse('/tmp/osullivan-spec.json')
+      File.delete(fp)
+      # is this sufficient?
+      expect(parsed.to_ordered_hash.to_a - from_file.to_ordered_hash.to_a).to eq []
+      expect(from_file.to_ordered_hash.to_a - parsed.to_ordered_hash.to_a).to eq []
+    end
+    it 'turns each memeber of "sequences" into an instance of Sequence' do
+      expected_klass = IIIF::Presentation::Sequence
+      parsed = described_class.from_ordered_hash(fixture)
+      parsed['sequences'].each do |s|
+        expect(s.class).to be expected_klass
+      end
+    end
+    it 'turns each member of sequences/canvaes in an instance of Canvas' do
+      expected_klass = IIIF::Presentation::Canvas
+      parsed = described_class.from_ordered_hash(fixture)
+      parsed['sequences'].each do |s|
+        s.canvases.each do |c|
+          expect(c.class).to be expected_klass
+        end
+      end
+    end
+    it 'turns the keys into snakes' do
+      expect(described_class.from_ordered_hash(fixture).has_key?('seeAlso')).to be_falsey
+      expect(described_class.from_ordered_hash(fixture).has_key?('see_also')).to be_truthy
+    end
+    it 'copies over plain-old key-values' do
+      parsed = described_class.from_ordered_hash(fixture)
+      expect(parsed['label']).to eq 'My Manifest'
+    end
+
   end
 
   describe '#to_ordered_hash' do

@@ -1,9 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../active_support/ordered_hash')
-require File.join(File.dirname(__FILE__), 'hash_behaviours')
 require File.join(File.dirname(__FILE__), 'service')
-require 'active_support/inflector'
-require 'active_support/ordered_hash'
-require 'json'
 
 module IIIF
   module Presentation
