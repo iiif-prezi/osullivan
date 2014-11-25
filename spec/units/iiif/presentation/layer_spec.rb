@@ -6,7 +6,6 @@ describe IIIF::Presentation::Layer do
       '@id' => 'http://www.example.org/iiif/book1/layer/transcription',
       '@type' => 'sc:Layer',
       'label' => 'Diplomatic Transcription',
-
       'otherContent' => [
         'http://www.example.org/iiif/book1/list/l1',
         'http://www.example.org/iiif/book1/list/l2',
