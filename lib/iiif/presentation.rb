@@ -4,6 +4,7 @@ service
     annotation
     annotation_list
     canvas
+    collection
     hash_behaviours
     layer
     manifest
