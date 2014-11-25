@@ -1,10 +1,11 @@
 %w{
 service 
-  abstract_resource 
+  abstract_resource
     annotation
     annotation_list
-    canvas 
-    hash_behaviours  
+    canvas
+    hash_behaviours
+    layer
     manifest
     resource
       image_resource 

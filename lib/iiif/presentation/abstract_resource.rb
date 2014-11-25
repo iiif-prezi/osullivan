@@ -35,7 +35,7 @@ module IIIF
         %w{ }
       end
 
-      # Not every subclass is allowed to have viewingDirection, but when it is,
+      # Not every subclass is allowed to have viewingDirect, but when it is,
       # it must be one of these values
       def legal_viewing_direction_values
         %w{ left-to-right right-to-left top-to-bottom bottom-to-top }

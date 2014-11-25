@@ -1,6 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../active_support/ordered_hash')
 require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 
 module IIIF
   module Presentation
