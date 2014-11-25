@@ -6,7 +6,7 @@
 
 There is (or will be) a class for all types in [IIIF Presentation API Spec](http://iiif.io/api/presentation/2.0/).
 
-After you've installed the gem (not yet published. Clone and do `rake:install`:
+After you've installed the gem (not yet published. Clone and do `rake:install`):
 
 ```ruby
 require 'iiif/presentation'
@@ -89,9 +89,6 @@ seed = '{
     "@id":"http://www.example.org/images/book1-page1",
     "profile":"http://iiif.io/api/image/2/profiles/level2.json"
   },
-  "some_other_thing": {
-    "foo" : "bar"
-  },
   "seeAlso": {
     "@id": "http://www.example.org/library/catalog/book1.marc",
     "format": "application/marc"
@@ -126,7 +123,7 @@ seed = '{
 
 obj = IIIF::Presentation::Service.parse(seed) # can also be a file path or a Hash
 puts obj.class
-puts obj.seeAlso.class
+puts obj.see_also.class
 
 > IIIF::Presentation::Manifest
 > ActiveSupport::OrderedHash
@@ -165,4 +162,5 @@ puts canvas.to_json(pretty: true, force: true)
 >   "@type": "sc:Canvas"
 > }
 ```
-This all needs a bit of tidying up, finishing , and refactoring, so expect it to change.
+This all needs a bit of tidying up, finishing, and refactoring, so expect it to 
+change.
