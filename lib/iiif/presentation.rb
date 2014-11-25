@@ -6,9 +6,10 @@ service
     canvas 
     hash_behaviours  
     manifest
-    resource 
+    resource
       image_resource 
     sequence 
+      range
 }.each do |f|
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end

@@ -14,17 +14,16 @@ module IIIF
         super + %w{ start_canvas viewing_direction }
       end
 
+      def legal_viewing_hint_values
+        %w{ individuals paged continuous }
+      end
+
       def initialize(hsh={})
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
         super(hsh)
       end
 
-      def legal_viewing_hint_values
-        %w{ individuals paged continuous }
-      end
-
       def validate
-        # TODO here:
         # * Must be at least one canvas
         # * All members of canvases must be a kind of Canvas
         super
