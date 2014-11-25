@@ -1,14 +1,17 @@
 %w{
 service 
-  abstract_resource 
+  abstract_resource
     annotation
     annotation_list
-    canvas 
-    hash_behaviours  
+    canvas
+    collection
+    hash_behaviours
+    layer
     manifest
-    resource 
+    resource
       image_resource 
     sequence 
+      range
 }.each do |f|
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end
