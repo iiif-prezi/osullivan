@@ -10,31 +10,11 @@ module IIIF
       #  * reject
       #  * replace
 
-      def_delegators :@data,
-        :[],
-        :[]=,
-        :camelize_keys,
-        :delete,
-        :empty?,
-        :fetch,
-        :has_key?,
-        :has_value?,
-        :include?,
-        :insert,
-        :insert_after,
-        :insert_before,
-        :key,
-        :key?,
-        :keys,
-        :length,
-        :member?,
-        :shift,
-        :size,
-        :snakeize_keys,
-        :store,
-        :unshift,
-        :value?,
-        :values
+      def_delegators :@data, :[], :[]=, :camelize_keys, :delete, :empty?, 
+        :fetch, :has_key?, :has_value?, :include?, :insert, :insert_after, 
+        :insert_before, :key, :key?, :keys, :length, :member?, :shift, :size, 
+        :snakeize_keys, :store, :unshift, :value?, :values
+      
 
       ###
       # Methods that take a block and should return an instance (self or a new'

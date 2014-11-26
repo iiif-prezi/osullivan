@@ -11,7 +11,7 @@ module IIIF
       end
 
       def array_only_keys
-        super + %w{ images other_content } # images?
+        super + %w{ other_content }
       end
 
       def string_only_keys
