@@ -18,7 +18,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'coveralls'
+  spec.add_development_dependency 'webmock'
+  spec.add_development_dependency 'vcr', '~> 2.9.3'
 
   spec.add_dependency 'json'
   spec.add_dependency 'activesupport', '~> 4.1'
+  spec.add_dependency 'faraday', '~> 0.9.0'
 end

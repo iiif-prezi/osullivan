@@ -1,0 +1,159 @@
+{
+  "http_interactions": [
+    {
+      "request": {
+        "method": "get",
+        "uri": "http://libimages.princeton.edu/loris2/pudl0001%2F4612422%2F00000001.jp2/info.json",
+        "body": {
+          "encoding": "US-ASCII",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "Faraday v0.9.0"
+          ],
+          "Accept-Encoding": [
+            "gzip;q=1.0,deflate;q=0.6,identity;q=0.3"
+          ],
+          "Accept": [
+            "*/*"
+          ]
+        }
+      },
+      "response": {
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "headers": {
+          "Server": [
+            "Apache/2.2.22 (Ubuntu)"
+          ],
+          "Link": [
+            "<http://iiif.io/api/image/2/level2.json>;rel=\"profile\",<http://iiif.io/api/image/2/context.json>;rel=\"http://www.w3.org/ns/json-ld#context\";type=\"application/ld+json\""
+          ],
+          "Access-Control-Allow-Origin": [
+            "*"
+          ],
+          "Last-Modified": [
+            "Wed, 26 Nov 2014 21:16:14 GMT"
+          ],
+          "Cache-Control": [
+            "max-age=5184000"
+          ],
+          "Expires": [
+            "Sun, 25 Jan 2015 21:16:14 GMT"
+          ],
+          "Content-Type": [
+            "application/json"
+          ],
+          "Content-Length": [
+            "737"
+          ],
+          "Accept-Ranges": [
+            "bytes"
+          ],
+          "Date": [
+            "Thu, 27 Nov 2014 00:55:14 GMT"
+          ],
+          "X-Varnish": [
+            "1471998866 1471996229"
+          ],
+          "Age": [
+            "13140"
+          ],
+          "Via": [
+            "1.1 varnish"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"profile\": [\"http://iiif.io/api/image/2/level2.json\", {\"supports\": [\"canonicalLinkHeader\", \"profileLinkHeader\", \"mirroring\", \"rotationArbitrary\", \"sizeAboveFull\"], \"qualities\": [\"default\", \"bitonal\", \"gray\", \"color\"], \"formats\": [\"jpg\", \"png\", \"gif\", \"webp\"]}], \"tiles\": [{\"width\": 1024, \"scaleFactors\": [1, 2, 4, 8, 16, 32]}], \"protocol\": \"http://iiif.io/api/image\", \"sizes\": [{\"width\": 96, \"height\": 225}, {\"width\": 191, \"height\": 450}, {\"width\": 381, \"height\": 900}, {\"width\": 762, \"height\": 1800}, {\"width\": 1524, \"height\": 3600}, {\"width\": 3047, \"height\": 7200}], \"height\": 7200, \"width\": 3047, \"@context\": \"http://iiif.io/api/image/2/context.json\", \"@id\": \"http://libimages.princeton.edu/loris2/pudl0001%2F4612422%2F00000001.jp2\"}"
+        },
+        "http_version": null
+      },
+      "recorded_at": "Thu, 27 Nov 2014 01:00:58 GMT"
+    },
+    {
+      "request": {
+        "method": "get",
+        "uri": "http://libimages.princeton.edu/loris2/xxxx%2F4612422%2F00000001.jp2/info.json",
+        "body": {
+          "encoding": "US-ASCII",
+          "string": ""
+        },
+        "headers": {
+          "User-Agent": [
+            "Faraday v0.9.0"
+          ],
+          "Accept-Encoding": [
+            "gzip;q=1.0,deflate;q=0.6,identity;q=0.3"
+          ],
+          "Accept": [
+            "*/*"
+          ]
+        }
+      },
+      "response": {
+        "status": {
+          "code": 404,
+          "message": "NOT FOUND"
+        },
+        "headers": {
+          "Server": [
+            "Apache/2.2.22 (Ubuntu)"
+          ],
+          "Link": [
+            "<http://iiif.io/api/image/2/level2.json>;rel=\"profile\""
+          ],
+          "Access-Control-Allow-Origin": [
+            "*"
+          ],
+          "Cache-Control": [
+            "max-age=5184000"
+          ],
+          "Expires": [
+            "Mon, 26 Jan 2015 10:20:46 GMT"
+          ],
+          "Vary": [
+            "Accept-Encoding"
+          ],
+          "Content-Type": [
+            "text/plain"
+          ],
+          "Content-Length": [
+            "88"
+          ],
+          "Accept-Ranges": [
+            "bytes"
+          ],
+          "Date": [
+            "Thu, 27 Nov 2014 10:20:46 GMT"
+          ],
+          "X-Varnish": [
+            "1472002765"
+          ],
+          "Age": [
+            "0"
+          ],
+          "Via": [
+            "1.1 varnish"
+          ],
+          "Connection": [
+            "keep-alive"
+          ]
+        },
+        "body": {
+          "encoding": "UTF-8",
+          "string": "Not Found: could not resolve identifier: xxxx%2F4612422%2F00000001.jp2  (404)"
+        },
+        "http_version": null
+      },
+      "recorded_at": "Thu, 27 Nov 2014 10:26:31 GMT"
+    }
+  ],
+  "recorded_with": "VCR 2.9.3"
+}
