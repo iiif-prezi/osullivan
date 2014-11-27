@@ -5,7 +5,7 @@ module IIIF
     class Resource < AbstractResource
 
       def required_keys
-        %w{ @id } # no @type strictly required, so no super
+        %w{ @id }
       end
 
       def string_only_keys
@@ -13,8 +13,6 @@ module IIIF
       end
 
       def initialize(hsh={})
-        
-        hsh['motivation'] = 'sc:painting' unless hsh.has_key? 'motivation'
         super(hsh)
       end
 

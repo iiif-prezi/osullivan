@@ -1,3 +1,4 @@
+require File.join(File.dirname(__FILE__), '../../../spec_helper')
 require 'active_support/ordered_hash'
 describe IIIF::Presentation::HashBehaviours do
 
