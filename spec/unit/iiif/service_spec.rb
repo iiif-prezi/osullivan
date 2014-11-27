@@ -1,4 +1,4 @@
-describe IIIF::Presentation::Service do
+describe IIIF::Service do
 
   describe 'self#get_descendant_class_by_jld_type' do
     it 'gets the right class' do

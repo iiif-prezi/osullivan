@@ -1,5 +1,7 @@
 require 'active_support/inflector'
 require 'json'
+require File.join(File.dirname(__FILE__), '../../../../lib/iiif/hash_behaviours')
+
 
 describe IIIF::Presentation::AbstractResource do
 
@@ -7,7 +9,7 @@ describe IIIF::Presentation::AbstractResource do
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
   let(:abstract_resource_subclass) do
     Class.new(IIIF::Presentation::AbstractResource) do
-      include IIIF::Presentation::HashBehaviours
+      include IIIF::HashBehaviours
 
       def initialize(hsh={})
         hsh['@type'] = 'a:SubClass' unless hsh.has_key?('@type')

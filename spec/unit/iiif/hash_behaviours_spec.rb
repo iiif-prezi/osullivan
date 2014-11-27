@@ -1,10 +1,10 @@
-require File.join(File.dirname(__FILE__), '../../../spec_helper')
+require File.join(File.dirname(__FILE__), '../../spec_helper')
 require 'active_support/ordered_hash'
-describe IIIF::Presentation::HashBehaviours do
+describe IIIF::HashBehaviours do
 
   let(:hash_like_class) do
     Class.new do
-      include IIIF::Presentation::HashBehaviours
+      include IIIF::HashBehaviours
       attr_accessor :data # Accessible for easier expects...not sure you'd do this in a real class
       def initialize()
         @data = ActiveSupport::OrderedHash.new

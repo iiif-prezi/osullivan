@@ -1,17 +1,17 @@
+require File.join(File.dirname(__FILE__), 'service')
+require File.join(File.dirname(__FILE__), 'hash_behaviours')
 %w{
-service 
-  abstract_resource
-    annotation
-    annotation_list
-    canvas
-    collection
-    hash_behaviours
-    layer
-    manifest
-    resource
-      image_resource 
-    sequence 
-      range
+abstract_resource
+  annotation
+  annotation_list
+  canvas
+  collection
+  layer
+  manifest
+  resource
+    image_resource 
+  sequence 
+    range
 }.each do |f|
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end

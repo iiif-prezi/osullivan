@@ -1,6 +1,6 @@
 require 'iiif/presentation'
 require 'coveralls'
-Dir["#{File.dirname(__FILE__)}/units/iiif/presentation/shared_examples/*.rb"].each do |f|
+Dir["#{File.dirname(__FILE__)}/unit/iiif/presentation/shared_examples/*.rb"].each do |f|
   require f
 end
 require 'vcr'

@@ -1,9 +1,9 @@
 require 'active_support/inflector'
 require 'json'
 
-describe IIIF::Presentation::Service do
+describe IIIF::Service do
 
-  let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
+  let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
 
   describe 'self.parse' do
@@ -101,7 +101,7 @@ describe IIIF::Presentation::Service do
     end
 
     it 'turns services into Services' do
-     expected_klass = IIIF::Presentation::Service
+     expected_klass = IIIF::Service
       parsed = described_class.from_ordered_hash(fixture)
       expect(parsed['service'].class).to be expected_klass
     end
@@ -112,7 +112,7 @@ describe IIIF::Presentation::Service do
       File.open(fp,'w') do |f|
         f.write(parsed.to_json)
       end
-      from_file = IIIF::Presentation::Service.parse('/tmp/osullivan-spec.json')
+      from_file = IIIF::Service.parse('/tmp/osullivan-spec.json')
       File.delete(fp)
       # is this sufficient?
       expect(parsed.to_ordered_hash.to_a - from_file.to_ordered_hash.to_a).to eq []
@@ -144,7 +144,6 @@ describe IIIF::Presentation::Service do
     end
 
   end
-
 
   describe '#to_ordered_hash' do
     let(:logo_uri) { 'http://www.example.org/logos/institution1.jpg' }
