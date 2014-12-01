@@ -1,5 +1,4 @@
 require File.join(File.dirname(__FILE__), 'service')
-require File.join(File.dirname(__FILE__), 'hash_behaviours')
 %w{
 abstract_resource
   annotation
@@ -15,7 +14,6 @@ abstract_resource
 }.each do |f|
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end
-require File.join(File.dirname(__FILE__), '../active_support/ordered_hash')
 
 module IIIF
   module Presentation

@@ -1,5 +1,4 @@
 require 'forwardable'
-require File.join(File.dirname(__FILE__), '../active_support/ordered_hash')
 
 module IIIF
   module HashBehaviours

@@ -1,5 +1,4 @@
 require File.join(File.dirname(__FILE__), 'hash_behaviours')
-require File.join(File.dirname(__FILE__), '../active_support/ordered_hash')
 require 'active_support/ordered_hash'
 require 'active_support/inflector'
 require 'json'
