@@ -74,7 +74,7 @@ puts manifest.to_json(pretty: true, force: true) # force: true skips validations
 
 ## Parsing Existing Objects
 
-Use `IIIF::Presentation::Service#parse`. It will figure out what the object
+Use `IIIF::Service#parse`. It will figure out what the object
 should be, based on `@type`, and fall back to `ActiveSupport::OrderedHash` when
 it can't e.g.:
 
@@ -121,7 +121,7 @@ seed = '{
   ]
 }'
 
-obj = IIIF::Presentation::Service.parse(seed) # can also be a file path or a Hash
+obj = IIIF::Service.parse(seed) # can also be a file path or a Hash
 puts obj.class
 puts obj.see_also.class
 

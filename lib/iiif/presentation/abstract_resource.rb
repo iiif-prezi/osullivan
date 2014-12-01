@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'service')
+require File.join(File.dirname(__FILE__), '../service')
 
 module IIIF
   module Presentation
@@ -24,7 +24,7 @@ module IIIF
       end
 
       def abstract_resource_only_keys
-        super + [ { key: 'service', type: IIIF::Presentation::Service } ]
+        super + [ { key: 'service', type: IIIF::Service } ]
       end
 
       def hash_only_keys
@@ -68,8 +68,6 @@ module IIIF
         super(opts)
       end
       
-
-
     end
 
   end

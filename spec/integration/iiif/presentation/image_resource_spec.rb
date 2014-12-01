@@ -43,7 +43,6 @@ describe IIIF::Presentation::ImageResource do
       it 'copies over all teh infos (when copy_info is true)' do
         opts = { service_id: valid_service_id, copy_info: true }
         resource = described_class.create_image_api_image_resource(opts)
-        puts resource.to_json(pretty: true)
         expect(resource['@id']).to eq 'http://libimages.princeton.edu/loris2/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
         expect(resource['@type']).to eq 'dcterms:Image'
         expect(resource.format).to eq "image/jpeg"
