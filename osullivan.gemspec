@@ -2,7 +2,7 @@ version = File.read(File.expand_path('../VERSION', __FILE__)).strip
 
 Gem::Specification.new do |spec|
   spec.name          = 'osullivan'
-  spec.version       = version 
+  spec.version       = version
   spec.authors       = ['Jon Stroop']
   spec.email         = ['jpstroop@gmail.com']
   spec.description   = 'API for working with IIIF Presentation manifests.'
@@ -22,6 +22,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'vcr', '~> 2.9.3'
 
   spec.add_dependency 'json'
-  spec.add_dependency 'activesupport', '~> 4.1'
+  spec.add_dependency 'activesupport', '~> 3.2'
   spec.add_dependency 'faraday', '~> 0.9.0'
 end
