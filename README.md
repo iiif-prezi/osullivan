@@ -2,11 +2,17 @@
 
 [![Build Status](https://travis-ci.org/jpstroop/osullivan.svg?branch=development)](https://travis-ci.org/jpstroop/osullivan) [![Coverage Status](https://coveralls.io/repos/jpstroop/osullivan/badge.png?branch=development)](https://coveralls.io/r/jpstroop/osullivan?branch=development)
 
+
+## Installation
+
+From the source code do `rake install`, or get the latest release [from RubyGems](https://rubygems.org/gems/osullivan).
+
 ## Building New Objects
 
 There is (or will be) a class for all types in [IIIF Presentation API Spec](http://iiif.io/api/presentation/2.0/).
 
-After you've installed the gem (not yet published. Clone and do `rake:install`):
+
+
 
 ```ruby
 require 'iiif/presentation'
