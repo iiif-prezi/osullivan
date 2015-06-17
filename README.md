@@ -1,6 +1,6 @@
 # OSullivan
 
-[![Build Status](https://travis-ci.org/IIIF/osullivan.svg?branch=development)](https://travis-ci.org/IIIF/osullivan) [![Coverage Status](https://coveralls.io/repos/IIIF/osullivan/badge.png?branch=development)](https://coveralls.io/r/IIIF/osullivan?branch=development)
+[![Build Status](https://travis-ci.org/IIIF/osullivan.svg?branch=development)](https://travis-ci.org/IIIF/osullivan) [![Coverage Status](https://coveralls.io/repos/IIIF/osullivan/badge.svg)](https://coveralls.io/r/IIIF/osullivan)
 
 
 ## Installation
