@@ -1,11 +1,11 @@
-# OSullivan
+# O'Sullivan: A Ruby API for working with IIIF Presentation manifests
 
 [![Build Status](https://travis-ci.org/IIIF/osullivan.svg?branch=development)](https://travis-ci.org/IIIF/osullivan) [![Coverage Status](https://coveralls.io/repos/IIIF/osullivan/badge.svg)](https://coveralls.io/r/IIIF/osullivan)
 
 
 ## Installation
 
-From the source code do `rake install`, or get the latest release [from RubyGems](https://rubygems.org/gems/osullivan).
+From the source code do `rake install`, or get the latest release [from RubyGems](https://rubygems.org/gems/iiif-presentation).
 
 ## Building New Objects
 
