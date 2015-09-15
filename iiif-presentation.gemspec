@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'webmock'
+  spec.add_development_dependency 'multi_json'
   spec.add_development_dependency 'vcr', '~> 2.9.3'
 
   spec.add_dependency 'json'
