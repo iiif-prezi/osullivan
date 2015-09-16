@@ -1,14 +1,14 @@
 version = File.read(File.expand_path('../VERSION', __FILE__)).strip
 
 Gem::Specification.new do |spec|
-  spec.name          = 'osullivan'
+  spec.name          = 'iiif-presentation'
   spec.version       = version
   spec.authors       = ['Jon Stroop']
   spec.email         = ['jpstroop@gmail.com']
   spec.description   = 'API for working with IIIF Presentation manifests.'
   spec.summary       = 'API for working with IIIF Presentation manifests.'
   spec.license       = 'Simplified BSD'
-  spec.homepage      = 'https://github.com/jpstroop/osullivan'
+  spec.homepage      = 'https://github.com/iiif/osullivan'
 
   spec.files         = `git ls-files`.split($/)
   spec.test_files    = spec.files.grep(%r{^spec/})
@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'webmock'
+  spec.add_development_dependency 'multi_json'
   spec.add_development_dependency 'vcr', '~> 2.9.3'
 
   spec.add_dependency 'json'
