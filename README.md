@@ -6,7 +6,7 @@
 
 ## Installation
 
-From the source code do `rake install`, or get the latest release [from RubyGems](https://rubygems.org/gems/iiif-presentation).
+From the source code do `rake install`, or get the latest release [from RubyGems](https://rubygems.org/gems/osullivan).
 
 ## Building New Objects
 
