@@ -90,7 +90,7 @@ module IIIF
               if remote_info['profile'].kind_of?(Array)
                 resource.service['profile'] = remote_info['profile'][0]
               else
-                resource.service['profile'] = remote_info['profile'][0]
+                resource.service['profile'] = remote_info['profile']
               end
             else
               resource.service['profile'] = profile
