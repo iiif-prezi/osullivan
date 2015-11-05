@@ -36,5 +36,11 @@ describe IIIF::Presentation::Canvas do
     it_behaves_like 'it has the appropriate methods for any-type keys'
   end
 
+  describe "#legal_viewing_hint_values" do
+    it "should not error" do
+      expect{subject.legal_viewing_hint_values}.not_to raise_error
+    end
+  end
+
 end
 
