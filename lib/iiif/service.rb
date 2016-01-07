@@ -234,9 +234,9 @@ module IIIF
     protected
 
     def self.get_descendant_class_by_jld_type(type)
-      IIIF::Service.all_service_subclasses.select { |klass|
+      IIIF::Service.all_service_subclasses.find do |klass|
         klass.const_defined?(:TYPE) && klass.const_get(:TYPE) == type
-      }.first
+      end
     end
 
     # All known subclasses of service.
