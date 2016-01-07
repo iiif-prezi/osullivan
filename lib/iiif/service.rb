@@ -1,4 +1,5 @@
 require File.join(File.dirname(__FILE__), 'hash_behaviours')
+require 'active_support/core_ext/class/subclasses'
 require 'active_support/ordered_hash'
 require 'active_support/inflector'
 require 'json'
@@ -240,10 +241,7 @@ module IIIF
 
     # All known subclasses of service.
     def self.all_service_subclasses
-      klass = IIIF::Service
-      # !c.name.nil? filters out classes that rspec creates for some reason;
-      # this condition isn't necessary when using the API, afaik
-      descendants = ObjectSpace.each_object(Class).select { |c| c < klass && !c.name.nil? }
+      @all_service_subclasses ||= IIIF::Service.descendants
     end
 
     def data=(hsh)
@@ -411,8 +409,3 @@ module IIIF
 
   end
 end
-
-
-
-
-
