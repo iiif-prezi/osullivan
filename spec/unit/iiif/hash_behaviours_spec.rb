@@ -7,7 +7,7 @@ describe IIIF::HashBehaviours do
       include IIIF::HashBehaviours
       attr_accessor :data # Accessible for easier expects...not sure you'd do this in a real class
       def initialize()
-        @data = ActiveSupport::OrderedHash.new
+        @data = IIIF::OrderedHash.new
       end
     end
   end

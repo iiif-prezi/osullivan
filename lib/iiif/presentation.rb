@@ -15,6 +15,8 @@ abstract_resource
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end
 
+require_relative 'ordered_hash'
+
 module IIIF
   module Presentation
     CONTEXT ||= 'http://iiif.io/api/presentation/2/context.json'
