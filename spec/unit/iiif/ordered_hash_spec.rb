@@ -1,4 +1,4 @@
-describe ActiveSupport::OrderedHash do
+describe IIIF::OrderedHash do
 
   describe '#camelize_keys' do
     before(:each) do
@@ -58,7 +58,7 @@ describe ActiveSupport::OrderedHash do
     let (:init_data) { [ ['wubble', 'fred'], ['baz', 'qux'], ['grault','garply'] ] }
     
     subject do 
-      hsh = ActiveSupport::OrderedHash.new
+      hsh = described_class.new
       init_data.each { |e| hsh[e[0]] = e[1] }
       hsh
     end
