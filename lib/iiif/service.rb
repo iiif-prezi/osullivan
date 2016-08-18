@@ -241,7 +241,7 @@ module IIIF
 
     # All known subclasses of service.
     def self.all_service_subclasses
-      @all_service_subclasses ||= IIIF::Service.descendants
+      @all_service_subclasses ||= IIIF::Service.descendants.reject(&:singleton_class?)
     end
 
     def data=(hsh)
