@@ -17,7 +17,7 @@ module IIIF
     ###
     # Methods that take a block and should return an instance (self or a new'
     # instance) have been overridden to do so, rather than an'
-    # ActiveSupport::OrderedHash based on the internal hash
+    # IIIF::OrderedHash based on the internal hash
 
     SIMPLE_SELF_RETURNERS = %w[delete_if each each_key each_value keep_if]
 

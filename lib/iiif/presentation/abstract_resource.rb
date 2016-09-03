@@ -41,6 +41,10 @@ module IIIF
         %w{ left-to-right right-to-left top-to-bottom bottom-to-top }
       end
 
+      def legal_viewing_hint_values
+        []
+      end
+
       # Initialize a Presentation node
       # @param [Hash] hsh - Anything in this hash will be added to the Object.'
       #   Order is only guaranteed if an ActiveSupport::OrderedHash is passed.

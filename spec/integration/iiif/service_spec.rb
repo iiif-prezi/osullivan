@@ -24,9 +24,9 @@ describe IIIF::Service do
         s = described_class.parse(h)
         expect(s['label']).to eq 'Book 1'
       end
-      it 'ActiveSupport::OrderedHash' do
+      it 'IIIF::OrderedHash' do
         h = JSON.parse(IO.read(manifest_from_spec_path))
-        oh = ActiveSupport::OrderedHash[h]
+        oh = IIIF::OrderedHash[h]
         s = described_class.parse(oh)
         expect(s['label']).to eq 'Book 1'
       end
@@ -95,7 +95,7 @@ describe IIIF::Service do
       expect(parsed.class).to be expected_klass
     end
     it 'turns keys without "@type" into an OrderedHash' do
-      expected_klass = ActiveSupport::OrderedHash
+      expected_klass = IIIF::OrderedHash
       parsed = described_class.from_ordered_hash(fixture)
       expect(parsed['some_other_thing'].class).to be expected_klass
     end

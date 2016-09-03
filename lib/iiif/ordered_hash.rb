@@ -1,7 +1,6 @@
 require 'active_support/inflector'
-require 'active_support/ordered_hash'
 
-module ActiveSupport
+module IIIF
   class OrderedHash < ::Hash
 
     # Insert a new key and value at the suppplied index.
@@ -14,7 +13,7 @@ module ActiveSupport
     # @param [Object] key
     # @param [Object] value
     def insert(index, key, value)
-      tmp = ActiveSupport::OrderedHash.new
+      tmp = IIIF::OrderedHash.new
       index = self.length + 1 + index if index < 0
       if index < 0
         m = "Index #{index} is too small for current length (#{length})"
