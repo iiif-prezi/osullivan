@@ -3,6 +3,7 @@ require 'active_support/core_ext/class/subclasses'
 require 'active_support/ordered_hash'
 require 'active_support/inflector'
 require 'json'
+require 'pry'
 
 module IIIF
   class Service
@@ -196,7 +197,12 @@ module IIIF
       export_hash
     end
 
+    class ExpectedHashError < StandardError; end
+
     def self.from_ordered_hash(hsh, default_klass=IIIF::OrderedHash)
+      unless hsh.is_a? Hash 
+        raise IIIF::Service::ExpectedHashError, "expected a hash"
+      end
       # Create a new object (new_object)
       type = nil
       if hsh.has_key?('@type')
@@ -206,26 +212,31 @@ module IIIF
 
       hsh.keys.each do |key|
         new_key = key.underscore == key ? key : key.underscore
-        if new_key == 'service'
-          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Service)
-        elsif new_key == 'resource'
-          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
-        elsif hsh[key].kind_of?(Hash)
-          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key])
-        elsif hsh[key].kind_of?(Array)
-          new_object[new_key] = []
-          hsh[key].each do |member|
-            if new_key == 'service'
-              new_object[new_key] << IIIF::Service.from_ordered_hash(member, IIIF::Service)
-            elsif member.kind_of?(Hash)
-              new_object[new_key] << IIIF::Service.from_ordered_hash(member)
-            else
-              new_object[new_key] << member
-              # Again, no nested arrays, right?
+        begin
+          if new_key == 'service'
+            new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Service)
+          elsif new_key == 'resource'
+            new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
+          elsif hsh[key].kind_of?(Hash)
+            new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key])
+          elsif hsh[key].kind_of?(Array)
+            new_object[new_key] = []
+            hsh[key].each do |member|
+              if new_key == 'service'
+                new_object[new_key] << IIIF::Service.from_ordered_hash(member, IIIF::Service)
+              elsif member.kind_of?(Hash)
+                new_object[new_key] << IIIF::Service.from_ordered_hash(member)
+              else
+                new_object[new_key] << member
+                # Again, no nested arrays, right?
+              end
             end
+          else
+            new_object[new_key] = hsh[key]
           end
-        else
-          new_object[new_key] = hsh[key]
+        rescue ExpectedHashError
+          m = "Expected value of '#{new_key}' to be a hash"
+          raise IIIF::Presentation::IllegalValueError, m
         end
       end
       new_object
