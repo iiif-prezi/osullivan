@@ -3,7 +3,6 @@ require 'active_support/core_ext/class/subclasses'
 require 'active_support/ordered_hash'
 require 'active_support/inflector'
 require 'json'
-require 'pry'
 
 module IIIF
   class Service
