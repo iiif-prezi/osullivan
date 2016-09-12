@@ -234,7 +234,7 @@ module IIIF
             new_object[new_key] = hsh[key]
           end
         rescue ExpectedHashError
-          m = "Expected value of '#{new_key}' to be a hash"
+          m = "Expected value of '#{new_key}' to be a hash.  Is it possible you have an array instead of a hash?"
           raise IIIF::Presentation::IllegalValueError, m
         end
       end
