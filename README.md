@@ -1,7 +1,7 @@
 # O'Sullivan: A Ruby API for working with IIIF Presentation manifests
 
-[![Build Status](https://travis-ci.org/iiif-prezi/osullivan.svg?branch=development)](https://travis-ci.org/IIIF/osullivan)
-[![Coverage Status](https://coveralls.io/repos/iiif-prezi/osullivan/badge.svg?branch=development&service=github)](https://coveralls.io/github/IIIF/osullivan?branch=development)
+[![Build Status](https://travis-ci.org/iiif-prezi/osullivan.svg?branch=development)](https://travis-ci.org/iiif-prezi/osullivan)
+[![Coverage Status](https://coveralls.io/repos/iiif-prezi/osullivan/badge.svg?branch=development&service=github)](https://coveralls.io/github/iiif-prezi/osullivan?branch=development)
 
 
 ## Installation
