@@ -32,7 +32,7 @@ describe IIIF::Presentation::ImageResource do
         # expect(resource['@context']).to eq 'http://iiif.io/api/presentation/2/context.json'
         # @context is only added when we call to_json...
         expect(resource['@id']).to eq 'http://libimages.princeton.edu/loris2/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
-        expect(resource['@type']).to eq 'dcterms:Image'
+        expect(resource['@type']).to eq 'dctypes:Image'
         expect(resource.format).to eq "image/jpeg"
         expect(resource.width).to eq 3047
         expect(resource.height).to eq 7200
@@ -44,7 +44,7 @@ describe IIIF::Presentation::ImageResource do
         opts = { service_id: valid_service_id, copy_info: true }
         resource = described_class.create_image_api_image_resource(opts)
         expect(resource['@id']).to eq 'http://libimages.princeton.edu/loris2/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
-        expect(resource['@type']).to eq 'dcterms:Image'
+        expect(resource['@type']).to eq 'dctypes:Image'
         expect(resource.format).to eq "image/jpeg"
         expect(resource.width).to eq 3047
         expect(resource.height).to eq 7200
@@ -119,5 +119,3 @@ describe IIIF::Presentation::ImageResource do
 
   end
 end
-
-

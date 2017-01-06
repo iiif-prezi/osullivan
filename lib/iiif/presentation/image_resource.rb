@@ -13,7 +13,7 @@ module IIIF
       end
 
       def initialize(hsh={})
-        hsh['@type'] = 'dcterms:Image' unless hsh.has_key? '@type'
+        hsh['@type'] = TYPE unless hsh.has_key? '@type'
         super(hsh)
       end
 
