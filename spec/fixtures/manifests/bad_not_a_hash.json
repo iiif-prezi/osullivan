@@ -1,0 +1,142 @@
+{
+	"@context": "http://iiif.io/api/presentation/2/context.json",
+	"@id": "https://data.ucd.ie/api/img/manifests/ivrla:3832",
+	"rendering": {
+		"@id": "https://digital.ucd.ie/get/ivrla:3832/content",
+		"format": "application/pdf",
+		"label": "Download as PDF"
+	},
+	"seeAlso": [
+		{
+			"@id": "https://digital.ucd.ie/view/ivrla:3832.xml",
+			"format": "text/xml",
+			"profile": "http://www.loc.gov/mods/v3",
+			"label": "MODS metadata describing this object"
+		},
+		{
+			"@id": "https://digital.ucd.ie/view/ivrla:3832.n3",
+			"format": "text/rdf+n3",
+			"label": "RDF n3 serialisation of metadata describing this object"
+		},
+		{
+			"@id": "https://digital.ucd.ie/view/ivrla:3832.n3",
+			"format": "application/rdf+xml",
+			"label": "RDF-XML metadata describing this object"
+		}
+	],
+	"within": {
+		"@id": "https://data.ucd.ie/api/img/collection/ivrla:3573",
+		"@type": "sc:Collection",
+		"label": "UCD Letters"
+	},
+	"navDate": "1859-06-15T00:00:00Z",
+	"attribution": "UCD Library Special Collections",
+	"logo": "https://digital.ucd.ie/images/logos/ucd_logo_sm.png",
+	"description": "[Letter from John Henry Newman (The Oratory, Birmingham) to Dr. Thomas Hayden, concerning a proposed medical lodging house.]",
+	"label": "[Letter from John Henry Newman (The Oratory, Birmingham) to Dr. Thomas Hayden, concerning a proposed medical lodging house.]",
+	"license": "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+	"@type": "sc:Manifest",
+	"thumbnail": "https://digital.ucd.ie/get/ivrla:3832/thumbnail",
+	"metadata": [
+		{
+			"label": "title",
+			"value": "[Letter from John Henry Newman (The Oratory, Birmingham) to Dr. Thomas Hayden, concerning a proposed medical lodging house.]"
+		},
+		{
+			"label": "Published",
+			"value": "The Oratory, Birmingham, England"
+		},
+		{
+			"label": "Date created",
+			"value": "15 June 1859"
+		},
+		{
+			"label": "Genre",
+			"value": "Correspondence"
+		}
+	],
+	"sequences": [
+		{
+			"@context": "http://iiif.io/api/presentation/2/context.json",
+			"@id": "https://data.ucd.ie/api/img/manifests/ivrla:3832/sequence/normal",
+			"@type": "sc:Sequence",
+			"label": "Current Page Order",
+			"viewingHint": "individuals",
+			"canvases": [
+				{
+					"@id": "https://data.ucd.ie/api/img/ivrla:3832/canvas/ivrla:3833",
+					"@type": "sc:Canvas",
+					"label": "[Page 1]",
+					"width": 2049,
+					"height": 3243,
+					"images": [
+						{
+							"resource": {
+								"service": {
+									"@id": "https://iiif.ucd.ie/loris/ivrla:3833",
+									"@context": "http://iiif.io/api/image/2/context.json",
+									"profile": "http://iiif.io/api/image/2/level2.json"
+								},
+								"format": "image/jpeg",
+								"height": 3243,
+								"width": 2049,
+								"@id": "https://iiif.ucd.ie/loris/ivrla:3833/full/full/0/default.jpg",
+								"@type": "dcTypes:Image"
+							},
+							"on": "https://data.ucd.ie/api/img/ivrla:3832/canvas/ivrla:3833",
+							"motivation": "sc:painting",
+							"@id": "https://data.ucd.ie/api/img/ivrla:3832/annotation/ivrla:3833",
+							"@type": "oa:Annotation"
+						}
+					]
+				},
+				{
+					"@id": "https://data.ucd.ie/api/img/ivrla:3832/canvas/ivrla:3834",
+					"@type": "sc:Canvas",
+					"label": "[Page 2]",
+					"width": 4045,
+					"height": 3227,
+					"images": [
+						{
+							"resource": {
+								"service": {
+									"@id": "https://iiif.ucd.ie/loris/ivrla:3834",
+									"@context": "http://iiif.io/api/image/2/context.json",
+									"profile": "http://iiif.io/api/image/2/level2.json"
+								},
+								"format": "image/jpeg",
+								"height": 3227,
+								"width": 4045,
+								"@id": "https://iiif.ucd.ie/loris/ivrla:3834/full/full/0/default.jpg",
+								"@type": "dcTypes:Image"
+							},
+							"on": "https://data.ucd.ie/api/img/ivrla:3832/canvas/ivrla:3834",
+							"motivation": "sc:painting",
+							"@id": "https://data.ucd.ie/api/img/ivrla:3832/annotation/ivrla:3834",
+							"@type": "oa:Annotation"
+						}
+					]
+				}
+			]
+		}
+	],
+	"service": [
+		{
+			"@context": "http://geojson.org/contexts/geojson-base.jsonld",
+			"@id": "https://data.ucd.ie/api/geo/v1/dl/geoFilter=id(ivrla:3832)&amp;format=geojson",
+			"label": "Point coordinates",
+			"profile": "http://geojson.org/geojson-spec.html",
+			"properties": {
+				"name": "The Oratory, Birmingham, England"
+			},
+			"type": "Feature",
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					-1.92883,
+					52.471985
+				]
+			}
+		}
+	]
+}

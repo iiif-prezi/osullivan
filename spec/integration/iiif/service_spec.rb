@@ -5,6 +5,7 @@ describe IIIF::Service do
 
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
+  let(:bad_manifest) { File.join(fixtures_dir, 'manifests/bad_not_a_hash.json') }
 
   describe 'self.parse' do
     it 'works from a file' do
@@ -35,6 +36,9 @@ describe IIIF::Service do
       s = described_class.parse(manifest_from_spec_path)
       expect(s.keys.include?('see_also')).to be_truthy
       expect(s.keys.include?('seeAlso')).to be_falsey
+    end
+    it 'errors gracefully on bad IIIF' do
+      expect { described_class.parse(bad_manifest) }.to raise_error(IIIF::Presentation::IllegalValueError)
     end
   end
 
