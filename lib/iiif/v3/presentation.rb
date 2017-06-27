@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'service')
 %w{
 abstract_resource
   annotation
-  annotation_list
+  annotation_page
   canvas
   collection
   layer
