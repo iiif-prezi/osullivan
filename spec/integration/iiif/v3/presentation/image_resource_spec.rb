@@ -1,6 +1,6 @@
 describe IIIF::V3::Presentation::ImageResource do
   vcr_options = {
-    cassette_name: 'pul_loris_cassette',
+    cassette_name: 'pul_loris_cassette_v3',
     record: :new_episodes,
     serialize_with: :json
   }
