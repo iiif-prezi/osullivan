@@ -43,6 +43,7 @@ describe IIIF::V3::Presentation::ImageResource do
       it 'copies over all teh infos (when copy_info is true)' do
         opts = { service_id: valid_service_id, copy_info: true }
         resource = described_class.create_image_api_image_resource(opts)
+
         expect(resource['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
         expect(resource['type']).to eq 'dctypes:Image'
         expect(resource.format).to eq "image/jpeg"
@@ -72,8 +73,8 @@ describe IIIF::V3::Presentation::ImageResource do
           {'width' => 1524, 'height' => 3600 },
           {'width' => 3047, 'height' =>  7200 }
         ]
-        skip('loris is still v2 and returns @id, not id')
         expect(resource.service['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
+        expect(resource.service).not_to have_key('@id')
       end
     end
 
