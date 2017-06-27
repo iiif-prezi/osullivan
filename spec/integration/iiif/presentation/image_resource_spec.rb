@@ -7,7 +7,6 @@ describe IIIF::Presentation::ImageResource do
 
   describe 'self#create_image_api_image_resource', vcr: vcr_options do
 
-    # 301 moved to https.../loris
     let(:image_server) { 'https://libimages.princeton.edu/loris' }
 
     let(:valid_service_id) {

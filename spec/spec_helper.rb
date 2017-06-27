@@ -10,6 +10,7 @@ Dir["#{File.dirname(__FILE__)}/unit/iiif/v3/presentation/shared_examples/*.rb"].
   require f
 end
 require 'vcr'
+require 'webmock/rspec'
 
 VCR.configure do |c|
   c.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
