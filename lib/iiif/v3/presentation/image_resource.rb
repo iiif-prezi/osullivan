@@ -84,6 +84,7 @@ module IIIF
             resource.service = Service.new
             if copy_info
               resource.service.merge!(remote_info)
+              resource.service['id'] ||= resource.service.delete('@id')
             else
               resource.service['@context'] = IMAGE_API_CONTEXT
               resource.service['id'] = service_id
