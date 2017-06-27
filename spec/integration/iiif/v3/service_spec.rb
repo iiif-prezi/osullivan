@@ -72,10 +72,10 @@ describe IIIF::V3::Service do
                 "width": 10,
                 "height": 20,
                 "label": "My Canvas",
-                "otherContent": [
+                "content": [
                   {
                     "id": "http://example.com/content",
-                    "type": "AnnotationList",
+                    "type": "AnnotationPage",
                     "motivation": "painting"
                   }
                 ]

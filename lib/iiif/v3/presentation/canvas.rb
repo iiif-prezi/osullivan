@@ -18,7 +18,7 @@ module IIIF
         end
 
         def array_only_keys
-          super + %w{ images other_content }
+          super + %w{ content }
         end
 
         # TODO: test and validate
@@ -36,8 +36,7 @@ module IIIF
         end
 
         def validate
-          # all members of images must be an annotation
-          # all members of otherContent must be an annotation list
+          # all members of content are of type AnnotationPage
           super
         end
       end

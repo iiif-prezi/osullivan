@@ -45,7 +45,7 @@ describe IIIF::V3::Presentation::Sequence do
         'label' => 'p. 1',
         'height' => 1000,
         'width' => 750,
-        'images'=>  []
+        'content'=>  []
       }],
       'viewing_hint' => 'paged',
       'start_canvas' => 'http://www.example.org/iiif/book1/canvas/p2',

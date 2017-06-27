@@ -7,8 +7,7 @@ describe IIIF::V3::Presentation::Canvas do
       "label" => "p. 1",
       "height" => 1000,
       "width" => 750,
-      "images" =>  [ ],
-      "otherContent" =>  [ ]
+      "content" =>  [ ]
     }
   end
 
