@@ -1,23 +1,19 @@
-describe IIIF::V3::Presentation::Layer do
+describe IIIF::V3::Presentation::AnnotationCollection do
 
   let(:fixed_values) do
     {
-      'id' => 'http://www.example.org/iiif/book1/layer/transcription',
-      'type' => 'Layer',
+      'id' => 'http://www.example.org/iiif/book1/annoColl/transcription',
+      'type' => 'AnnotationCollection',
       'label' => 'Diplomatic Transcription',
-      'otherContent' => [
-        'http://www.example.org/iiif/book1/list/l1',
-        'http://www.example.org/iiif/book1/list/l2',
-        'http://www.example.org/iiif/book1/list/l3',
-        'http://www.example.org/iiif/book1/list/l4'
-      ]
+      'first' => 'http://www.example.org/iiif/book1/list/l1',
+      'last' => 'http://www.example.org/iiif/book1/list/l4',
     }
   end
 
 
   describe '#initialize' do
     it 'sets type' do
-      expect(subject['type']).to eq 'Layer'
+      expect(subject['type']).to eq 'AnnotationCollection'
     end
   end
 
