@@ -12,7 +12,7 @@ module IIIF
         end
 
         def array_only_keys
-          super + %w{ ranges }
+          super + %w{ members }
         end
 
         def legal_viewing_hint_values
@@ -25,7 +25,7 @@ module IIIF
         end
 
         def validate
-          # Values of the ranges array must be strings
+          # Values of the members array must be canvas or range
         end
       end
     end
