@@ -20,8 +20,10 @@ require_relative 'ordered_hash'
 module IIIF
   module V3
     module Presentation
-      # TODO: when v3 is baked, there will be a context
-      # CONTEXT ||= 'http://iiif.io/api/presentation/2/context.json'
+      CONTEXT ||= [
+       'http://www.w3.org/ns/anno.jsonld',
+       'http://iiif.io/api/presentation/3/context.json'
+      ]
 
       class MissingRequiredKeyError < StandardError; end
       class IllegalValueError < StandardError; end

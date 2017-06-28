@@ -98,11 +98,11 @@ describe IIIF::V3::Presentation::AbstractResource do
   end
 
   describe '#to_ordered_hash' do
-    describe 'does not add the @context' do
+    describe 'adds the @context' do
       before(:each) { subject.delete('@context') }
       it 'by default' do
         expect(subject.has_key?('@context')).to be_falsey
-        expect(subject.to_ordered_hash.has_key?('@context')).to be_falsey
+        expect(subject.to_ordered_hash.has_key?('@context')).to be_truthy
       end
       it 'unless you say not to' do
         expect(subject.has_key?('@context')).to be_falsey
