@@ -61,7 +61,7 @@
                   "type": "Annotation",
                   "motivation": "painting",
                   "target": "http://www.example.org/iiif/book1/canvas/p1",
-                  "resource": {
+                  "body": {
                     "id": "http://www.example.org/iiif/book1/res/page1.jpg",
                     "type": "Image",
                     "format": "image/jpeg",
@@ -96,7 +96,7 @@
                 {
                   "type": "Annotation",
                   "motivation": "painting",
-                  "resource": {
+                  "body": {
                     "id": "http://www.example.org/images/book1-page2/full/1500,2000/0/default.jpg",
                     "type": "Image",
                     "format": "image/jpeg",
@@ -147,7 +147,7 @@
                   "type": "Annotation",
                   "motivation": "painting",
                   "target": "http://www.example.org/iiif/book1/canvas/p3",
-                  "resource": {
+                  "body": {
                     "id": "http://www.example.org/iiif/book1/res/page3.jpg",
                     "type": "Image",
                     "format": "image/jpeg",
