@@ -176,10 +176,19 @@
       "id": "http://www.example.org/iiif/book1/range/r1",
       "type": "Range",
       "label": "Introduction",
-      "canvases": [
-        "http://www.example.org/iiif/book1/canvas/p1",
-        "http://www.example.org/iiif/book1/canvas/p2",
-        "http://www.example.org/iiif/book1/canvas/p3#xywh=0,0,750,300"
+      "members": [
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p1",
+          "type": "Canvas"
+        },
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p2",
+          "type": "Canvas"
+        },
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p3#xywh=0,0,750,300",
+          "type": "Canvas"
+        }
       ]
     }
   ]
