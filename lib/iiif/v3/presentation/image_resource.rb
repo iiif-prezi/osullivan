@@ -7,7 +7,7 @@ module IIIF
     module Presentation
       class ImageResource < Resource
 
-        TYPE = 'dctypes:Image'
+        TYPE = 'Image'
 
         def int_only_keys
           super + %w{ width height }
@@ -50,8 +50,8 @@ module IIIF
           #
           # {
           #   "id":"http://www.example.org/iiif/book1/res/page1.jpg",
-          #   "type":"dctypes:Image",
-          #   "format":"image/jpeg",
+          #   "type": "Image",
+          #   "format": "image/jpeg",
           #   "service": {
           #     "@context": "http://iiif.io/api/image/2/context.json",
           #     "id":"http://www.example.org/images/book1-page1",

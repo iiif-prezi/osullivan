@@ -28,7 +28,7 @@
                   "target": "http://www.example.org/iiif/book1/canvas/p1",
                   "resource": {
                     "id": "http://www.example.org/iiif/book1/res/page1.jpg",
-                    "type": "dctypes:Image",
+                    "type": "Image",
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
