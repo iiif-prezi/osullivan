@@ -63,7 +63,7 @@
                   "target": "http://www.example.org/iiif/book1/canvas/p1",
                   "resource": {
                     "id": "http://www.example.org/iiif/book1/res/page1.jpg",
-                    "type": "dctypes:Image",
+                    "type": "Image",
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
@@ -98,7 +98,7 @@
                   "motivation": "painting",
                   "resource": {
                     "id": "http://www.example.org/images/book1-page2/full/1500,2000/0/default.jpg",
-                    "type": "dctypes:Image",
+                    "type": "Image",
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
@@ -149,7 +149,7 @@
                   "target": "http://www.example.org/iiif/book1/canvas/p3",
                   "resource": {
                     "id": "http://www.example.org/iiif/book1/res/page3.jpg",
-                    "type": "dctypes:Image",
+                    "type": "Image",
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
