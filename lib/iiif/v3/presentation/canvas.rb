@@ -10,7 +10,7 @@ module IIIF
         TYPE = 'Canvas'
 
         def required_keys
-          super + %w{ id width height label }
+          super + %w{ id label }
         end
 
         def any_type_keys
