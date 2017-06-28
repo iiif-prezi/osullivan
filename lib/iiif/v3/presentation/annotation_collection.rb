@@ -3,20 +3,25 @@ require File.join(File.dirname(__FILE__), 'abstract_resource')
 module IIIF
   module V3
     module Presentation
-      class Layer < AbstractResource
+      class AnnotationCollection < AbstractResource
 
-        TYPE = 'Layer'
+        TYPE = 'AnnotationCollection'
 
         def required_keys
-          super + %w{ id label }
+          super + %w{ id }
+        end
+
+        def int_only_keys
+          super + %w{ total }
         end
 
         def array_only_keys
-          super + %w{ other_content }
+          super + %w{ content }
         end
 
         def string_only_keys
-          super + %w{ viewing_direction } # should any of the any_type_keys be here?
+          # first and last are actually uris
+          super + %w{ viewing_direction, first, last }
         end
 
         def initialize(hsh={})
@@ -25,8 +30,6 @@ module IIIF
         end
 
         def validate
-          # Must all members of otherContent and images must be a URI (string), or
-          # can they be inline?
           super
         end
       end
