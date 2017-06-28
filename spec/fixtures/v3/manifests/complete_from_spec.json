@@ -1,4 +1,8 @@
 {
+  "@context": [
+    "http://iiif.io/api/presentation/3/context.json",
+    "http://www.w3.org/ns/anno.jsonld"
+  ],
   "id": "http://www.example.org/iiif/book1/manifest",
   "type": "Manifest",
   "label": "Book 1",
@@ -64,6 +68,7 @@
                     "height": 2000,
                     "width": 1500,
                     "service": {
+                      "@context": "http://iiif.io/api/image/2/context.json",
                       "id": "http://www.example.org/images/book1-page1",
                       "profile": "http://iiif.io/api/image/2/level1.json"
                     }

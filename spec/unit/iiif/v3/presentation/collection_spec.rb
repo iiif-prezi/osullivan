@@ -2,6 +2,10 @@ describe IIIF::V3::Presentation::Collection do
 
   let(:fixed_values) do
     {
+      "@context": [
+        "http://iiif.io/api/presentation/3/context.json",
+        "http://www.w3.org/ns/anno.jsonld"
+      ],
       'id' => 'http://example.org/iiif/collection/top',
       'type' => 'Collection',
       'label' => 'Top Level Collection for Example Organization',

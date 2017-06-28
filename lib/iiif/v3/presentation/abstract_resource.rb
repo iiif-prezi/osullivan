@@ -47,9 +47,9 @@ module IIIF
         end
 
         # Initialize a Presentation node
-        # @param [Hash] hsh - Anything in this hash will be added to the Object.'
+        # @param [Hash] hsh - Anything in this hash will be added to the Object.
         #   Order is only guaranteed if an ActiveSupport::OrderedHash is passed.
-        # @param [boolean] include_context (default: false). Pass true if the'
+        # @param [boolean] include_context (default: false). Pass true if the
         #   context should be included.
         def initialize(hsh={})
           if self.class == IIIF::V3::Presentation::AbstractResource
@@ -66,11 +66,10 @@ module IIIF
         #  * sort_json_ld_keys: (true|false). Brings all properties starting with
         #      '@'. Default: true. to the top of the document and sorts them.
         def to_ordered_hash(opts={})
-          # TODO: when v3 is baked, there will be a context
-          # include_context = opts.fetch(:include_context, true)
-          # if include_context && !self.has_key?('@context')
-          #   self['@context'] = IIIF::V3::Presentation::CONTEXT
-          # end
+          include_context = opts.fetch(:include_context, true)
+          if include_context && !self.has_key?('@context')
+            self['@context'] = IIIF::V3::Presentation::CONTEXT
+          end
           super(opts)
         end
 

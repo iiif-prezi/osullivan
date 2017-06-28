@@ -40,6 +40,10 @@ describe IIIF::V3::Service do
 
   describe 'self#from_ordered_hash' do
     let(:fixture) { JSON.parse('{
+        "@context": [
+          "http://iiif.io/api/presentation/3/context.json",
+          "http://www.w3.org/ns/anno.jsonld"
+        ],
         "id": "http://example.com/manifest",
         "type": "Manifest",
         "label": "My Manifest",
