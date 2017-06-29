@@ -5,6 +5,7 @@ abstract_resource
   annotation_collection
   annotation_page
   canvas
+  choice
   collection
   manifest
   resource
