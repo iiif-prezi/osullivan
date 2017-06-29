@@ -17,6 +17,7 @@ module IIIF
     def abstract_resource_only_keys; %w{ }; end
     def hash_only_keys; %w{ }; end
     def int_only_keys; %w{ }; end
+    def numeric_only_keys; %w{ }; end
 
     def initialize(hsh={})
       @data = IIIF::OrderedHash[hsh]
@@ -304,6 +305,15 @@ module IIIF
       define_accessor_methods(*int_only_keys) do |key, arg|
         unless arg.kind_of?(Integer) && arg > 0
           m = "#{key} must be a positive Integer."
+          raise IIIF::Presentation::IllegalValueError, m
+        end
+      end
+    end
+
+    def define_methods_for_numeric_only_keys
+      define_accessor_methods(*numeric_only_keys) do |key, arg|
+        unless arg.kind_of?(Numeric) && arg > 0
+          m = "#{key} must be a positive Integer or Float."
           raise IIIF::Presentation::IllegalValueError, m
         end
       end
