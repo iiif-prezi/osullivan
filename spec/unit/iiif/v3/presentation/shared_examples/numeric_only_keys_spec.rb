@@ -1,6 +1,6 @@
 require 'set'
 
-shared_examples 'it has the appropriate methods for numeric-only keys' do
+shared_examples 'it has the appropriate methods for numeric-only keys v3' do
 
   described_class.new.numeric_only_keys.each do |prop|
 

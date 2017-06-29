@@ -8,6 +8,10 @@ describe IIIF::V3::Presentation::Resource do
     it_behaves_like 'it has the appropriate methods for integer-only keys v3'
   end
 
+  describe "#{described_class}.numeric_only_keys" do
+    it_behaves_like 'it has the appropriate methods for numeric-only keys v3'
+  end
+
   describe "#{described_class}.define_methods_for_string_only_keys" do
     it_behaves_like 'it has the appropriate methods for string-only keys v3'
   end
