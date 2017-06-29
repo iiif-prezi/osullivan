@@ -2,9 +2,9 @@ describe IIIF::V3::Presentation::AnnotationCollection do
 
   let(:fixed_values) do
     {
-      "@context": [
-        "http://iiif.io/api/presentation/3/context.json",
-        "http://www.w3.org/ns/anno.jsonld"
+      '@context' => [
+        'http://iiif.io/api/presentation/3/context.json',
+        'http://www.w3.org/ns/anno.jsonld'
       ],
       'id' => 'http://www.example.org/iiif/book1/annoColl/transcription',
       'type' => 'AnnotationCollection',
