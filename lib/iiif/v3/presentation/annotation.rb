@@ -15,10 +15,30 @@ module IIIF
           super + [ { key: 'body', type: IIIF::V3::Presentation::Resource } ]
         end
 
+        def string_only_keys
+          super + %w{ time_mode }
+        end
+
+        def legal_time_mode_values
+          %w{ trim scale loop }
+        end
+
         def initialize(hsh={})
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           hsh['motivation'] = 'painting' unless hsh.has_key? 'motivation'
           super(hsh)
+        end
+
+        def validate
+          super
+
+          # time mode values
+          if self.has_key?('time_mode')
+            unless self.legal_time_mode_values.include?(self['time_mode'])
+              m = "timeMode for #{self.class} must be one of #{self.legal_time_mode_values}."
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
+          end
         end
       end
     end
