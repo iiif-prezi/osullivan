@@ -16,7 +16,7 @@ module IIIF
         end
 
         def legal_viewing_hint_values
-          %w{ auto-advance }
+          %w{ auto-advance together }
         end
 
         def initialize(hsh={})
