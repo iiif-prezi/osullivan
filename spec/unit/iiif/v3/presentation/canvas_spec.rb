@@ -2,7 +2,7 @@ describe IIIF::V3::Presentation::Canvas do
 
   let(:fixed_values) do
     {
-      "@context": [
+      "@context" => [
         "http://iiif.io/api/presentation/3/context.json",
         "http://www.w3.org/ns/anno.jsonld"
       ],
