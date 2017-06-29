@@ -24,6 +24,7 @@ module IIIF
       self.define_methods_for_array_only_keys
       self.define_methods_for_string_only_keys
       self.define_methods_for_int_only_keys
+      self.define_methods_for_numeric_only_keys
       self.define_methods_for_abstract_resource_only_keys
       self.snakeize_keys
     end
@@ -253,56 +254,22 @@ module IIIF
     end
 
     def define_methods_for_any_type_keys
+      define_accessor_methods(*any_type_keys)
+
+      # override the getter defined by define_accessor_methods to avoid returning
+      # an array for empty values.
       any_type_keys.each do |key|
-        # Setters
-        define_singleton_method("#{key}=") do |arg|
-          self.send('[]=', key, arg)
-        end
-        if key.camelize(:lower) != key
-          define_singleton_method("#{key.camelize(:lower)}=") do |arg|
-            self.send('[]=', key, arg)
-          end
-        end
-        # Getters
         define_singleton_method(key) do
           self.send('[]', key)
-        end
-        if key.camelize(:lower) != key
-          define_singleton_method(key.camelize(:lower)) do
-            self.send('[]', key)
-          end
         end
       end
     end
 
     def define_methods_for_array_only_keys
-      array_only_keys.each do |key|
-        # Setters
-        define_singleton_method("#{key}=") do |arg|
-          unless arg.kind_of?(Array)
-            m = "#{key} must be an Array."
-            raise IIIF::Presentation::IllegalValueError, m
-          end
-          self.send('[]=', key, arg)
-        end
-        if key.camelize(:lower) != key
-          define_singleton_method("#{key.camelize(:lower)}=") do |arg|
-            unless arg.kind_of?(Array)
-              m = "#{key} must be an Array."
-              raise IIIF::Presentation::IllegalValueError, m
-            end
-            self.send('[]=', key, arg)
-          end
-        end
-        # Getters
-        define_singleton_method(key) do
-          self[key] ||= []
-          self[key]
-        end
-        if key.camelize(:lower) != key
-          define_singleton_method(key.camelize(:lower)) do
-            self.send('[]', key)
-          end
+      define_accessor_methods(*array_only_keys) do |key, arg|
+        unless arg.kind_of?(Array)
+          m = "#{key} must be an Array."
+          raise IIIF::Presentation::IllegalValueError, m
         end
       end
     end
@@ -312,85 +279,44 @@ module IIIF
       abstract_resource_only_keys.each do |hsh|
         key = hsh[:key]
         type = hsh[:type]
-        # Setters
-        define_singleton_method("#{key}=") do |arg|
+
+        define_accessor_methods(key) do |key, arg|
           unless arg.kind_of?(type)
             m = "#{key} must be an #{type}."
             raise IIIF::Presentation::IllegalValueError, m
-          end
-          self.send('[]=', key, arg)
-        end
-        if key.camelize(:lower) != key
-          define_singleton_method("#{key.camelize(:lower)}=") do |arg|
-            unless arg.kind_of?(type)
-              m = "#{key} must be an #{type}."
-              raise IIIF::Presentation::IllegalValueError, m
-            end
-            self.send('[]=', key, arg)
-          end
-        end
-        # Getters
-        define_singleton_method(key) do
-          self[key] ||= []
-          self[key]
-        end
-        if key.camelize(:lower) != key
-          define_singleton_method(key.camelize(:lower)) do
-            self.send('[]', key)
           end
         end
       end
     end
 
-
     def define_methods_for_string_only_keys
-      string_only_keys.each do |key|
-        # Setter
-        define_singleton_method("#{key}=") do |arg|
-          unless arg.kind_of?(String)
-            m = "#{key} must be an String."
-            raise IIIF::Presentation::IllegalValueError, m
-          end
-          self.send('[]=', key, arg)
-        end
-        if key.camelize(:lower) != key
-          define_singleton_method("#{key.camelize(:lower)}=") do |arg|
-            unless arg.kind_of?(String)
-              m = "#{key} must be an String."
-              raise IIIF::Presentation::IllegalValueError, m
-            end
-            self.send('[]=', key, arg)
-          end
-        end
-        # Getter
-        define_singleton_method(key) do
-          self[key] ||= []
-          self[key]
-        end
-        if key.camelize(:lower) != key
-          define_singleton_method(key.camelize(:lower)) do
-            self.send('[]', key)
-          end
+      define_accessor_methods(*string_only_keys) do |key, arg|
+        unless arg.kind_of?(String)
+          m = "#{key} must be an String."
+          raise IIIF::Presentation::IllegalValueError, m
         end
       end
     end
 
     def define_methods_for_int_only_keys
-      int_only_keys.each do |key|
+      define_accessor_methods(*int_only_keys) do |key, arg|
+        unless arg.kind_of?(Integer) && arg > 0
+          m = "#{key} must be a positive Integer."
+          raise IIIF::Presentation::IllegalValueError, m
+        end
+      end
+    end
+
+    def define_accessor_methods(*keys, &validation)
+      keys.each do |key|
         # Setter
         define_singleton_method("#{key}=") do |arg|
-          unless arg.kind_of?(Integer) && arg > 0
-            m = "#{key} must be a positive Integer."
-            raise IIIF::Presentation::IllegalValueError, m
-          end
+          validation.call(key, arg) if block_given?
           self.send('[]=', key, arg)
         end
         if key.camelize(:lower) != key
           define_singleton_method("#{key.camelize(:lower)}=") do |arg|
-            unless arg.kind_of?(Integer) && arg > 0
-              m = "#{key} must be a positive Integer."
-              raise IIIF::Presentation::IllegalValueError, m
-            end
+            validation.call(key, arg) if block_given?
             self.send('[]=', key, arg)
           end
         end
@@ -406,6 +332,5 @@ module IIIF
         end
       end
     end
-
   end
 end
