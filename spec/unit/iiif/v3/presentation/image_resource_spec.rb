@@ -1,8 +1,8 @@
 describe IIIF::V3::Presentation::ImageResource do
 
   describe '#initialize' do
-    it 'sets type to dctypes:Image' do
-      expect(subject['type']).to eq 'dctypes:Image'
+    it 'sets type to Image' do
+      expect(subject['type']).to eq 'Image'
     end
   end
 

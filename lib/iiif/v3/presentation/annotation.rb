@@ -12,7 +12,7 @@ module IIIF
         end
 
         def abstract_resource_only_keys
-          super + [ { key: 'resource', type: IIIF::V3::Presentation::Resource } ]
+          super + [ { key: 'body', type: IIIF::V3::Presentation::Resource } ]
         end
 
         def initialize(hsh={})

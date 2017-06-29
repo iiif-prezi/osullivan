@@ -5,14 +5,27 @@ describe IIIF::V3::Presentation::Range do
       'id' => 'http://www.example.org/iiif/book1/range/r1',
       'type' => 'Range',
       'label' => 'Introduction',
-      'ranges' => [
-        'http://www.example.org/iiif/book1/range/r1-1',
-        'http://www.example.org/iiif/book1/range/r1-2'
-      ],
-      'canvases' => [
-        'http://www.example.org/iiif/book1/canvas/p1',
-        'http://www.example.org/iiif/book1/canvas/p2',
-        'http://www.example.org/iiif/book1/canvas/p3#xywh=0,0,750,300'
+      'members' => [
+        {
+          "id": 'http://www.example.org/iiif/book1/range/r1-1',
+          "type": "Range"
+        },
+        {
+          "id": 'http://www.example.org/iiif/book1/range/r1-2',
+          "type": "Range"
+        },
+        {
+          "id": 'http://www.example.org/iiif/book1/canvas/p1',
+          "type": "Canvas"
+        },
+        {
+          "id": 'http://www.example.org/iiif/book1/canvas/p2',
+          "type": "Canvas"
+        },
+        {
+          "id": 'http://www.example.org/iiif/book1/canvas/p3#xywh=0,0,750,300',
+          "type": "Canvas"
+        }
       ]
     }
   end

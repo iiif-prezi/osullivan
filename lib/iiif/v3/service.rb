@@ -209,7 +209,7 @@ module IIIF
           new_key = key.underscore == key ? key : key.underscore
           if new_key == 'service'
             new_object[new_key] = IIIF::V3::Service.from_ordered_hash(hsh[key], IIIF::V3::Service)
-          elsif new_key == 'resource'
+          elsif new_key == 'body'
             new_object[new_key] = IIIF::V3::Service.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Resource)
           elsif hsh[key].kind_of?(Hash)
             new_object[new_key] = IIIF::V3::Service.from_ordered_hash(hsh[key])

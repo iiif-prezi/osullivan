@@ -2,6 +2,10 @@ describe IIIF::V3::Presentation::Canvas do
 
   let(:fixed_values) do
     {
+      "@context": [
+        "http://iiif.io/api/presentation/3/context.json",
+        "http://www.w3.org/ns/anno.jsonld"
+      ],
       "id" => "http://www.example.org/iiif/book1/canvas/p1",
       "type" => "Canvas",
       "label" => "p. 1",

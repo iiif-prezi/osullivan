@@ -1,4 +1,8 @@
 {
+  "@context": [
+    "http://iiif.io/api/presentation/3/context.json",
+    "http://www.w3.org/ns/anno.jsonld"
+  ],
   "id": "http://www.example.org/iiif/book1/manifest",
   "type": "Manifest",
   "label": "Book 1",
@@ -57,13 +61,14 @@
                   "type": "Annotation",
                   "motivation": "painting",
                   "target": "http://www.example.org/iiif/book1/canvas/p1",
-                  "resource": {
+                  "body": {
                     "id": "http://www.example.org/iiif/book1/res/page1.jpg",
-                    "type": "dctypes:Image",
+                    "type": "Image",
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
                     "service": {
+                      "@context": "http://iiif.io/api/image/2/context.json",
                       "id": "http://www.example.org/images/book1-page1",
                       "profile": "http://iiif.io/api/image/2/level1.json"
                     }
@@ -91,9 +96,9 @@
                 {
                   "type": "Annotation",
                   "motivation": "painting",
-                  "resource": {
+                  "body": {
                     "id": "http://www.example.org/images/book1-page2/full/1500,2000/0/default.jpg",
-                    "type": "dctypes:Image",
+                    "type": "Image",
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
@@ -142,9 +147,9 @@
                   "type": "Annotation",
                   "motivation": "painting",
                   "target": "http://www.example.org/iiif/book1/canvas/p3",
-                  "resource": {
+                  "body": {
                     "id": "http://www.example.org/iiif/book1/res/page3.jpg",
-                    "type": "dctypes:Image",
+                    "type": "Image",
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
@@ -171,10 +176,19 @@
       "id": "http://www.example.org/iiif/book1/range/r1",
       "type": "Range",
       "label": "Introduction",
-      "canvases": [
-        "http://www.example.org/iiif/book1/canvas/p1",
-        "http://www.example.org/iiif/book1/canvas/p2",
-        "http://www.example.org/iiif/book1/canvas/p3#xywh=0,0,750,300"
+      "members": [
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p1",
+          "type": "Canvas"
+        },
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p2",
+          "type": "Canvas"
+        },
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p3#xywh=0,0,750,300",
+          "type": "Canvas"
+        }
       ]
     }
   ]
