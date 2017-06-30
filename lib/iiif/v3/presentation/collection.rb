@@ -15,6 +15,10 @@ module IIIF
           super + %w{ collections manifests }
         end
 
+        def legal_viewing_hint_values
+          %w{ auto-advance together }
+        end
+
         def initialize(hsh={})
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           super(hsh)

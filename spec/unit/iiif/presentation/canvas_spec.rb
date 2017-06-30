@@ -43,4 +43,3 @@ describe IIIF::Presentation::Canvas do
   end
 
 end
-

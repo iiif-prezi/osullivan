@@ -20,7 +20,7 @@ module IIIF
         end
 
         def legal_viewing_hint_values
-          %w{ individuals paged continuous none }
+          %w{ individuals paged continuous auto-advance none }
         end
 
         def initialize(hsh={})

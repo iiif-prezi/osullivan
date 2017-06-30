@@ -13,6 +13,10 @@ module IIIF
           super + %w{ format }
         end
 
+        def numeric_only_keys
+          super + %w{ duration }
+        end
+
         def initialize(hsh={})
           super(hsh)
         end
