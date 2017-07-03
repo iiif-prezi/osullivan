@@ -26,10 +26,7 @@ module IIIF
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           super(hsh)
         end
-
-        def validate
-          super
-        end
+        
       end
     end
   end
