@@ -24,7 +24,7 @@ module IIIF
       end
 
       def abstract_resource_only_keys
-        [ { key: 'service', type: IIIF::V3::Service } ]
+        [ { key: 'service', type: IIIF::V3::Presentation::Service } ]
       end
 
       def hash_only_keys
@@ -85,7 +85,7 @@ module IIIF
             end
             raise ArgumentError, m
           end
-          return IIIF::V3::Service.from_ordered_hash(ordered_hash)
+          return IIIF::V3::Presentation::Service.from_ordered_hash(ordered_hash)
         end
       end
 
@@ -251,7 +251,7 @@ module IIIF
         hsh.keys.each do |key|
           new_key = key.underscore == key ? key : key.underscore
           if new_key == 'service'
-            new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Service)
+            new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Service)
           elsif new_key == 'body'
             new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Resource)
           elsif hsh[key].kind_of?(Hash)
@@ -260,7 +260,7 @@ module IIIF
             new_object[new_key] = []
             hsh[key].each do |member|
               if new_key == 'service'
-                new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member, IIIF::V3::Service)
+                new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member, IIIF::V3::Presentation::Service)
               elsif member.kind_of?(Hash)
                 new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member)
               else
