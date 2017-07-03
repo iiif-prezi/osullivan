@@ -58,8 +58,9 @@ module IIIF
         end
         @data = IIIF::OrderedHash[hsh]
         self.define_methods_for_any_type_keys
-        self.define_methods_for_array_only_keys
         self.define_methods_for_string_only_keys
+        self.define_methods_for_array_only_keys
+        self.define_methods_for_hash_only_keys
         self.define_methods_for_int_only_keys
         self.define_methods_for_numeric_only_keys
         self.define_methods_for_abstract_resource_only_keys
@@ -90,18 +91,15 @@ module IIIF
       end
 
       def validate
-        # TODO:
-        # * check for required keys
-        # * type check Array-only values
-        # * type check String-only values
-        # * type check Integer-only values
-        # * type check AbstractResource-only values
         self.required_keys.each do |k|
           unless self.has_key?(k)
             m = "A(n) #{k} is required for each #{self.class}"
             raise IIIF::V3::Presentation::MissingRequiredKeyError, m
           end
         end
+
+        # note that xxx_only key values are checked via, e.g. self.define_methods_for_array_only_keys
+
         # Viewing Direction values
         if self.has_key?('viewing_direction')
           unless self.legal_viewing_direction_values.include?(self['viewing_direction'])
@@ -316,8 +314,17 @@ module IIIF
         end
       end
 
+      def define_methods_for_hash_only_keys
+        define_accessor_methods(*hash_only_keys) do |key, arg|
+          unless arg.kind_of?(Hash)
+            m = "#{key} must be a Hash."
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+        end
+      end
+
       def define_methods_for_abstract_resource_only_keys
-        # keys in this case is an array of hashes with { key: 'k', type: Class }
+        # values in this case: an array of hashes with { key: 'k', type: Class }
         abstract_resource_only_keys.each do |hsh|
           key = hsh[:key]
           type = hsh[:type]
