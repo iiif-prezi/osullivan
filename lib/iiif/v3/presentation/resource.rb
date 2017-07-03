@@ -15,9 +15,6 @@ module IIIF
           super + %w{ duration }
         end
 
-        def initialize(hsh={})
-          super(hsh)
-        end
       end
     end
   end

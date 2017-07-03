@@ -11,10 +11,6 @@ module IIIF
           super + %w{ id label }
         end
 
-        def any_type_keys
-          super + %w{  }
-        end
-
         def array_only_keys
           super + %w{ content }
         end
