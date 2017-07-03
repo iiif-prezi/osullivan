@@ -27,9 +27,8 @@ module IIIF
         end
 
         def validate
-          # TODO: check types of sequences and structure members
-
           super
+          # TODO: check types of sequences and structure members
         end
       end
     end

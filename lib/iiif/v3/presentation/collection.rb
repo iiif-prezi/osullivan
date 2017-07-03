@@ -23,8 +23,9 @@ module IIIF
         end
 
         def validate
-          # each member of collections and manifests must be a Hash
-          # each member of collections and manifests MUST have id, type, and label
+          super
+          # TODO: each member of collections and manifests must be a Hash
+          # TODO: each member of collections and manifests MUST have id, type, and label
         end
       end
     end

@@ -23,9 +23,9 @@ module IIIF
         end
 
         def validate
-          # * Must be at least one canvas
-          # * All members of canvases must be a kind of Canvas
           super
+          # TODO: Must be at least one canvas
+          # TODO: All members of canvases must be a kind of Canvas
         end
       end
     end
