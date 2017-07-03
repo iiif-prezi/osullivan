@@ -1,14 +1,14 @@
 require 'active_support/inflector'
 require 'json'
-require File.join(File.dirname(__FILE__), '../../../../../lib/iiif/v3/hash_behaviours')
+require File.join(File.dirname(__FILE__), '../../../../lib/iiif/v3/hash_behaviours')
 
 
-describe IIIF::V3::Presentation::AbstractResource do
+describe IIIF::V3::AbstractResource do
 
-  let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../../fixtures') }
+  let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'v3/manifests/complete_from_spec.json') }
   let(:abstract_resource_subclass) do
-    Class.new(IIIF::V3::Presentation::AbstractResource) do
+    Class.new(IIIF::V3::AbstractResource) do
       include IIIF::V3::HashBehaviours
 
       def initialize(hsh={})
@@ -30,7 +30,7 @@ describe IIIF::V3::Presentation::AbstractResource do
 
   describe '#initialize' do
     it 'raises an error if you try to instantiate AbstractResource' do
-      expect { IIIF::V3::Presentation::AbstractResource.new }.to raise_error(RuntimeError)
+      expect { IIIF::V3::AbstractResource.new }.to raise_error(RuntimeError)
     end
     it 'sets type' do
       expect(subject['type']).to eq 'a:SubClass'

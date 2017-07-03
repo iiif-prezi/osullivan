@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class Canvas < AbstractResource
+      class Canvas < IIIF::V3::AbstractResource
 
         # TODO (?) a simple 'Image Canvas' constructor.
 

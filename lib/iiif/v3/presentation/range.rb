@@ -1,5 +1,3 @@
-require File.join(File.dirname(__FILE__), 'sequence')
-
 module IIIF
   module V3
     module Presentation
