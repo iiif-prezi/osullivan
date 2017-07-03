@@ -1,5 +1,5 @@
 require_relative 'abstract_resource'
-require_relative 'ordered_hash'
+require_relative '../ordered_hash'
 
 require File.join(File.dirname(__FILE__), 'service')
 %w{
