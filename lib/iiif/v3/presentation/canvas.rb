@@ -30,8 +30,8 @@ module IIIF
         end
 
         def validate
-          # all members of content are of type AnnotationPage
           super
+          # TODO: all members of content are of type AnnotationPage
         end
       end
     end

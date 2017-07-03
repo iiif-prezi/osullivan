@@ -19,7 +19,8 @@ module IIIF
         end
 
         def validate
-          # Each member or resources must be a kind of Annotation
+          super
+          # TODO: Each member or resources must be a kind of Annotation
         end
 
       end

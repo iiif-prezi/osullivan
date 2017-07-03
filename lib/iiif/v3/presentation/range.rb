@@ -23,7 +23,8 @@ module IIIF
         end
 
         def validate
-          # Values of the members array must be canvas or range
+          super
+          # TODO: Values of the members array must be canvas or range
         end
       end
     end
