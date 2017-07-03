@@ -1,7 +1,7 @@
 require 'active_support/inflector'
 require 'json'
 
-describe IIIF::V3::Service do
+describe IIIF::V3::AbstractResource do
 
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'v3/manifests/complete_from_spec.json') }
@@ -104,7 +104,7 @@ describe IIIF::V3::Service do
     end
 
     it 'turns services into Services' do
-     expected_klass = IIIF::V3::Service
+      expected_klass = IIIF::V3::Service
       parsed = described_class.from_ordered_hash(fixture)
       expect(parsed['service'].class).to be expected_klass
     end
@@ -152,6 +152,8 @@ describe IIIF::V3::Service do
     let(:logo_uri) { 'http://www.example.org/logos/institution1.jpg' }
     let(:within_uri) { 'http://www.example.org/collections/books/' }
     let(:see_also) { 'http://www.example.org/library/catalog/book1.xml' }
+    # NOTE:  Using Service to test, as we can't initialize the abstract class
+    let(:instantiated_class) { IIIF::V3::Service.new }
 
     describe 'it puts the json-ld keys at the top' do
       let(:extra_props) { [
@@ -160,28 +162,28 @@ describe IIIF::V3::Service do
         ['within','http://example.com/something']
       ] }
       let(:sorted_ld_keys) {
-        subject.keys.select { |k| k.start_with?('@') }.sort!
+        instantiated_class.keys.select { |k| k.start_with?('@') }.sort!
       }
       before(:each) {
         extra_props.reverse.each do |k,v|
-          subject.unshift(k,v)
+          instantiated_class.unshift(k,v)
         end
       }
 
       it 'by default' do
         (0..extra_props.length-1).each do |i|
-          expect(subject.keys[i]).to eq(extra_props[i][0])
+          expect(instantiated_class.keys[i]).to eq(extra_props[i][0])
         end
-        oh = subject.to_ordered_hash
+        oh = instantiated_class.to_ordered_hash
         (0..sorted_ld_keys.length-1).each do |i|
           expect(oh.keys[i]).to eq(sorted_ld_keys[i])
         end
       end
       it 'unless you say not to' do
         (0..extra_props.length-1).each do |i|
-          expect(subject.keys[i]).to eq(extra_props[i][0])
+          expect(instantiated_class.keys[i]).to eq(extra_props[i][0])
         end
-        oh = subject.to_ordered_hash(sort_json_ld_keys: false)
+        oh = instantiated_class.to_ordered_hash(sort_json_ld_keys: false)
         (0..extra_props.length-1).each do |i|
           expect(oh.keys[i]).to eq(extra_props[i][0])
         end
@@ -190,23 +192,23 @@ describe IIIF::V3::Service do
 
     describe 'removes empty keys' do
       it 'if they\'re arrays' do
-        subject['logo'] = logo_uri
-        subject['within'] = []
-        ordered_hash = subject.to_ordered_hash
+        instantiated_class['logo'] = logo_uri
+        instantiated_class['within'] = []
+        ordered_hash = instantiated_class.to_ordered_hash
         expect(ordered_hash.has_key?('within')).to be_falsey
       end
       it 'if they\'re nil' do
-        subject['logo'] = logo_uri
-        subject['within'] = nil
-        ordered_hash = subject.to_ordered_hash
+        instantiated_class['logo'] = logo_uri
+        instantiated_class['within'] = nil
+        ordered_hash = instantiated_class.to_ordered_hash
         expect(ordered_hash.has_key?('within')).to be_falsey
       end
     end
 
     it 'converts snake_case keys to camelCase' do
-      subject['see_also'] = logo_uri
-      subject['within'] = within_uri
-      ordered_hash = subject.to_ordered_hash
+      instantiated_class['see_also'] = logo_uri
+      instantiated_class['within'] = within_uri
+      ordered_hash = instantiated_class.to_ordered_hash
       expect(ordered_hash.keys.include?('seeAlso')).to be_truthy
     end
   end
