@@ -1,8 +1,8 @@
 require_relative 'abstract_resource'
 require_relative '../ordered_hash'
-require_relative 'service'
 
 # NOTE: image_resource must follow resource due to inheritance
+# NOTE: range must follow sequence due to inheritance
 %w{
   annotation
   annotation_collection
@@ -15,6 +15,7 @@ require_relative 'service'
   image_resource
   sequence
   range
+  service
 }.each do |f|
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end

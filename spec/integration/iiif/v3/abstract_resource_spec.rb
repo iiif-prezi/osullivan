@@ -104,7 +104,7 @@ describe IIIF::V3::AbstractResource do
     end
 
     it 'turns services into Services' do
-      expected_klass = IIIF::V3::Service
+      expected_klass = IIIF::V3::Presentation::Service
       parsed = described_class.from_ordered_hash(fixture)
       expect(parsed['service'].class).to be expected_klass
     end
@@ -115,7 +115,7 @@ describe IIIF::V3::AbstractResource do
       File.open(fp,'w') do |f|
         f.write(parsed.to_json)
       end
-      from_file = IIIF::V3::Service.parse('/tmp/osullivan-spec.json')
+      from_file = IIIF::V3::Presentation::Service.parse('/tmp/osullivan-spec.json')
       File.delete(fp)
       # is this sufficient?
       expect(parsed.to_ordered_hash.to_a - from_file.to_ordered_hash.to_a).to eq []
@@ -153,7 +153,7 @@ describe IIIF::V3::AbstractResource do
     let(:within_uri) { 'http://www.example.org/collections/books/' }
     let(:see_also) { 'http://www.example.org/library/catalog/book1.xml' }
     # NOTE:  Using Service to test, as we can't initialize the abstract class
-    let(:instantiated_class) { IIIF::V3::Service.new }
+    let(:instantiated_class) { IIIF::V3::Presentation::Service.new }
 
     describe 'it puts the json-ld keys at the top' do
       let(:extra_props) { [
