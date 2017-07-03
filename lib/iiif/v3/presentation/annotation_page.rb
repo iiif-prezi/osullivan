@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class AnnotationPage < AbstractResource
+      class AnnotationPage < IIIF::V3::AbstractResource
 
         TYPE = 'AnnotationPage'
 
@@ -21,7 +19,8 @@ module IIIF
         end
 
         def validate
-          # Each member or resources must be a kind of Annotation
+          super
+          # TODO: Each member or resources must be a kind of Annotation
         end
 
       end

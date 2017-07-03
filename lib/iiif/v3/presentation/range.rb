@@ -1,5 +1,3 @@
-require File.join(File.dirname(__FILE__), 'sequence')
-
 module IIIF
   module V3
     module Presentation
@@ -25,7 +23,8 @@ module IIIF
         end
 
         def validate
-          # Values of the members array must be canvas or range
+          super
+          # TODO: Values of the members array must be canvas or range
         end
       end
     end

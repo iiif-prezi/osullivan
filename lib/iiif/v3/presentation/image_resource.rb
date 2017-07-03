@@ -1,6 +1,4 @@
-require File.join(File.dirname(__FILE__), 'resource')
 require 'faraday'
-require 'json'
 
 module IIIF
   module V3

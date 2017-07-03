@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class AnnotationCollection < AbstractResource
+      class AnnotationCollection < IIIF::V3::AbstractResource
 
         TYPE = 'AnnotationCollection'
 
@@ -28,10 +26,7 @@ module IIIF
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           super(hsh)
         end
-
-        def validate
-          super
-        end
+        
       end
     end
   end

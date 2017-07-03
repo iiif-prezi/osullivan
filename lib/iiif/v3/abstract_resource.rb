@@ -1,30 +1,66 @@
-require File.join(File.dirname(__FILE__), 'hash_behaviours')
-require 'active_support/core_ext/class/subclasses'
-require 'active_support/ordered_hash'
-require 'active_support/inflector'
-require 'json'
+require_relative '../hash_behaviours'
 
 module IIIF
   module V3
-    class Service
-      include IIIF::V3::HashBehaviours
+    class AbstractResource
+      include IIIF::HashBehaviours
 
-      # Anything goes! SHOULD have id and profile, MAY have label
-      # Consider subclassing this for typical services...
-      def required_keys; %w{ }; end
-      def any_type_keys; %w{ }; end
-      def string_only_keys; %w{ }; end
-      def array_only_keys; %w{ }; end
-      def abstract_resource_only_keys; %w{ }; end
-      def hash_only_keys; %w{ }; end
-      def int_only_keys; %w{ }; end
-      def numeric_only_keys; %w{ }; end
+      # Every subclass should override the following methods defining key value types, see Subclasses for how
+      def required_keys
+        %w{ type }
+      end
 
+      def any_type_keys # these are allowed on all classes
+        %w{ label description thumbnail attribution logo see_also
+        related within }
+      end
+
+      def string_only_keys
+        %w{ viewing_hint } # should any of the any_type_keys be here?
+      end
+
+      def array_only_keys
+        %w{ metadata rights }
+      end
+
+      def abstract_resource_only_keys
+        [ { key: 'service', type: IIIF::V3::Presentation::Service } ]
+      end
+
+      def hash_only_keys
+        %w{ }
+      end
+      def int_only_keys
+        %w{ }
+      end
+      def numeric_only_keys
+        %w{ }
+      end
+
+      # Not every subclass is allowed to have viewingDirect, but when it is,
+      # it must be one of these values
+      def legal_viewing_direction_values
+        %w{ left-to-right right-to-left top-to-bottom bottom-to-top }
+      end
+
+      def legal_viewing_hint_values
+        []
+      end
+
+      # Initialize a Presentation node
+      # @param [Hash] hsh - Anything in this hash will be added to the Object.
+      #   Order is only guaranteed if an ActiveSupport::OrderedHash is passed.
+      # @param [boolean] include_context (default: false). Pass true if the
+      #   context should be included.
       def initialize(hsh={})
-        @data = IIIF::V3::OrderedHash[hsh]
+        if self.class == IIIF::V3::AbstractResource
+          raise "#{self.class} is an abstract class. Please use one of its subclasses."
+        end
+        @data = IIIF::OrderedHash[hsh]
         self.define_methods_for_any_type_keys
-        self.define_methods_for_array_only_keys
         self.define_methods_for_string_only_keys
+        self.define_methods_for_array_only_keys
+        self.define_methods_for_hash_only_keys
         self.define_methods_for_int_only_keys
         self.define_methods_for_numeric_only_keys
         self.define_methods_for_abstract_resource_only_keys
@@ -37,11 +73,11 @@ module IIIF
         def parse(s)
           ordered_hash = nil
           if s.kind_of?(String) && File.exists?(s)
-            ordered_hash = IIIF::V3::OrderedHash[JSON.parse(IO.read(s))]
+            ordered_hash = IIIF::OrderedHash[JSON.parse(IO.read(s))]
           elsif s.kind_of?(String) && !File.exists?(s)
-            ordered_hash = IIIF::V3::OrderedHash[JSON.parse(s)]
+            ordered_hash = IIIF::OrderedHash[JSON.parse(s)]
           elsif s.kind_of?(Hash)
-            ordered_hash = IIIF::V3::OrderedHash[s]
+            ordered_hash = IIIF::OrderedHash[s]
           else
             m = '#parse takes a path to a file, a JSON String, or a Hash, '
             m += "argument was a #{s.class}."
@@ -50,23 +86,20 @@ module IIIF
             end
             raise ArgumentError, m
           end
-          return IIIF::V3::Service.from_ordered_hash(ordered_hash)
+          return IIIF::V3::Presentation::Service.from_ordered_hash(ordered_hash)
         end
       end
 
       def validate
-        # TODO:
-        # * check for required keys
-        # * type check Array-only values
-        # * type check String-only values
-        # * type check Integer-only values
-        # * type check AbstractResource-only values
         self.required_keys.each do |k|
           unless self.has_key?(k)
             m = "A(n) #{k} is required for each #{self.class}"
             raise IIIF::V3::Presentation::MissingRequiredKeyError, m
           end
         end
+
+        # note that xxx_only key values are checked via, e.g. self.define_methods_for_array_only_keys
+
         # Viewing Direction values
         if self.has_key?('viewing_direction')
           unless self.legal_viewing_direction_values.include?(self['viewing_direction'])
@@ -104,9 +137,15 @@ module IIIF
 
       # Options:
       #  * force: (true|false). Skips validations.
+      #  * include_context: (true|false). Adds the @context to the top of the
+      #      document if it doesn't exist. Default: true.
       #  * sort_json_ld_keys: (true|false). Brings all properties starting with
       #      '@'. Default: true. to the top of the document and sorts them.
       def to_ordered_hash(opts={})
+        include_context = opts.fetch(:include_context, true)
+        if include_context && !self.has_key?('@context')
+          self['@context'] = IIIF::V3::Presentation::CONTEXT
+        end
         force = opts.fetch(:force, false)
         sort_json_ld_keys = opts.fetch(:sort_json_ld_keys, true)
 
@@ -114,7 +153,7 @@ module IIIF
           self.validate
         end
 
-        export_hash = IIIF::V3::OrderedHash.new
+        export_hash = IIIF::OrderedHash.new
 
         if sort_json_ld_keys
           self.keys.select { |k| k.start_with?('@') }.sort!.each do |k|
@@ -133,7 +172,7 @@ module IIIF
               export_hash[k] = self.data[k].to_ordered_hash(sub_opts)
 
             elsif self.data[k].kind_of?(Hash)
-              export_hash[k] = IIIF::V3::OrderedHash.new
+              export_hash[k] = IIIF::OrderedHash.new
               self.data[k].each do |sub_k, v|
 
                 if v.respond_to?(:to_ordered_hash)
@@ -161,7 +200,7 @@ module IIIF
                   export_hash[k] << member.to_ordered_hash(sub_opts)
 
                 elsif member.kind_of?(Hash)
-                  hsh = IIIF::V3::OrderedHash.new
+                  hsh = IIIF::OrderedHash.new
                   export_hash[k] << hsh
                   member.each do |sub_k,v|
 
@@ -199,29 +238,29 @@ module IIIF
         export_hash
       end
 
-      def self.from_ordered_hash(hsh, default_klass=IIIF::V3::OrderedHash)
+      def self.from_ordered_hash(hsh, default_klass=IIIF::OrderedHash)
         # Create a new object (new_object)
         type = nil
         if hsh.has_key?('type')
-          type = IIIF::V3::Service.get_descendant_class_by_jld_type(hsh['type'])
+          type = IIIF::V3::AbstractResource.get_descendant_class_by_jld_type(hsh['type'])
         end
         new_object = type.nil? ? default_klass.new : type.new
 
         hsh.keys.each do |key|
           new_key = key.underscore == key ? key : key.underscore
           if new_key == 'service'
-            new_object[new_key] = IIIF::V3::Service.from_ordered_hash(hsh[key], IIIF::V3::Service)
+            new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Service)
           elsif new_key == 'body'
-            new_object[new_key] = IIIF::V3::Service.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Resource)
+            new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Resource)
           elsif hsh[key].kind_of?(Hash)
-            new_object[new_key] = IIIF::V3::Service.from_ordered_hash(hsh[key])
+            new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key])
           elsif hsh[key].kind_of?(Array)
             new_object[new_key] = []
             hsh[key].each do |member|
               if new_key == 'service'
-                new_object[new_key] << IIIF::V3::Service.from_ordered_hash(member, IIIF::V3::Service)
+                new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member, IIIF::V3::Presentation::Service)
               elsif member.kind_of?(Hash)
-                new_object[new_key] << IIIF::V3::Service.from_ordered_hash(member)
+                new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member)
               else
                 new_object[new_key] << member
                 # Again, no nested arrays, right?
@@ -237,14 +276,13 @@ module IIIF
       protected
 
       def self.get_descendant_class_by_jld_type(type)
-        IIIF::V3::Service.all_service_subclasses.find do |klass|
+        IIIF::V3::AbstractResource.all_known_subclasses.find do |klass|
           klass.const_defined?(:TYPE) && klass.const_get(:TYPE) == type
         end
       end
 
-      # All known subclasses of service.
-      def self.all_service_subclasses
-        @all_service_subclasses ||= IIIF::V3::Service.descendants.reject(&:singleton_class?)
+      def self.all_known_subclasses
+        @all_known_subclasses ||= IIIF::V3::AbstractResource.descendants.reject(&:singleton_class?)
       end
 
       def data=(hsh)
@@ -276,15 +314,24 @@ module IIIF
         end
       end
 
+      def define_methods_for_hash_only_keys
+        define_accessor_methods(*hash_only_keys) do |key, arg|
+          unless arg.kind_of?(Hash)
+            m = "#{key} must be a Hash."
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+        end
+      end
+
       def define_methods_for_abstract_resource_only_keys
-        # keys in this case is an array of hashes with { key: 'k', type: Class }
+        # values in this case: an array of hashes with { key: 'k', type: Class }
         abstract_resource_only_keys.each do |hsh|
           key = hsh[:key]
           type = hsh[:type]
 
-          define_accessor_methods(key) do |key, arg|
+          define_accessor_methods(key) do |k, arg|
             unless arg.kind_of?(type)
-              m = "#{key} must be an #{type}."
+              m = "#{k} must be an #{type}."
               raise IIIF::V3::Presentation::IllegalValueError, m
             end
           end
@@ -343,6 +390,7 @@ module IIIF
           end
         end
       end
+
     end
   end
 end

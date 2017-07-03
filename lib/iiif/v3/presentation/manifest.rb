@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class Manifest < AbstractResource
+      class Manifest < IIIF::V3::AbstractResource
 
         TYPE = 'Manifest'
 
@@ -29,9 +27,8 @@ module IIIF
         end
 
         def validate
-          # TODO: check types of sequences and structure members
-
           super
+          # TODO: check types of sequences and structure members
         end
       end
     end

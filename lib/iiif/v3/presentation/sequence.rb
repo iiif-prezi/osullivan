@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class Sequence < AbstractResource
+      class Sequence < IIIF::V3::AbstractResource
 
         TYPE = 'Sequence'
 
@@ -25,9 +23,9 @@ module IIIF
         end
 
         def validate
-          # * Must be at least one canvas
-          # * All members of canvases must be a kind of Canvas
           super
+          # TODO: Must be at least one canvas
+          # TODO: All members of canvases must be a kind of Canvas
         end
       end
     end

@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class Canvas < AbstractResource
+      class Canvas < IIIF::V3::AbstractResource
 
         # TODO (?) a simple 'Image Canvas' constructor.
 
@@ -11,10 +9,6 @@ module IIIF
 
         def required_keys
           super + %w{ id label }
-        end
-
-        def any_type_keys
-          super + %w{  }
         end
 
         def array_only_keys
@@ -36,8 +30,8 @@ module IIIF
         end
 
         def validate
-          # all members of content are of type AnnotationPage
           super
+          # TODO: all members of content are of type AnnotationPage
         end
       end
     end

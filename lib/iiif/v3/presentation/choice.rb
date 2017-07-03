@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class Choice < AbstractResource
+      class Choice < IIIF::V3::AbstractResource
 
         TYPE = 'Choice'
 

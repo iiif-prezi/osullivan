@@ -1,4 +1,5 @@
 coverage/
 pkg/
 Gemfile.lock
+.pry_history
 

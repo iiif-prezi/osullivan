@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class Collection < AbstractResource
+      class Collection < IIIF::V3::AbstractResource
 
         TYPE = 'Collection'
 
@@ -25,8 +23,9 @@ module IIIF
         end
 
         def validate
-          # each member of collections and manifests must be a Hash
-          # each member of collections and manifests MUST have id, type, and label
+          super
+          # TODO: each member of collections and manifests must be a Hash
+          # TODO: each member of collections and manifests MUST have id, type, and label
         end
       end
     end

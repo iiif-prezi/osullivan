@@ -1,9 +1,7 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
-
 module IIIF
   module V3
     module Presentation
-      class Resource < AbstractResource
+      class Resource < IIIF::V3::AbstractResource
 
         def required_keys
           %w{ id }
@@ -17,9 +15,6 @@ module IIIF
           super + %w{ duration }
         end
 
-        def initialize(hsh={})
-          super(hsh)
-        end
       end
     end
   end
