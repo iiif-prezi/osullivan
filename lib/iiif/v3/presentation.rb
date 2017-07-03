@@ -1,6 +1,8 @@
+require_relative 'abstract_resource'
+require_relative 'ordered_hash'
+
 require File.join(File.dirname(__FILE__), 'service')
 %w{
-abstract_resource
   annotation
   annotation_collection
   annotation_page
@@ -9,14 +11,12 @@ abstract_resource
   collection
   manifest
   resource
-    image_resource
+  image_resource
   sequence
-    range
+  range
 }.each do |f|
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end
-
-require_relative 'ordered_hash'
 
 module IIIF
   module V3

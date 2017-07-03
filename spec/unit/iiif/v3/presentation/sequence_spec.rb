@@ -24,7 +24,7 @@ describe IIIF::V3::Presentation::Sequence do
         }
       },
       'attribution' => 'Provided by Example Organization',
-      'rights' => 'http://www.example.org/license.html',
+      'rights' => [{'id' => 'http://www.example.org/license.html'}],
       'logo' => 'http://www.example.org/logos/institution1.jpg',
       'see_also' => 'http://www.example.org/library/catalog/book1.xml',
       'service' => {
@@ -77,7 +77,7 @@ describe IIIF::V3::Presentation::Sequence do
 
   describe '#array_only_keys' do
     it 'accumulates from the superclass' do
-      expect(subject.array_only_keys).to eq %w{ metadata canvases }
+      expect(subject.array_only_keys).to eq %w{ metadata rights canvases }
     end
   end
 
