@@ -8,10 +8,6 @@ module IIIF
           super.reject {|el| el == 'type' }
         end
 
-        def initialize(hsh={})
-          super(hsh)
-        end
-
       end
     end
   end
