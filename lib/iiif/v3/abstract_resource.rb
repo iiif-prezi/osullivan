@@ -322,9 +322,9 @@ module IIIF
           key = hsh[:key]
           type = hsh[:type]
 
-          define_accessor_methods(key) do |key, arg|
+          define_accessor_methods(key) do |k, arg|
             unless arg.kind_of?(type)
-              m = "#{key} must be an #{type}."
+              m = "#{k} must be an #{type}."
               raise IIIF::V3::Presentation::IllegalValueError, m
             end
           end
