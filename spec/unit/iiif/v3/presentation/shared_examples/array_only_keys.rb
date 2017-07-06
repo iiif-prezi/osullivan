@@ -1,5 +1,3 @@
-require 'set'
-
 shared_examples 'it has the appropriate methods for array-only keys v3' do
 
   described_class.new.array_only_keys.each do |prop|
