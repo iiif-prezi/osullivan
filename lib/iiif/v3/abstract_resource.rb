@@ -36,6 +36,9 @@ module IIIF
       def numeric_only_keys
         %w{ }
       end
+      def uri_only_keys
+        %w{ }
+      end
 
       # Not every subclass is allowed to have viewingDirect, but when it is,
       # it must be one of these values
@@ -64,6 +67,7 @@ module IIIF
         self.define_methods_for_int_only_keys
         self.define_methods_for_numeric_only_keys
         self.define_methods_for_abstract_resource_only_keys
+        self.define_methods_for_uri_only_keys
         self.snakeize_keys
       end
 
@@ -360,6 +364,15 @@ module IIIF
         define_accessor_methods(*numeric_only_keys) do |key, arg|
           unless arg.kind_of?(Numeric) && arg > 0
             m = "#{key} must be a positive Integer or Float."
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+        end
+      end
+
+      def define_methods_for_uri_only_keys
+        define_accessor_methods(*uri_only_keys) do |key, arg|
+          unless arg.kind_of?(String) && arg =~ URI::regexp
+            m = "#{key} must be a String containing a URI."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
