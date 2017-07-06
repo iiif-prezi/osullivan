@@ -360,7 +360,7 @@ module IIIF
         define_accessor_methods(*numeric_only_keys) do |key, arg|
           unless arg.kind_of?(Numeric) && arg > 0
             m = "#{key} must be a positive Integer or Float."
-            raise IIIF::Presentation::IllegalValueError, m
+            raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
       end
