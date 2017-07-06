@@ -49,6 +49,7 @@ describe IIIF::V3::AbstractResource do
         "label": "My Manifest",
         "service": {
           "@context": "http://iiif.io/api/image/2/context.json",
+          "@id":"http://www.example.org/images/book1-page1",
           "id":"http://www.example.org/images/book1-page1",
           "profile":"http://iiif.io/api/image/2/profiles/level2.json"
         },
