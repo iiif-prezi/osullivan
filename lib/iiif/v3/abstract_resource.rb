@@ -16,7 +16,7 @@ module IIIF
       end
 
       def string_only_keys
-        %w{ viewing_hint } # should any of the any_type_keys be here?
+        %w{ viewing_hint viewing_direction }
       end
 
       def array_only_keys
