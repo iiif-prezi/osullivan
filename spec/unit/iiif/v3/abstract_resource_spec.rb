@@ -20,11 +20,16 @@ describe IIIF::V3::AbstractResource do
       end
     end
   end
-
   subject do
     instance = abstract_resource_subclass.new
     instance['id'] = 'http://example.com/prefix/manifest/123'
     instance
+  end
+
+  describe '#required_keys' do
+    it 'accumulate' do
+      expect(subject.required_keys).to eq %w{ type id }
+    end
   end
 
   describe '#initialize' do
@@ -41,7 +46,29 @@ describe IIIF::V3::AbstractResource do
     end
   end
 
-  describe 'A nested object (e.g. self[\'metdata\'])' do
+  describe '#validate' do
+    it 'raises MissingRequiredKeyError if required key is missing' do
+      subject.required_keys.each { |k| subject.delete(k) }
+      expect { subject.validate }.to raise_error IIIF::V3::Presentation::MissingRequiredKeyError
+    end
+    it 'raises IllegalValueError for bad viewing_direction' do
+      subject['viewing_direction'] = 'foo'
+      exp_err_msg = "viewingDirection must be one of #{subject.legal_viewing_direction_values}"
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    end
+    it 'raises IllegalValueError for bad viewing_hint' do
+      subject['viewing_hint'] = 'foo'
+      exp_err_msg = "viewingHint for #{subject.class} must be one of #{subject.legal_viewing_hint_values}"
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    end
+    it 'raises IllegalValueError for metadata entry that is not a Hash' do
+      subject['metadata'] = [{ 'foo' => 'bar' }, 'error', { 'bar' => 'foo' }]
+      exp_err_msg = "All entries in the metadata list must be a type of Hash"
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    end
+  end
+
+  describe 'A nested object (e.g. self[\'metadata\'])' do
     it 'returns [] if not set' do
       expect(subject.metadata).to eq([])
     end
@@ -87,12 +114,6 @@ describe IIIF::V3::AbstractResource do
       expect(parsed['metadata'][1]['value'].length).to eq(2)
       expect(parsed['metadata'][1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
       File.delete('/tmp/osullivan-spec.json')
-    end
-  end
-
-  describe '#required_keys' do
-    it 'accumulates' do
-      expect(subject.required_keys).to eq %w{ type id }
     end
   end
 

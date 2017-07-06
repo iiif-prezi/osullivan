@@ -102,7 +102,8 @@ module IIIF
           end
         end
 
-        # note that xxx_only key values are checked via, e.g. self.define_methods_for_array_only_keys
+        # Note:  self.define_methods_for_xxx_only_keys does NOT provide validation
+        #  when key values are assigned directly with hash syntax, e.g. my_image_resource['format']= 'image/jpeg'
 
         # Viewing Direction values
         if self.has_key?('viewing_direction')
@@ -114,12 +115,12 @@ module IIIF
         # Viewing Hint values
         if self.has_key?('viewing_hint')
           unless self.legal_viewing_hint_values.include?(self['viewing_hint'])
-            m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values}."
+            m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values}"
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
         # Metadata is all hashes
-        if self.has_key?('metadata')
+        if self.has_key?('metadata') && self['metadata'].kind_of?(Array)
           unless self['metadata'].all? { |entry| entry.kind_of?(Hash) }
             m = 'All entries in the metadata list must be a type of Hash'
             raise IIIF::V3::Presentation::IllegalValueError, m
@@ -345,7 +346,7 @@ module IIIF
       def define_methods_for_string_only_keys
         define_accessor_methods(*string_only_keys) do |key, arg|
           unless arg.kind_of?(String)
-            m = "#{key} must be an String."
+            m = "#{key} must be a String."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
