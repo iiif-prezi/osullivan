@@ -1,5 +1,3 @@
-require 'set'
-
 shared_examples 'it has the appropriate methods for integer-only keys v3' do
 
   described_class.new.int_only_keys.each do |prop|
