@@ -9,10 +9,6 @@ module IIIF
           super + %w{ id label }
         end
 
-        def string_only_keys
-          super + %w{ viewing_direction }
-        end
-
         def array_only_keys
           super + %w{ sequences structures }
         end

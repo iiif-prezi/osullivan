@@ -10,7 +10,7 @@ module IIIF
         end
 
         def string_only_keys
-          super + %w{ start_canvas viewing_direction }
+          super + %w{ start_canvas }
         end
 
         def legal_viewing_hint_values

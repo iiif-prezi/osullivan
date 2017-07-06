@@ -71,7 +71,7 @@ describe IIIF::V3::Presentation::Sequence do
 
   describe '#string_only_keys' do
     it 'accumulates from the superclass' do
-      expect(subject.string_only_keys).to eq %w{ viewing_hint start_canvas viewing_direction }
+      expect(subject.string_only_keys).to eq %w{ viewing_hint viewing_direction start_canvas }
     end
   end
 
