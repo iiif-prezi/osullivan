@@ -60,7 +60,7 @@ describe IIIF::V3::AbstractResource do
           "id": "http://www.example.org/library/catalog/book1.marc",
           "format": "application/marc"
         },
-        "sequences": [
+        "items": [
           {
             "id":"http://www.example.org/iiif/book1/sequence/normal",
             "type": "Sequence",
@@ -122,16 +122,15 @@ describe IIIF::V3::AbstractResource do
       expect(parsed.to_ordered_hash.to_a - from_file.to_ordered_hash.to_a).to eq []
       expect(from_file.to_ordered_hash.to_a - parsed.to_ordered_hash.to_a).to eq []
     end
-    it 'turns each member of "sequences" into an instance of Sequence' do
-      expected_klass = IIIF::V3::Presentation::Sequence
+    it 'turns each member of "items" into an instance of Sequence' do
       parsed = described_class.from_ordered_hash(fixture)
-      parsed['sequences'].each do |s|
-        expect(s.class).to be expected_klass
+      parsed['items'].each do |s|
+        expect(s.class).to be IIIF::V3::Presentation::Sequence
       end
     end
-    it 'turns each member of items into an instance of Canvas' do
+    it 'turns each member of sequences/items into an instance of Canvas' do
       parsed = described_class.from_ordered_hash(fixture)
-      parsed['sequences'].each do |s|
+      parsed['items'].each do |s|
         s.items.each do |c|
           expect(c.class).to be IIIF::V3::Presentation::Canvas
         end
@@ -145,7 +144,6 @@ describe IIIF::V3::AbstractResource do
       parsed = described_class.from_ordered_hash(fixture)
       expect(parsed['label']).to eq 'My Manifest'
     end
-
   end
 
   describe '#to_ordered_hash' do
