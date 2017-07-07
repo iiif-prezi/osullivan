@@ -144,11 +144,32 @@ module IIIF
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
-        # Metadata is all hashes
-        if self.has_key?('metadata') && self['metadata'].kind_of?(Array)
+        # Metadata is Array; each entry is a Hash containing (only) 'label' and 'value' properties
+        if self.has_key?('metadata') && self['metadata']
           unless self['metadata'].all? { |entry| entry.kind_of?(Hash) }
-            m = 'All entries in the metadata list must be a type of Hash'
+            m = 'metadata must be an Array with Hash members'
             raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+          self['metadata'].each do |entry|
+            md_keys = entry.keys
+            unless md_keys.size == 2 && md_keys.include?('label') && md_keys.include?('value')
+              m = "metadata members must be a Hash of keys 'label' and 'value'"
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
+          end
+        end
+        # thumbnail is Array; each entry is a Hash containing (at least) 'id' and 'type' keys
+        if self.has_key?('thumbnail') && self['thumbnail']
+          unless self['thumbnail'].all? { |entry| entry.kind_of?(Hash) }
+            m = 'thumbnail must be an Array with Hash members'
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+          self['thumbnail'].each do |entry|
+            thumb_keys = entry.keys
+            unless thumb_keys.include?('id') && thumb_keys.include?('type')
+              m = 'thumbnail members must be a Hash including keys "id" and "type"'
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
           end
         end
       end

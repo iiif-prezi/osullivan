@@ -71,8 +71,27 @@ describe IIIF::V3::AbstractResource do
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
     it 'raises IllegalValueError for metadata entry that is not a Hash' do
-      subject['metadata'] = [{ 'foo' => 'bar' }, 'error', { 'bar' => 'foo' }]
-      exp_err_msg = "All entries in the metadata list must be a type of Hash"
+      subject['metadata'] = ['error']
+      exp_err_msg = "metadata must be an Array with Hash members"
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    end
+    it 'raises IllegalValueError for metadata entry that does not contain exactly "label" and "value"' do
+      subject['metadata'] = [{ 'label' => 'bar', 'value' => 'foo' }]
+      expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+      subject['metadata'] = [{ 'label' => 'bar', 'bar' => 'foo' }]
+      exp_err_msg = "metadata members must be a Hash of keys 'label' and 'value'"
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    end
+    it 'raises IllegalValueError for thumbnail entry that is not a Hash' do
+      subject['thumbnail'] = ['error']
+      exp_err_msg = "thumbnail must be an Array with Hash members"
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    end
+    it 'raises IllegalValueError for thumbnail entry that does not contain "id" and "type"' do
+      subject['thumbnail'] = [{ 'id' => 'bar', 'type' => 'foo', 'random' => 'xxx' }]
+      expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+      subject['thumbnail'] = [{ 'id' => 'bar' }]
+      exp_err_msg = 'thumbnail members must be a Hash including keys "id" and "type"'
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
   end
