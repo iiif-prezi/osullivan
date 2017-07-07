@@ -21,17 +21,21 @@ module IIIF
         %w{ }
       end
 
-      def any_type_keys # these are allowed on all classes
-        %w{ label description thumbnail attribution logo see_also
-        related within }
+      # NOTE: keys associated with a single resource type are not included below in xxx_keys methods:
+      #  those single resource types should include additional keys by overriding xxx_keys as appropriate
+
+      def any_type_keys
+        # values *may* be multivalued
+        # NOTE: for id: "Resources that do not require URIs [for ids] may be assigned blank node identifiers"
+        %w{ label description id attribution logo related rendering see_also within }
       end
 
       def string_only_keys
-        %w{ viewing_hint viewing_direction }
+        %w{ nav_date type format viewing_direction viewing_hint start_canvas }
       end
 
       def array_only_keys
-        %w{ metadata rights }
+        %w{ metadata rights thumbnail first last next prev items }
       end
 
       def abstract_resource_only_keys
@@ -41,12 +45,15 @@ module IIIF
       def hash_only_keys
         %w{ }
       end
+
       def int_only_keys
-        %w{ }
+        %w{ height width total start_index }
       end
+
       def numeric_only_keys
-        %w{ }
+        %w{ duration }
       end
+
       def uri_only_keys
         %w{ }
       end

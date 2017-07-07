@@ -17,10 +17,6 @@ module IIIF
           super + %w{ content }
         end
 
-        def uri_only_keys
-          super + %w{ first last }
-        end
-
         def initialize(hsh={})
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           super(hsh)

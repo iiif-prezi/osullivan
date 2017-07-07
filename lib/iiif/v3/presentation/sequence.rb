@@ -5,12 +5,8 @@ module IIIF
 
         TYPE = 'Sequence'
 
-        def array_only_keys
-          super + %w{ canvases }
-        end
-
-        def string_only_keys
-          super + %w{ start_canvas }
+        def required_keys
+          super + %w{ items }
         end
 
         def legal_viewing_hint_values
