@@ -5,7 +5,13 @@ module IIIF
     class AbstractResource
       include IIIF::HashBehaviours
 
-      # Every subclass should override the following methods defining key value types, see Subclasses for how
+      # properties used by content resources only
+      CONTENT_RESOURCE_PROPERTIES = %w{ format height width duration }
+
+      # used by Collection, AnnotationCollection
+      PAGING_PROPERTIES = %w{ first last next prev total start_index }
+
+      # subclasses should override required_keys as appropriate, e.g. super + %w{ id }
       def required_keys
         %w{ type }
       end
