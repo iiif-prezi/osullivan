@@ -18,6 +18,10 @@ describe IIIF::V3::AbstractResource do
       def required_keys
         super + %w{ id }
       end
+
+      def prohibited_keys
+        super + %w{ verboten }
+      end
     end
   end
   subject do
@@ -50,6 +54,11 @@ describe IIIF::V3::AbstractResource do
     it 'raises MissingRequiredKeyError if required key is missing' do
       subject.required_keys.each { |k| subject.delete(k) }
       expect { subject.validate }.to raise_error IIIF::V3::Presentation::MissingRequiredKeyError
+    end
+    it 'raises ProhibitedKeyError if prohibited key is present' do
+      subject['verboten'] = 666
+      exp_err_msg = "verboten is a prohibited key in #{subject.class}"
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::ProhibitedKeyError, exp_err_msg)
     end
     it 'raises IllegalValueError for bad viewing_direction' do
       subject['viewing_direction'] = 'foo'

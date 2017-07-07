@@ -29,6 +29,7 @@ module IIIF
       ]
 
       class MissingRequiredKeyError < StandardError; end
+      class ProhibitedKeyError < StandardError; end
       class IllegalValueError < StandardError; end
     end
   end

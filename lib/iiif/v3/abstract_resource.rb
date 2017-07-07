@@ -16,6 +16,11 @@ module IIIF
         %w{ type }
       end
 
+      # subclasses should override prohibited_keys as appropriate, e.g. super + PAGING_PROPERTIES
+      def prohibited_keys
+        %w{ }
+      end
+
       def any_type_keys # these are allowed on all classes
         %w{ label description thumbnail attribution logo see_also
         related within }
@@ -105,6 +110,13 @@ module IIIF
           unless self.has_key?(k)
             m = "A(n) #{k} is required for each #{self.class}"
             raise IIIF::V3::Presentation::MissingRequiredKeyError, m
+          end
+        end
+
+        self.prohibited_keys.each do |k|
+          if self.has_key?(k)
+            m = "#{k} is a prohibited key in #{self.class}"
+            raise IIIF::V3::Presentation::ProhibitedKeyError, m
           end
         end
 
