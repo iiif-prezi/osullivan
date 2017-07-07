@@ -311,8 +311,8 @@ module IIIF
       end
 
       def define_methods_for_array_only_keys
-        define_accessor_methods(*array_only_keys) do |key, arg|
-          unless arg.kind_of?(Array)
+        define_accessor_methods(*array_only_keys) do |key, val|
+          unless val.kind_of?(Array)
             m = "#{key} must be an Array."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -320,8 +320,8 @@ module IIIF
       end
 
       def define_methods_for_hash_only_keys
-        define_accessor_methods(*hash_only_keys) do |key, arg|
-          unless arg.kind_of?(Hash)
+        define_accessor_methods(*hash_only_keys) do |key, val|
+          unless val.kind_of?(Hash)
             m = "#{key} must be a Hash."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -334,8 +334,8 @@ module IIIF
           key = hsh[:key]
           type = hsh[:type]
 
-          define_accessor_methods(key) do |k, arg|
-            unless arg.kind_of?(type)
+          define_accessor_methods(key) do |k, val|
+            unless val.kind_of?(type)
               m = "#{k} must be an #{type}."
               raise IIIF::V3::Presentation::IllegalValueError, m
             end
@@ -344,8 +344,8 @@ module IIIF
       end
 
       def define_methods_for_string_only_keys
-        define_accessor_methods(*string_only_keys) do |key, arg|
-          unless arg.kind_of?(String)
+        define_accessor_methods(*string_only_keys) do |key, val|
+          unless val.kind_of?(String)
             m = "#{key} must be a String."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -353,8 +353,8 @@ module IIIF
       end
 
       def define_methods_for_int_only_keys
-        define_accessor_methods(*int_only_keys) do |key, arg|
-          unless arg.kind_of?(Integer) && arg > 0
+        define_accessor_methods(*int_only_keys) do |key, val|
+          unless val.kind_of?(Integer) && val > 0
             m = "#{key} must be a positive Integer."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -362,8 +362,8 @@ module IIIF
       end
 
       def define_methods_for_numeric_only_keys
-        define_accessor_methods(*numeric_only_keys) do |key, arg|
-          unless arg.kind_of?(Numeric) && arg > 0
+        define_accessor_methods(*numeric_only_keys) do |key, val|
+          unless val.kind_of?(Numeric) && val > 0
             m = "#{key} must be a positive Integer or Float."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -371,8 +371,8 @@ module IIIF
       end
 
       def define_methods_for_uri_only_keys
-        define_accessor_methods(*uri_only_keys) do |key, arg|
-          unless arg.kind_of?(String) && arg =~ URI::regexp
+        define_accessor_methods(*uri_only_keys) do |key, val|
+          unless val.kind_of?(String) && val =~ URI::regexp
             m = "#{key} must be a String containing a URI."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -382,14 +382,14 @@ module IIIF
       def define_accessor_methods(*keys, &validation)
         keys.each do |key|
           # Setter
-          define_singleton_method("#{key}=") do |arg|
-            validation.call(key, arg) if block_given?
-            self.send('[]=', key, arg)
+          define_singleton_method("#{key}=") do |val|
+            validation.call(key, val) if block_given?
+            self.send('[]=', key, val)
           end
           if key.camelize(:lower) != key
-            define_singleton_method("#{key.camelize(:lower)}=") do |arg|
-              validation.call(key, arg) if block_given?
-              self.send('[]=', key, arg)
+            define_singleton_method("#{key.camelize(:lower)}=") do |val|
+              validation.call(key, val) if block_given?
+              self.send('[]=', key, val)
             end
           end
           # Getter
