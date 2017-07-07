@@ -1,5 +1,3 @@
-require 'set'
-
 shared_examples 'it has the appropriate methods for numeric-only keys v3' do
 
   described_class.new.numeric_only_keys.each do |prop|
@@ -19,10 +17,10 @@ shared_examples 'it has the appropriate methods for numeric-only keys v3' do
         end
       end
       it 'raises an exception when attempting to set it to something other than an Integer' do
-        expect { subject.send("#{prop}=", 'Foo') }.to raise_error IIIF::Presentation::IllegalValueError
+        expect { subject.send("#{prop}=", 'Foo') }.to raise_error IIIF::V3::Presentation::IllegalValueError
       end
       it 'raises an exception when attempting to set it to a negative number' do
-        expect { subject.send("#{prop}=", -1.0) }.to raise_error IIIF::Presentation::IllegalValueError
+        expect { subject.send("#{prop}=", -1.0) }.to raise_error IIIF::V3::Presentation::IllegalValueError
       end
     end
 

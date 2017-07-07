@@ -1,5 +1,3 @@
-require 'set'
-
 shared_examples 'it has the appropriate methods for abstract_resource_only_keys v3' do
 
   described_class.new.abstract_resource_only_keys.each do |entry|

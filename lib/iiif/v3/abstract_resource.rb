@@ -16,7 +16,7 @@ module IIIF
       end
 
       def string_only_keys
-        %w{ viewing_hint } # should any of the any_type_keys be here?
+        %w{ viewing_hint viewing_direction }
       end
 
       def array_only_keys
@@ -34,6 +34,9 @@ module IIIF
         %w{ }
       end
       def numeric_only_keys
+        %w{ }
+      end
+      def uri_only_keys
         %w{ }
       end
 
@@ -64,6 +67,7 @@ module IIIF
         self.define_methods_for_int_only_keys
         self.define_methods_for_numeric_only_keys
         self.define_methods_for_abstract_resource_only_keys
+        self.define_methods_for_uri_only_keys
         self.snakeize_keys
       end
 
@@ -98,7 +102,8 @@ module IIIF
           end
         end
 
-        # note that xxx_only key values are checked via, e.g. self.define_methods_for_array_only_keys
+        # Note:  self.define_methods_for_xxx_only_keys does NOT provide validation
+        #  when key values are assigned directly with hash syntax, e.g. my_image_resource['format']= 'image/jpeg'
 
         # Viewing Direction values
         if self.has_key?('viewing_direction')
@@ -110,12 +115,12 @@ module IIIF
         # Viewing Hint values
         if self.has_key?('viewing_hint')
           unless self.legal_viewing_hint_values.include?(self['viewing_hint'])
-            m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values}."
+            m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values}"
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
         # Metadata is all hashes
-        if self.has_key?('metadata')
+        if self.has_key?('metadata') && self['metadata'].kind_of?(Array)
           unless self['metadata'].all? { |entry| entry.kind_of?(Hash) }
             m = 'All entries in the metadata list must be a type of Hash'
             raise IIIF::V3::Presentation::IllegalValueError, m
@@ -341,7 +346,7 @@ module IIIF
       def define_methods_for_string_only_keys
         define_accessor_methods(*string_only_keys) do |key, arg|
           unless arg.kind_of?(String)
-            m = "#{key} must be an String."
+            m = "#{key} must be a String."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
@@ -360,7 +365,16 @@ module IIIF
         define_accessor_methods(*numeric_only_keys) do |key, arg|
           unless arg.kind_of?(Numeric) && arg > 0
             m = "#{key} must be a positive Integer or Float."
-            raise IIIF::Presentation::IllegalValueError, m
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+        end
+      end
+
+      def define_methods_for_uri_only_keys
+        define_accessor_methods(*uri_only_keys) do |key, arg|
+          unless arg.kind_of?(String) && arg =~ URI::regexp
+            m = "#{key} must be a String containing a URI."
+            raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
       end

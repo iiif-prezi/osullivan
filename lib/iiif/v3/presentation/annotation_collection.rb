@@ -17,16 +17,15 @@ module IIIF
           super + %w{ content }
         end
 
-        def string_only_keys
-          # first and last are actually uris
-          super + %w{ viewing_direction, first, last }
+        def uri_only_keys
+          super + %w{ first last }
         end
 
         def initialize(hsh={})
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           super(hsh)
         end
-        
+
       end
     end
   end
