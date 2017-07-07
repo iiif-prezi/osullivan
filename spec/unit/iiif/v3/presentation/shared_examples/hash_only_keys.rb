@@ -10,7 +10,7 @@ shared_examples 'it has the appropriate methods for hash-only keys v3' do
       end
       if prop.camelize(:lower) != prop
         it "is aliased as ##{prop.camelize(:lower)}=" do
-          ex = [{'label' => 'XYZ'}]
+          ex = {'label' => 'XYZ'}
           subject.send("#{prop.camelize(:lower)}=", ex)
           expect(subject[prop]).to eq ex
         end
