@@ -78,7 +78,7 @@ describe IIIF::V3::AbstractResource do
       end
       it 'does not raise error for entry that contains exactly "label" and "value"' do
         subject['metadata'] = [{ 'label' => 'bar', 'value' => 'foo' }]
-        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+        expect { subject.validate }.not_to raise_error
       end
       it 'raises IllegalValueError for entry that does not contain exactly "label" and "value"' do
         subject['metadata'] = [{ 'label' => 'bar', 'bar' => 'foo' }]
@@ -94,7 +94,7 @@ describe IIIF::V3::AbstractResource do
       end
       it 'does not raise error for entry with "id" and "type"' do
         subject['thumbnail'] = [{ 'id' => 'bar', 'type' => 'foo', 'random' => 'xxx' }]
-        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+        expect { subject.validate }.not_to raise_error
       end
       it 'raises IllegalValueError for entry that does not contain "id" and "type"' do
         subject['thumbnail'] = [{ 'id' => 'bar' }]
@@ -105,7 +105,7 @@ describe IIIF::V3::AbstractResource do
     describe 'nav_date' do
       it 'does not raise error for value of form YYYY-MM-DDThh:mm:ssZ' do
         subject['nav_date'] = '1991-01-02T13:04:27Z'
-        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+        expect { subject.validate }.not_to raise_error
       end
       it 'raises IllegalValueError for value not of form YYYY-MM-DDThh:mm:ssZ' do
         subject['nav_date'] = '1991-01-02T13:04:27+0500'
@@ -121,7 +121,7 @@ describe IIIF::V3::AbstractResource do
       end
       it 'does not raise error for entry with "id" that is URI' do
         subject['rights'] = [{ 'id' => 'http://example.org/rights', 'format' => 'text/html' }]
-        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+        expect { subject.validate }.not_to raise_error
       end
       it 'raises IllegalValueError for entry with "id" that is not URI' do
         subject['rights'] = [{ 'id' => 'bar', 'format' => 'text/html' }]
@@ -142,7 +142,7 @@ describe IIIF::V3::AbstractResource do
       end
       it 'does not raise error for entry with "label" and "format"' do
         subject['rendering'] = [{ 'label' => 'bar', 'format' => 'foo', 'random' => 'xxx' }]
-        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+        expect { subject.validate }.not_to raise_error
       end
       it 'raises IllegalValueError for entry that does not contain "label" and "format"' do
         subject['rendering'] = [{ 'label' => 'bar' }]
