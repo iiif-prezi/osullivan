@@ -114,7 +114,6 @@ describe IIIF::V3::AbstractResource do
       end
     end
     describe 'rights' do
-      #rights - confusing;  Array of hashes? including id which must be a URI?
       it 'raises IllegalValueError for entry that is not a Hash' do
         subject['rights'] = ['error']
         exp_err_msg = "rights must be an Array with Hash members"
@@ -132,6 +131,22 @@ describe IIIF::V3::AbstractResource do
       it 'raises IllegalValueError for entry that does not contain "id"' do
         subject['rights'] = [{ 'whoops' => 'http://example.org/rights' }]
         exp_err_msg = 'rights members must be a Hash including "id"'
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+    end
+    describe 'rendering' do
+      it 'raises IllegalValueError for entry that is not a Hash' do
+        subject['rendering'] = ['error']
+        exp_err_msg = "rendering must be an Array with Hash members"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+      it 'does not raise error for entry with "label" and "format"' do
+        subject['rendering'] = [{ 'label' => 'bar', 'format' => 'foo', 'random' => 'xxx' }]
+        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+      end
+      it 'raises IllegalValueError for entry that does not contain "label" and "format"' do
+        subject['rendering'] = [{ 'label' => 'bar' }]
+        exp_err_msg = 'rendering members must be a Hash including keys "label" and "format"'
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
     end

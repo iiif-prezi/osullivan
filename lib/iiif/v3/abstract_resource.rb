@@ -27,7 +27,7 @@ module IIIF
       def any_type_keys
         # values *may* be multivalued
         # NOTE: for id: "Resources that do not require URIs [for ids] may be assigned blank node identifiers"
-        %w{ label description id attribution logo related rendering see_also within }
+        %w{ label description id attribution logo related see_also within }
       end
 
       def string_only_keys
@@ -35,7 +35,7 @@ module IIIF
       end
 
       def array_only_keys
-        %w{ metadata rights thumbnail first last next prev items }
+        %w{ metadata rights thumbnail rendering first last next prev items }
       end
 
       def abstract_resource_only_keys
@@ -127,8 +127,9 @@ module IIIF
           end
         end
 
-        # Note:  self.define_methods_for_xxx_only_keys does NOT provide validation
-        #  when key values are assigned directly with hash syntax, e.g. my_image_resource['format']= 'image/jpeg'
+        # Note:  self.define_methods_for_xxx_only_keys provides some validation at assignment time
+        #  currently, there is NO validation when key values are assigned directly with hash syntax,
+        #  e.g. my_image_resource['format'] = 'image/jpeg'
 
         # Viewing Direction values
         if self.has_key?('viewing_direction')
@@ -195,8 +196,20 @@ module IIIF
             validate_uri(entry['id'], 'id') # raises IllegalValueError
           end
         end
-
-        # TODO: rendering -  A label and the format of the rendering resource must be supplied
+        #  rendering is Array; each entry is a Hash containing 'label' and 'format' keys
+        if self.has_key?('rendering') && self['rendering']
+          unless self['rendering'].all? { |entry| entry.kind_of?(Hash) }
+            m = 'rendering must be an Array with Hash members'
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+          self['rendering'].each do |entry|
+            rendering_keys = entry.keys
+            unless rendering_keys.include?('label') && rendering_keys.include?('format')
+              m = 'rendering members must be a Hash including keys "label" and "format"'
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
+          end
+        end
       end
 
       # Options
