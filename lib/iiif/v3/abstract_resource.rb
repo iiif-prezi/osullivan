@@ -158,7 +158,7 @@ module IIIF
             end
           end
         end
-        # thumbnail is Array; each entry is a Hash containing (at least) 'id' and 'type' keys
+        # Thumbnail is Array; each entry is a Hash containing (at least) 'id' and 'type' keys
         if self.has_key?('thumbnail') && self['thumbnail']
           unless self['thumbnail'].all? { |entry| entry.kind_of?(Hash) }
             m = 'thumbnail must be an Array with Hash members'
@@ -172,6 +172,20 @@ module IIIF
             end
           end
         end
+        # NavDate (navigation date)
+        if self.has_key?('nav_date')
+          begin
+            Date.strptime(self['nav_date'], '%Y-%m-%dT%H:%M:%SZ')
+          rescue ArgumentError
+            m = "nav_date must be of form YYYY-MM-DDThh:mm:ssZ"
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+        end
+
+        # TODO: rights - confusing;  Array of hashes? including id which must be a URI?
+        # rights
+
+        # TODO: rendering -  A label and the format of the rendering resource must be supplied
       end
 
       # Options
