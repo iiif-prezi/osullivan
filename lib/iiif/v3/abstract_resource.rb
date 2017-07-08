@@ -181,9 +181,20 @@ module IIIF
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
-
-        # TODO: rights - confusing;  Array of hashes? including id which must be a URI?
-        # rights
+        # rights is Array; each entry is a Hash containing 'id' with a URI value
+        if self.has_key?('rights')
+          unless self['rights'].all? { |entry| entry.kind_of?(Hash) }
+            m = 'rights must be an Array with Hash members'
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+          self['rights'].each do |entry|
+            unless entry.keys.include?('id')
+              m = 'rights members must be a Hash including "id"'
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
+            validate_uri(entry['id'], 'id') # raises IllegalValueError
+          end
+        end
 
         # TODO: rendering -  A label and the format of the rendering resource must be supplied
       end
@@ -431,12 +442,7 @@ module IIIF
       end
 
       def define_methods_for_uri_only_keys
-        define_accessor_methods(*uri_only_keys) do |key, val|
-          unless val.kind_of?(String) && val =~ URI::regexp
-            m = "#{key} must be a String containing a URI."
-            raise IIIF::V3::Presentation::IllegalValueError, m
-          end
-        end
+        define_accessor_methods(*uri_only_keys) { |key, val| validate_uri(val, key) }
       end
 
       def define_accessor_methods(*keys, &validation)
@@ -462,6 +468,14 @@ module IIIF
               self.send('[]', key)
             end
           end
+        end
+      end
+
+      private
+      def validate_uri(val, key)
+        unless val.kind_of?(String) && val =~ URI::regexp
+          m = "#{key} value must be a String containing a URI"
+          raise IIIF::V3::Presentation::IllegalValueError, m
         end
       end
 
