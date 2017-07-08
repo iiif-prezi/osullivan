@@ -18,6 +18,10 @@ describe IIIF::V3::AbstractResource do
       def required_keys
         super + %w{ id }
       end
+
+      def prohibited_keys
+        super + %w{ verboten }
+      end
     end
   end
   subject do
@@ -51,6 +55,11 @@ describe IIIF::V3::AbstractResource do
       subject.required_keys.each { |k| subject.delete(k) }
       expect { subject.validate }.to raise_error IIIF::V3::Presentation::MissingRequiredKeyError
     end
+    it 'raises ProhibitedKeyError if prohibited key is present' do
+      subject['verboten'] = 666
+      exp_err_msg = "verboten is a prohibited key in #{subject.class}"
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::ProhibitedKeyError, exp_err_msg)
+    end
     it 'raises IllegalValueError for bad viewing_direction' do
       subject['viewing_direction'] = 'foo'
       exp_err_msg = "viewingDirection must be one of #{subject.legal_viewing_direction_values}"
@@ -61,10 +70,85 @@ describe IIIF::V3::AbstractResource do
       exp_err_msg = "viewingHint for #{subject.class} must be one of #{subject.legal_viewing_hint_values}"
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
-    it 'raises IllegalValueError for metadata entry that is not a Hash' do
-      subject['metadata'] = [{ 'foo' => 'bar' }, 'error', { 'bar' => 'foo' }]
-      exp_err_msg = "All entries in the metadata list must be a type of Hash"
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    describe 'metadata' do
+      it 'raises IllegalValueError for entry that is not a Hash' do
+        subject['metadata'] = ['error']
+        exp_err_msg = "metadata must be an Array with Hash members"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+      it 'does not raise error for entry that contains exactly "label" and "value"' do
+        subject['metadata'] = [{ 'label' => 'bar', 'value' => 'foo' }]
+        expect { subject.validate }.not_to raise_error
+      end
+      it 'raises IllegalValueError for entry that does not contain exactly "label" and "value"' do
+        subject['metadata'] = [{ 'label' => 'bar', 'bar' => 'foo' }]
+        exp_err_msg = "metadata members must be a Hash of keys 'label' and 'value'"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+    end
+    describe 'thumbnail' do
+      it 'raises IllegalValueError for entry that is not a Hash' do
+        subject['thumbnail'] = ['error']
+        exp_err_msg = "thumbnail must be an Array with Hash members"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+      it 'does not raise error for entry with "id" and "type"' do
+        subject['thumbnail'] = [{ 'id' => 'bar', 'type' => 'foo', 'random' => 'xxx' }]
+        expect { subject.validate }.not_to raise_error
+      end
+      it 'raises IllegalValueError for entry that does not contain "id" and "type"' do
+        subject['thumbnail'] = [{ 'id' => 'bar' }]
+        exp_err_msg = 'thumbnail members must be a Hash including keys "id" and "type"'
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+    end
+    describe 'nav_date' do
+      it 'does not raise error for value of form YYYY-MM-DDThh:mm:ssZ' do
+        subject['nav_date'] = '1991-01-02T13:04:27Z'
+        expect { subject.validate }.not_to raise_error
+      end
+      it 'raises IllegalValueError for value not of form YYYY-MM-DDThh:mm:ssZ' do
+        subject['nav_date'] = '1991-01-02T13:04:27+0500'
+        exp_err_msg = 'nav_date must be of form YYYY-MM-DDThh:mm:ssZ'
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+    end
+    describe 'rights' do
+      it 'raises IllegalValueError for entry that is not a Hash' do
+        subject['rights'] = ['error']
+        exp_err_msg = "rights must be an Array with Hash members"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+      it 'does not raise error for entry with "id" that is URI' do
+        subject['rights'] = [{ 'id' => 'http://example.org/rights', 'format' => 'text/html' }]
+        expect { subject.validate }.not_to raise_error
+      end
+      it 'raises IllegalValueError for entry with "id" that is not URI' do
+        subject['rights'] = [{ 'id' => 'bar', 'format' => 'text/html' }]
+        exp_err_msg = "id value must be a String containing a URI"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+      it 'raises IllegalValueError for entry that does not contain "id"' do
+        subject['rights'] = [{ 'whoops' => 'http://example.org/rights' }]
+        exp_err_msg = 'rights members must be a Hash including "id"'
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+    end
+    describe 'rendering' do
+      it 'raises IllegalValueError for entry that is not a Hash' do
+        subject['rendering'] = ['error']
+        exp_err_msg = "rendering must be an Array with Hash members"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+      it 'does not raise error for entry with "label" and "format"' do
+        subject['rendering'] = [{ 'label' => 'bar', 'format' => 'foo', 'random' => 'xxx' }]
+        expect { subject.validate }.not_to raise_error
+      end
+      it 'raises IllegalValueError for entry that does not contain "label" and "format"' do
+        subject['rendering'] = [{ 'label' => 'bar' }]
+        exp_err_msg = 'rendering members must be a Hash including keys "label" and "format"'
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
     end
   end
 

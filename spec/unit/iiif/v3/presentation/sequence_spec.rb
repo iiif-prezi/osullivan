@@ -1,5 +1,11 @@
 describe IIIF::V3::Presentation::Sequence do
 
+  describe '#required_keys' do
+    it 'accumulates from the superclass' do
+      expect(subject.required_keys).to eq %w{ type items }
+    end
+  end
+
   let(:subclass_subject) do
     Class.new(IIIF::V3::Presentation::Sequence) do
       def initialize(hsh={})
@@ -39,7 +45,7 @@ describe IIIF::V3::Presentation::Sequence do
       'within' => 'http://www.example.org/collections/books/',
       # Sequence
       'metadata' => [{'label'=>'Author', 'value'=>'Anne Author'}],
-      'canvases' => [{
+      'items' => [{
         'id' => 'http://www.example.org/iiif/book1/canvas/p1',
         'type' => 'Canvas',
         'label' => 'p. 1',
@@ -63,24 +69,6 @@ describe IIIF::V3::Presentation::Sequence do
     end
   end
 
-  describe '#required_keys' do
-    it 'accumulates from the superclass' do
-      expect(subject.required_keys).to eq %w{ type }
-    end
-  end
-
-  describe '#string_only_keys' do
-    it 'accumulates from the superclass' do
-      expect(subject.string_only_keys).to eq %w{ viewing_hint viewing_direction start_canvas }
-    end
-  end
-
-  describe '#array_only_keys' do
-    it 'accumulates from the superclass' do
-      expect(subject.array_only_keys).to eq %w{ metadata rights canvases }
-    end
-  end
-
   describe "#{described_class}.define_methods_for_array_only_keys" do
     it_behaves_like 'it has the appropriate methods for array-only keys v3'
   end
@@ -96,10 +84,12 @@ describe IIIF::V3::Presentation::Sequence do
   describe '#validate' do
     it 'raises an error if viewing_hint isn\'t an allowable value' do
       subject['viewing_hint'] = 'foo'
+      subject['items'] = [IIIF::V3::Presentation::Canvas.new]
       expect { subject.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError
     end
     it 'raises an error if viewing_directon isn\'t an allowable value' do
       subject['viewing_direction'] = 'foo-to-bar'
+      subject['items'] = [IIIF::V3::Presentation::Canvas.new]
       expect { subject.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError
     end
   end

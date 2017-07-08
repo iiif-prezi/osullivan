@@ -5,22 +5,37 @@ module IIIF
     class AbstractResource
       include IIIF::HashBehaviours
 
-      # Every subclass should override the following methods defining key value types, see Subclasses for how
+      # properties used by content resources only
+      CONTENT_RESOURCE_PROPERTIES = %w{ format height width duration }
+
+      # used by Collection, AnnotationCollection
+      PAGING_PROPERTIES = %w{ first last next prev total start_index }
+
+      # subclasses should override required_keys as appropriate, e.g. super + %w{ id }
       def required_keys
         %w{ type }
       end
 
-      def any_type_keys # these are allowed on all classes
-        %w{ label description thumbnail attribution logo see_also
-        related within }
+      # subclasses should override prohibited_keys as appropriate, e.g. super + PAGING_PROPERTIES
+      def prohibited_keys
+        %w{ }
+      end
+
+      # NOTE: keys associated with a single resource type are not included below in xxx_keys methods:
+      #  those single resource types should include additional keys by overriding xxx_keys as appropriate
+
+      def any_type_keys
+        # values *may* be multivalued
+        # NOTE: for id: "Resources that do not require URIs [for ids] may be assigned blank node identifiers"
+        %w{ label description id attribution logo related see_also within }
       end
 
       def string_only_keys
-        %w{ viewing_hint viewing_direction }
+        %w{ nav_date type format viewing_direction viewing_hint start_canvas }
       end
 
       def array_only_keys
-        %w{ metadata rights }
+        %w{ metadata rights thumbnail rendering first last next prev items }
       end
 
       def abstract_resource_only_keys
@@ -30,12 +45,15 @@ module IIIF
       def hash_only_keys
         %w{ }
       end
+
       def int_only_keys
-        %w{ }
+        %w{ height width total start_index }
       end
+
       def numeric_only_keys
-        %w{ }
+        %w{ duration }
       end
+
       def uri_only_keys
         %w{ }
       end
@@ -102,8 +120,16 @@ module IIIF
           end
         end
 
-        # Note:  self.define_methods_for_xxx_only_keys does NOT provide validation
-        #  when key values are assigned directly with hash syntax, e.g. my_image_resource['format']= 'image/jpeg'
+        self.prohibited_keys.each do |k|
+          if self.has_key?(k)
+            m = "#{k} is a prohibited key in #{self.class}"
+            raise IIIF::V3::Presentation::ProhibitedKeyError, m
+          end
+        end
+
+        # Note:  self.define_methods_for_xxx_only_keys provides some validation at assignment time
+        #  currently, there is NO validation when key values are assigned directly with hash syntax,
+        #  e.g. my_image_resource['format'] = 'image/jpeg'
 
         # Viewing Direction values
         if self.has_key?('viewing_direction')
@@ -119,11 +145,69 @@ module IIIF
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
-        # Metadata is all hashes
-        if self.has_key?('metadata') && self['metadata'].kind_of?(Array)
+        # Metadata is Array; each entry is a Hash containing (only) 'label' and 'value' properties
+        if self.has_key?('metadata') && self['metadata']
           unless self['metadata'].all? { |entry| entry.kind_of?(Hash) }
-            m = 'All entries in the metadata list must be a type of Hash'
+            m = 'metadata must be an Array with Hash members'
             raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+          self['metadata'].each do |entry|
+            md_keys = entry.keys
+            unless md_keys.size == 2 && md_keys.include?('label') && md_keys.include?('value')
+              m = "metadata members must be a Hash of keys 'label' and 'value'"
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
+          end
+        end
+        # Thumbnail is Array; each entry is a Hash containing (at least) 'id' and 'type' keys
+        if self.has_key?('thumbnail') && self['thumbnail']
+          unless self['thumbnail'].all? { |entry| entry.kind_of?(Hash) }
+            m = 'thumbnail must be an Array with Hash members'
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+          self['thumbnail'].each do |entry|
+            thumb_keys = entry.keys
+            unless thumb_keys.include?('id') && thumb_keys.include?('type')
+              m = 'thumbnail members must be a Hash including keys "id" and "type"'
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
+          end
+        end
+        # NavDate (navigation date)
+        if self.has_key?('nav_date')
+          begin
+            Date.strptime(self['nav_date'], '%Y-%m-%dT%H:%M:%SZ')
+          rescue ArgumentError
+            m = "nav_date must be of form YYYY-MM-DDThh:mm:ssZ"
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+        end
+        # rights is Array; each entry is a Hash containing 'id' with a URI value
+        if self.has_key?('rights')
+          unless self['rights'].all? { |entry| entry.kind_of?(Hash) }
+            m = 'rights must be an Array with Hash members'
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+          self['rights'].each do |entry|
+            unless entry.keys.include?('id')
+              m = 'rights members must be a Hash including "id"'
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
+            validate_uri(entry['id'], 'id') # raises IllegalValueError
+          end
+        end
+        #  rendering is Array; each entry is a Hash containing 'label' and 'format' keys
+        if self.has_key?('rendering') && self['rendering']
+          unless self['rendering'].all? { |entry| entry.kind_of?(Hash) }
+            m = 'rendering must be an Array with Hash members'
+            raise IIIF::V3::Presentation::IllegalValueError, m
+          end
+          self['rendering'].each do |entry|
+            rendering_keys = entry.keys
+            unless rendering_keys.include?('label') && rendering_keys.include?('format')
+              m = 'rendering members must be a Hash including keys "label" and "format"'
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
           end
         end
       end
@@ -311,8 +395,8 @@ module IIIF
       end
 
       def define_methods_for_array_only_keys
-        define_accessor_methods(*array_only_keys) do |key, arg|
-          unless arg.kind_of?(Array)
+        define_accessor_methods(*array_only_keys) do |key, val|
+          unless val.kind_of?(Array)
             m = "#{key} must be an Array."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -320,8 +404,8 @@ module IIIF
       end
 
       def define_methods_for_hash_only_keys
-        define_accessor_methods(*hash_only_keys) do |key, arg|
-          unless arg.kind_of?(Hash)
+        define_accessor_methods(*hash_only_keys) do |key, val|
+          unless val.kind_of?(Hash)
             m = "#{key} must be a Hash."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -334,8 +418,8 @@ module IIIF
           key = hsh[:key]
           type = hsh[:type]
 
-          define_accessor_methods(key) do |k, arg|
-            unless arg.kind_of?(type)
+          define_accessor_methods(key) do |k, val|
+            unless val.kind_of?(type)
               m = "#{k} must be an #{type}."
               raise IIIF::V3::Presentation::IllegalValueError, m
             end
@@ -344,8 +428,8 @@ module IIIF
       end
 
       def define_methods_for_string_only_keys
-        define_accessor_methods(*string_only_keys) do |key, arg|
-          unless arg.kind_of?(String)
+        define_accessor_methods(*string_only_keys) do |key, val|
+          unless val.kind_of?(String)
             m = "#{key} must be a String."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -353,8 +437,8 @@ module IIIF
       end
 
       def define_methods_for_int_only_keys
-        define_accessor_methods(*int_only_keys) do |key, arg|
-          unless arg.kind_of?(Integer) && arg > 0
+        define_accessor_methods(*int_only_keys) do |key, val|
+          unless val.kind_of?(Integer) && val > 0
             m = "#{key} must be a positive Integer."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -362,8 +446,8 @@ module IIIF
       end
 
       def define_methods_for_numeric_only_keys
-        define_accessor_methods(*numeric_only_keys) do |key, arg|
-          unless arg.kind_of?(Numeric) && arg > 0
+        define_accessor_methods(*numeric_only_keys) do |key, val|
+          unless val.kind_of?(Numeric) && val > 0
             m = "#{key} must be a positive Integer or Float."
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
@@ -371,25 +455,20 @@ module IIIF
       end
 
       def define_methods_for_uri_only_keys
-        define_accessor_methods(*uri_only_keys) do |key, arg|
-          unless arg.kind_of?(String) && arg =~ URI::regexp
-            m = "#{key} must be a String containing a URI."
-            raise IIIF::V3::Presentation::IllegalValueError, m
-          end
-        end
+        define_accessor_methods(*uri_only_keys) { |key, val| validate_uri(val, key) }
       end
 
       def define_accessor_methods(*keys, &validation)
         keys.each do |key|
           # Setter
-          define_singleton_method("#{key}=") do |arg|
-            validation.call(key, arg) if block_given?
-            self.send('[]=', key, arg)
+          define_singleton_method("#{key}=") do |val|
+            validation.call(key, val) if block_given?
+            self.send('[]=', key, val)
           end
           if key.camelize(:lower) != key
-            define_singleton_method("#{key.camelize(:lower)}=") do |arg|
-              validation.call(key, arg) if block_given?
-              self.send('[]=', key, arg)
+            define_singleton_method("#{key.camelize(:lower)}=") do |val|
+              validation.call(key, val) if block_given?
+              self.send('[]=', key, val)
             end
           end
           # Getter
@@ -402,6 +481,14 @@ module IIIF
               self.send('[]', key)
             end
           end
+        end
+      end
+
+      private
+      def validate_uri(val, key)
+        unless val.kind_of?(String) && val =~ URI::regexp
+          m = "#{key} value must be a String containing a URI"
+          raise IIIF::V3::Presentation::IllegalValueError, m
         end
       end
 

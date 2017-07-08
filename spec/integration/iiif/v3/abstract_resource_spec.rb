@@ -69,7 +69,7 @@ describe IIIF::V3::AbstractResource do
             "viewingHint":"paged",
             "startCanvas": "http://www.example.org/iiif/book1/canvas/p2",
 
-            "canvases": [
+            "items": [
               {
                 "id": "http://example.com/canvas",
                 "type": "Canvas",
@@ -128,12 +128,11 @@ describe IIIF::V3::AbstractResource do
         expect(s.class).to be expected_klass
       end
     end
-    it 'turns each member of sequences/canvaes in an instance of Canvas' do
-      expected_klass = IIIF::V3::Presentation::Canvas
+    it 'turns each member of items into an instance of Canvas' do
       parsed = described_class.from_ordered_hash(fixture)
       parsed['sequences'].each do |s|
-        s.canvases.each do |c|
-          expect(c.class).to be expected_klass
+        s.items.each do |c|
+          expect(c.class).to be IIIF::V3::Presentation::Canvas
         end
       end
     end
