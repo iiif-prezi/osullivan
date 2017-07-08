@@ -70,29 +70,48 @@ describe IIIF::V3::AbstractResource do
       exp_err_msg = "viewingHint for #{subject.class} must be one of #{subject.legal_viewing_hint_values}"
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
-    it 'raises IllegalValueError for metadata entry that is not a Hash' do
-      subject['metadata'] = ['error']
-      exp_err_msg = "metadata must be an Array with Hash members"
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    describe 'metadata' do
+      it 'raises IllegalValueError for entry that is not a Hash' do
+        subject['metadata'] = ['error']
+        exp_err_msg = "metadata must be an Array with Hash members"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+      it 'does not raise error for entry that contains exactly "label" and "value"' do
+        subject['metadata'] = [{ 'label' => 'bar', 'value' => 'foo' }]
+        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+      end
+      it 'raises IllegalValueError for entry that does not contain exactly "label" and "value"' do
+        subject['metadata'] = [{ 'label' => 'bar', 'bar' => 'foo' }]
+        exp_err_msg = "metadata members must be a Hash of keys 'label' and 'value'"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
     end
-    it 'raises IllegalValueError for metadata entry that does not contain exactly "label" and "value"' do
-      subject['metadata'] = [{ 'label' => 'bar', 'value' => 'foo' }]
-      expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
-      subject['metadata'] = [{ 'label' => 'bar', 'bar' => 'foo' }]
-      exp_err_msg = "metadata members must be a Hash of keys 'label' and 'value'"
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    describe 'thumbnail' do
+      it 'raises IllegalValueError for entry that is not a Hash' do
+        subject['thumbnail'] = ['error']
+        exp_err_msg = "thumbnail must be an Array with Hash members"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+      it 'does not raise error for entry with "id" and "type"' do
+        subject['thumbnail'] = [{ 'id' => 'bar', 'type' => 'foo', 'random' => 'xxx' }]
+        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+      end
+      it 'raises IllegalValueError for entry that does not contain "id" and "type"' do
+        subject['thumbnail'] = [{ 'id' => 'bar' }]
+        exp_err_msg = 'thumbnail members must be a Hash including keys "id" and "type"'
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
     end
-    it 'raises IllegalValueError for thumbnail entry that is not a Hash' do
-      subject['thumbnail'] = ['error']
-      exp_err_msg = "thumbnail must be an Array with Hash members"
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
-    end
-    it 'raises IllegalValueError for thumbnail entry that does not contain "id" and "type"' do
-      subject['thumbnail'] = [{ 'id' => 'bar', 'type' => 'foo', 'random' => 'xxx' }]
-      expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
-      subject['thumbnail'] = [{ 'id' => 'bar' }]
-      exp_err_msg = 'thumbnail members must be a Hash including keys "id" and "type"'
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    describe 'nav_date' do
+      it 'does not raise error for value of form YYYY-MM-DDThh:mm:ssZ' do
+        subject['nav_date'] = '1991-01-02T13:04:27Z'
+        expect { subject.validate }.not_to raise_error(IIIF::V3::Presentation::IllegalValueError)
+      end
+      it 'raises IllegalValueError for value not of form YYYY-MM-DDThh:mm:ssZ' do
+        subject['nav_date'] = '1991-01-02T13:04:27+0500'
+        exp_err_msg = 'nav_date must be of form YYYY-MM-DDThh:mm:ssZ'
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
     end
   end
 
