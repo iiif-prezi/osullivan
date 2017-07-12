@@ -31,6 +31,10 @@ module IIIF
               m = "@id is required for IIIF::V3::Presentation::Service with @context #{IIIF_IMAGE_V2_CONTEXT}"
               raise IIIF::V3::Presentation::MissingRequiredKeyError, m
             end
+            if self.has_key?('id') && (self['@id'] != self['id'])
+              m = "id and @id values must match for IIIF::V3::Presentation::Service with @context #{IIIF_IMAGE_V2_CONTEXT}"
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
             unless self.has_key?('profile')
               m = "profile is required for IIIF::V3::Presentation::Service with @context #{IIIF_IMAGE_V2_CONTEXT}"
               raise IIIF::V3::Presentation::MissingRequiredKeyError, m

@@ -7,18 +7,16 @@ describe IIIF::V3::Presentation::Service do
   end
 
   describe '#prohibited_keys' do
-    keys = IIIF::V3::Presentation::Service::CONTENT_RESOURCE_PROPERTIES +
-      IIIF::V3::Presentation::Service::PAGING_PROPERTIES +
-      %w{
-        nav_date
-        viewing_direction
-        start_canvas
-        content_annotation
-      }
-    keys.each do |k|
-      it "#{k} is prohibited" do
-        expect(subject.prohibited_keys).to include(k)
-      end
+    it 'contains the expected key names' do
+      keys = described_class::CONTENT_RESOURCE_PROPERTIES +
+        described_class::PAGING_PROPERTIES +
+        %w{
+          nav_date
+          viewing_direction
+          start_canvas
+          content_annotation
+        }
+      expect(subject.prohibited_keys).to include(*keys)
     end
   end
 
@@ -105,46 +103,53 @@ describe IIIF::V3::Presentation::Service do
         exp_err_msg = 'profile is required for IIIF::V3::Presentation::Service with @context http://iiif.io/api/image/2/context.json'
         expect{service_obj.validate}.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, exp_err_msg)
       end
+      it 'must have matching values for "@id" and "id" if both are specified' do
+        service_obj = described_class.new({
+          '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
+          '@id' => id_uri,
+          'id' => "#{id_uri}/foo"
+          })
+        exp_err_msg = 'id and @id values must match for IIIF::V3::Presentation::Service with @context http://iiif.io/api/image/2/context.json'
+        expect{service_obj.validate}.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
     end
   end
 
-  describe '"integration" tests' do
-    describe 'realistic examples from Stanford purl manifests' do
-      it 'iiif image v2 service' do
-        service_obj = described_class.new({
-          '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
-          'id' => id_uri,
-          '@id' => id_uri,
-          'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
-        })
-        expect(service_obj.keys.size).to eq 4
-        expect(service_obj.keys).to include('@context', '@id', 'id', 'profile')
-        expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
-        expect(service_obj['id']).to eq id_uri
-        expect(service_obj['@id']).to eq id_uri
-        expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
-      end
-      it 'login service' do
-        service_obj = IIIF::V3::Presentation::Service.new(
-          'id' => 'https://example.org/auth/iiif',
-          'profile' => described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE,
-          'label' => 'label value',
-          'service' => [{
-            'id' => 'https://example.org/image/iiif/token',
-            'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
-          }]
-        )
-        expect(service_obj.keys.size).to eq 4
-        expect(service_obj.keys).to include('id', 'profile', 'label', 'service')
-        expect(service_obj['id']).to eq 'https://example.org/auth/iiif'
-        expect(service_obj['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE
-        expect(service_obj['label']).to eq 'label value'
-        inner_service = service_obj['service'][0]
-        expect(inner_service.keys.size).to eq 2
-        expect(inner_service.keys).to include('id', 'profile')
-        expect(inner_service['id']).to eq 'https://example.org/image/iiif/token'
-        expect(inner_service['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
-      end
+  describe 'realistic examples from Stanford purl manifests' do
+    it 'iiif image v2 service' do
+      service_obj = described_class.new({
+        '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
+        'id' => id_uri,
+        '@id' => id_uri,
+        'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+      })
+      expect(service_obj.keys.size).to eq 4
+      expect(service_obj.keys).to include('@context', '@id', 'id', 'profile')
+      expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
+      expect(service_obj['id']).to eq id_uri
+      expect(service_obj['@id']).to eq id_uri
+      expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+    end
+    it 'login service' do
+      service_obj = described_class.new(
+        'id' => 'https://example.org/auth/iiif',
+        'profile' => described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE,
+        'label' => 'label value',
+        'service' => [{
+          'id' => 'https://example.org/image/iiif/token',
+          'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+        }]
+      )
+      expect(service_obj.keys.size).to eq 4
+      expect(service_obj.keys).to include('id', 'profile', 'label', 'service')
+      expect(service_obj['id']).to eq 'https://example.org/auth/iiif'
+      expect(service_obj['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE
+      expect(service_obj['label']).to eq 'label value'
+      inner_service = service_obj['service'][0]
+      expect(inner_service.keys.size).to eq 2
+      expect(inner_service.keys).to include('id', 'profile')
+      expect(inner_service['id']).to eq 'https://example.org/image/iiif/token'
+      expect(inner_service['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
     end
   end
 end
