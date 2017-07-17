@@ -115,41 +115,64 @@ describe IIIF::V3::Presentation::Service do
     end
   end
 
-  describe 'realistic examples from Stanford purl manifests' do
-    it 'iiif image v2 service' do
-      service_obj = described_class.new({
-        '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
-        'id' => id_uri,
-        '@id' => id_uri,
-        'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
-      })
-      expect(service_obj.keys.size).to eq 4
-      expect(service_obj.keys).to include('@context', '@id', 'id', 'profile')
-      expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
-      expect(service_obj['id']).to eq id_uri
-      expect(service_obj['@id']).to eq id_uri
-      expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+  describe 'realistic examples' do
+    describe 'from Stanford purl manifests' do
+      it 'iiif image v2 service' do
+        service_obj = described_class.new({
+          '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
+          'id' => id_uri,
+          '@id' => id_uri,
+          'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+        })
+        expect(service_obj.keys.size).to eq 4
+        expect(service_obj.keys).to include('@context', '@id', 'id', 'profile')
+        expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
+        expect(service_obj['id']).to eq id_uri
+        expect(service_obj['@id']).to eq id_uri
+        expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+      end
+      it 'login service' do
+        service_obj = described_class.new(
+          'id' => 'https://example.org/auth/iiif',
+          'profile' => described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE,
+          'label' => 'label value',
+          'service' => [{
+            'id' => 'https://example.org/image/iiif/token',
+            'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+          }]
+        )
+        expect(service_obj.keys.size).to eq 4
+        expect(service_obj.keys).to include('id', 'profile', 'label', 'service')
+        expect(service_obj['id']).to eq 'https://example.org/auth/iiif'
+        expect(service_obj['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE
+        expect(service_obj['label']).to eq 'label value'
+        inner_service = service_obj['service'][0]
+        expect(inner_service.keys.size).to eq 2
+        expect(inner_service.keys).to include('id', 'profile')
+        expect(inner_service['id']).to eq 'https://example.org/image/iiif/token'
+        expect(inner_service['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+      end
     end
-    it 'login service' do
-      service_obj = described_class.new(
-        'id' => 'https://example.org/auth/iiif',
-        'profile' => described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE,
-        'label' => 'label value',
-        'service' => [{
-          'id' => 'https://example.org/image/iiif/token',
-          'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
-        }]
-      )
-      expect(service_obj.keys.size).to eq 4
-      expect(service_obj.keys).to include('id', 'profile', 'label', 'service')
-      expect(service_obj['id']).to eq 'https://example.org/auth/iiif'
-      expect(service_obj['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE
-      expect(service_obj['label']).to eq 'label value'
-      inner_service = service_obj['service'][0]
-      expect(inner_service.keys.size).to eq 2
-      expect(inner_service.keys).to include('id', 'profile')
-      expect(inner_service['id']).to eq 'https://example.org/image/iiif/token'
-      expect(inner_service['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+    describe 'example from http://prezi3.iiif.io/api/presentation/3.0' do
+      it 'iiif image v2' do
+        service_obj = described_class.new({
+          "@context" => "http://iiif.io/api/image/2/context.json",
+          "id" => "http://example.org/images/book1-page2",
+          "@id" => "http://example.org/images/book1-page2",
+          "profile" => "http://iiif.io/api/image/2/level1.json",
+          "height" => 8000,
+          "width" => 6000,
+          "tiles" => [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
+        })
+        expect(service_obj.keys.size).to eq 7
+        expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
+        expect(service_obj['id']).to eq 'http://example.org/images/book1-page2'
+        expect(service_obj['@id']).to eq 'http://example.org/images/book1-page2'
+        expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+        expect(service_obj['height']).to eq 8000
+        expect(service_obj['width']).to eq 6000
+        expect(service_obj['tiles']).to eq [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
+      end
     end
   end
 end
