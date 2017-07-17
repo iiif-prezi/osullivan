@@ -1,10 +1,15 @@
 require 'iiif/presentation'
+require 'iiif/v3/presentation'
 require 'simplecov'
 require 'coveralls'
 Dir["#{File.dirname(__FILE__)}/unit/iiif/presentation/shared_examples/*.rb"].each do |f|
   require f
 end
+Dir["#{File.dirname(__FILE__)}/unit/iiif/v3/presentation/shared_examples/*.rb"].each do |f|
+  require f
+end
 require 'vcr'
+require 'webmock/rspec'
 
 VCR.configure do |c|
   c.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
