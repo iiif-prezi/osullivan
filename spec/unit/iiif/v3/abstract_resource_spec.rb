@@ -22,6 +22,10 @@ describe IIIF::V3::AbstractResource do
       def prohibited_keys
         super + %w{ verboten }
       end
+
+      def legal_viewing_hint_values
+        %w{ viewing_hint1 viewing_hint2 }
+      end
     end
   end
   subject do
@@ -65,10 +69,20 @@ describe IIIF::V3::AbstractResource do
       exp_err_msg = "viewingDirection must be one of #{subject.legal_viewing_direction_values}"
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
-    it 'raises IllegalValueError for bad viewing_hint' do
-      subject['viewing_hint'] = 'foo'
-      exp_err_msg = "viewingHint for #{subject.class} must be one of #{subject.legal_viewing_hint_values}"
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    describe 'viewing_hint' do
+      it 'can be a uri' do
+        subject['viewing_hint'] = 'https://example.org/viewiing_hint'
+        expect { subject.validate }.not_to raise_error
+      end
+      it 'can be a member of legal_viewing_hint_values' do
+        subject['viewing_hint'] = subject.legal_viewing_hint_values.first
+        expect { subject.validate }.not_to raise_error
+      end
+      it 'raises IllegalValueError for bad viewing_hint' do
+        subject['viewing_hint'] = 'foo'
+        exp_err_msg = "viewingHint for #{subject.class} must be one of #{subject.legal_viewing_hint_values} or a URI"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
     end
     describe 'metadata' do
       it 'raises IllegalValueError for entry that is not a Hash' do

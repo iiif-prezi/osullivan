@@ -140,9 +140,12 @@ module IIIF
         end
         # Viewing Hint values
         if self.has_key?('viewing_hint')
-          unless self.legal_viewing_hint_values.include?(self['viewing_hint'])
-            m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values}"
-            raise IIIF::V3::Presentation::IllegalValueError, m
+          viewing_hint_val = self['viewing_hint']
+          unless self.legal_viewing_hint_values.include?(viewing_hint_val)
+            unless viewing_hint_val.kind_of?(String) && viewing_hint_val =~ URI::regexp
+              m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values} or a URI"
+              raise IIIF::V3::Presentation::IllegalValueError, m
+            end
           end
         end
         # Metadata is Array; each entry is a Hash containing (only) 'label' and 'value' properties
