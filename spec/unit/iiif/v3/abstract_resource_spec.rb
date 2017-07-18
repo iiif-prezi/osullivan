@@ -168,6 +168,13 @@ describe IIIF::V3::AbstractResource do
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
     end
+    describe 'startCanvas' do
+      it 'raises IllegalValueError for entry that is not URI' do
+        subject.startCanvas = 'foo'
+        exp_err_msg = "startCanvas value must be a String containing a URI"
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+      end
+    end
   end
 
   describe 'A nested object (e.g. self[\'metadata\'])' do
