@@ -213,6 +213,10 @@ module IIIF
             end
           end
         end
+        # startCanvas is a String with a URI value
+        if self.has_key?('start_canvas') && self['start_canvas'].kind_of?(String)
+          validate_uri(self['start_canvas'], 'startCanvas') # raises IllegalValueError
+        end
       end
 
       # Options
