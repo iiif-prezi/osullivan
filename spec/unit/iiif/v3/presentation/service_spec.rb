@@ -124,6 +124,7 @@ describe IIIF::V3::Presentation::Service do
           '@id' => id_uri,
           'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
         })
+        expect{service_obj.validate}.not_to raise_error
         expect(service_obj.keys.size).to eq 4
         expect(service_obj.keys).to include('@context', '@id', 'id', 'profile')
         expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
@@ -132,25 +133,57 @@ describe IIIF::V3::Presentation::Service do
         expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
       end
       it 'login service' do
+        token_service = described_class.new({
+          'id' => 'https://example.org/image/iiif/token',
+          'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+        })
+        expect{token_service.validate}.not_to raise_error
+        expect(token_service.class).to eq described_class
+        expect(token_service.keys.size).to eq 2
+        expect(token_service.keys).to include('id', 'profile')
+        expect(token_service['id']).to eq 'https://example.org/image/iiif/token'
+        expect(token_service['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
         service_obj = described_class.new(
           'id' => 'https://example.org/auth/iiif',
           'profile' => described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE,
           'label' => 'label value',
-          'service' => [{
-            'id' => 'https://example.org/image/iiif/token',
-            'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
-          }]
+          'service' => [token_service]
         )
+        expect{service_obj.validate}.not_to raise_error
         expect(service_obj.keys.size).to eq 4
         expect(service_obj.keys).to include('id', 'profile', 'label', 'service')
         expect(service_obj['id']).to eq 'https://example.org/auth/iiif'
         expect(service_obj['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE
         expect(service_obj['label']).to eq 'label value'
         inner_service = service_obj['service'][0]
+        expect(inner_service.class).to eq described_class
+        expect{inner_service.validate}.not_to raise_error
         expect(inner_service.keys.size).to eq 2
         expect(inner_service.keys).to include('id', 'profile')
         expect(inner_service['id']).to eq 'https://example.org/image/iiif/token'
         expect(inner_service['profile']).to eq described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+      end
+      it 'triply nested service' do
+        inner = described_class.new({
+          'id' => 'https://example.org/image/iiif/token',
+          'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+          })
+        expect{inner.validate}.not_to raise_error
+        middle = described_class.new({
+          "id" => "https://example.org/auth/iiif",
+          "profile" => described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE,
+          "label" => "Stanford-affiliated? Login to view",
+          "service" => [inner]
+          })
+        expect{middle.validate}.not_to raise_error
+        outer = described_class.new({
+          "@context" => described_class::IIIF_IMAGE_V2_CONTEXT,
+            "@id" => "https://example.org/iiif/yy816tv6021_img_1",
+            "id" => "https://example.org/iiif/yy816tv6021_img_1",
+            "profile" => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE,
+            "service" => [middle]
+          })
+        expect{outer.validate}.not_to raise_error
       end
     end
     describe 'example from http://prezi3.iiif.io/api/presentation/3.0' do
@@ -172,6 +205,8 @@ describe IIIF::V3::Presentation::Service do
         expect(service_obj['height']).to eq 8000
         expect(service_obj['width']).to eq 6000
         expect(service_obj['tiles']).to eq [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
+        # TODO:  note that this won't validate because "height is a prohibited key in IIIF::V3::Presentation::Service"
+        # expect{service_obj.validate}.not_to raise_error
       end
     end
   end
