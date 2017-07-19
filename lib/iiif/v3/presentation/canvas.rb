@@ -13,6 +13,10 @@ module IIIF
           super + PAGING_PROPERTIES + %w{ viewing_direction format nav_date start_canvas content_annotations }
         end
 
+        def int_only_keys
+          super + %w{ depth }
+        end
+
         def array_only_keys
           super + %w{ content }
         end

@@ -22,6 +22,12 @@ describe IIIF::V3::Presentation::Canvas do
    end
   end
 
+  describe '#int_only_keys' do
+    it 'depth (for 3d objects)' do
+      expect(subject.int_only_keys).to include('depth')
+    end
+  end
+
   describe '#array_only_keys' do
     it 'content' do
       expect(subject.array_only_keys).to include('content')
@@ -149,42 +155,27 @@ describe IIIF::V3::Presentation::Canvas do
       end
     end
 
-    ex5 = {
-            "id" => "http://example.org/iiif/book1/canvas/p2",
-            "type" => "Canvas",
-            "label" => "p. 2",
-            "height" =>1000,
-            "width" =>750,
-            "images" => [
-              {
-                "type" => "Annotation",
-                "motivation" => "painting",
-                "resource" =>{
-                    "id" => "http://example.org/images/book1-page2/full/1500,2000/0/default.jpg",
-                    "type" => "dctypes:Image",
-                    "format" => "image/jpeg",
-                    "height" =>2000,
-                    "width" =>1500,
-                    "service" => {
-                        "@context" => "http://iiif.io/api/image/2/context.json",
-                        "id" => "http://example.org/images/book1-page2",
-                        "profile" => "http://iiif.io/api/image/2/level1.json",
-                        "height" =>8000,
-                        "width" =>6000,
-                        "tiles" => [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
-                    }
-                },
-                "on" => "http://example.org/iiif/book1/canvas/p2"
-              }
-            ],
-            "otherContent" => [
-              {
-                "id" => "http://example.org/iiif/book1/list/p2",
-                "type" => "AnnotationList",
-                "within" => "http://example.org/iiif/book1/layer/l1"
-              }
-            ]
-          }
+    describe '3d object' do
+      let(:canvas_3d_object) { described_class.new({
+        "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/3d",
+        "thumbnail" => [{'id' => "http://files.universalviewer.io/manifests/nelis/animal-skull/thumb.jpg",
+          'type' => 'Image'}],
+        "width" => 10000,
+        "height" => 10000,
+        "depth" => 10000,
+        "label" => "A stage for an object",
+        "content" => [anno_page]
+        })}
+      it 'validates' do
+        expect{canvas_3d_object.validate}.not_to raise_error
+      end
+      it 'thumbnail' do
+        expect(canvas_3d_object.thumbnail).to eq [{'id' => "http://files.universalviewer.io/manifests/nelis/animal-skull/thumb.jpg", 'type' => 'Image'}]
+      end
+      it 'depth' do
+        expect(canvas_3d_object.depth).to eq 10000
+      end
+    end
 
     describe 'video object' do
       let(:canvas_for_video) { described_class.new({
@@ -224,35 +215,7 @@ describe IIIF::V3::Presentation::Canvas do
       end
     end
 
-  ex_3d_tom_crane = {
-               "id" =>"http://tomcrane.github.io/scratch/manifests/3/canvas/3d",
-               "type" =>"Canvas",
-               "thumbnail" =>"http://files.universalviewer.io/manifests/nelis/animal-skull/thumb.jpg",
-               "width" =>10000,
-               "height" =>10000,
-               "depth" =>10000,
-               "label" =>"A stage for an object",
-               "content" =>[
-                  {
-                     "id" =>"...",
-                     "type" =>"AnnotationPage",
-                     "items" =>[
-                        {
-                           "id" =>"http://tomcrane.github.io/scratch/manifests/3/3d/anno1",
-                           "type" =>"Annotation",
-                           "motivation" =>"painting",
-                           "body" =>{
-                              "id" =>"http://files.universalviewer.io/manifests/nelis/animal-skull/animal-skull.json",
-                              "type" =>"PhysicalObject",
-                              "format" =>"application/vnd.threejs+json",
-                              "label" =>"Animal Skull"
-                           },
-                           "target" =>"http://tomcrane.github.io/scratch/manifests/3/canvas/3d"
-                        }
-                     ]
-                  }
-               ]
-}
+    # TODO: still need Stanford examples
 
     # file
     # Audio
