@@ -75,7 +75,9 @@ describe IIIF::V3::Presentation::Canvas do
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg)
     end
 
-    let(:exp_extent_err_msg) { "#{described_class} must have (a height and a width) and/or a duration" }
+    # let(:exp_extent_err_msg) { "#{described_class} must have (a height and a width) and/or a duration" }
+    #  (see sul-dlss/purl/issues/169)
+    let(:exp_extent_err_msg) { "#{described_class} requires both height and width or neither" }
     it 'raises an IllegalValueError if height is a string' do
       subject['height'] = 'foo'
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_extent_err_msg)
@@ -90,6 +92,8 @@ describe IIIF::V3::Presentation::Canvas do
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_extent_err_msg)
     end
     it 'raises an IllegalValueError if no width, height or duration' do
+      # (see sul-dlss/purl/issues/169)
+      skip('while this is in the current v3 spec, it does not make sense for some content (e.g. txt files)')
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_extent_err_msg)
     end
     it 'allows width, height and duration' do

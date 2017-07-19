@@ -51,14 +51,18 @@ module IIIF
           # It may have width, height and duration.""
           height = self['height']
           width = self['width']
-          extent_err_msg = "#{self.class} must have (a height and a width) and/or a duration"
           if (!!height ^ !!width) # this is an exclusive or: forces height and width to boolean
+            extent_err_msg = "#{self.class} requires both height and width or neither"
             raise IIIF::V3::Presentation::IllegalValueError, extent_err_msg
           end
-          duration = self['duration']
-          unless (height && width) || duration
-            raise IIIF::V3::Presentation::IllegalValueError, extent_err_msg
-          end
+          # NOTE:  relaxing requirement for (exactly one width and one height, and/or exactly one duration)
+          #  as Stanford has objects (such as txt files) for which this makes no sense
+          #  (see sul-dlss/purl/issues/169)
+          # duration = self['duration']
+          # unless (height && width) || duration
+          #   extent_err_msg = "#{self.class} must have (a height and a width) and/or a duration"
+          #   raise IIIF::V3::Presentation::IllegalValueError, extent_err_msg
+          # end
 
           # TODO: Content must not be associated with space or time outside of the Canvas’s dimensions,
           # such as at coordinates below 0,0, greater than the height or width, before 0 seconds, or after the duration.
