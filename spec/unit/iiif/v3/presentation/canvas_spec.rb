@@ -155,6 +155,75 @@ describe IIIF::V3::Presentation::Canvas do
       end
     end
 
+    describe 'file object' do
+      describe 'without extent info' do
+        let(:file_object) { described_class.new({
+          "id" => "https://example.org/bd742gh0511/iiif3/canvas/bd742gh0511_1",
+          "label" => "File 1",
+          "content" => [anno_page]
+          })}
+        it 'validates' do
+          expect{file_object.validate}.not_to raise_error
+        end
+      end
+    end
+
+    describe 'image object' do
+      describe 'without extent info' do
+        let(:image_object) { described_class.new({
+          "id" => "https://example.org/yv090xk3108/iiif3/canvas/yv090xk3108_1",
+          "label" => "image",
+          "content" => [anno_page]
+          })}
+        it 'validates' do
+          expect{image_object.validate}.not_to raise_error
+        end
+      end
+      describe 'with extent given' do
+        let(:image_object) { described_class.new({
+          "id" => "https://example.org/yy816tv6021/iiif3/canvas/yy816tv6021_3",
+          "label" => "Image of media (1 of 2)",
+          "height" => 3456,
+          "width" => 5184,
+          "content" => [anno_page]
+          })}
+        it 'validates' do
+          expect{image_object.validate}.not_to raise_error
+        end
+      end
+    end
+
+    describe 'audio object' do
+      describe 'without duration' do
+        let(:canvas_for_audio) { described_class.new({
+          "id" => "https://example.org/xk681bt2506/iiif3/canvas/xk681bt2506_1",
+          "label" => "Audio file 1",
+          "content" => [anno_page]
+          })}
+        it 'validates' do
+          expect{canvas_for_audio.validate}.not_to raise_error
+        end
+      end
+      describe 'digerati example' do
+        let(:canvas_for_audio) { described_class.new({
+          "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/2",
+          "label" => "Track 2",
+          "description" => "foo",
+          "duration" => 45,
+          "content" => [anno_page]
+          })}
+        it 'validates' do
+          expect{canvas_for_audio.validate}.not_to raise_error
+        end
+        it 'duration' do
+          expect(canvas_for_audio.duration).to eq 45
+        end
+        it 'description' do
+          expect(canvas_for_audio.description).to eq 'foo'
+        end
+      end
+    end
+
     describe '3d object' do
       let(:canvas_3d_object) { described_class.new({
         "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/3d",
@@ -178,89 +247,25 @@ describe IIIF::V3::Presentation::Canvas do
     end
 
     describe 'video object' do
-      let(:canvas_for_video) { described_class.new({
-        "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/1",
-        "label" => "Associate multiple Video representations as Choice",
-        "height" => 1000,
-        "width" => 1000,
-        "duration" => 100,
-        "content" => [anno_page]
-        }) }
-      it 'validates' do
-        expect{canvas_for_video.validate}.not_to raise_error
-      end
-      it 'height, width, duration' do
-        expect(canvas_for_video.height).to eq 1000
-        expect(canvas_for_video.width).to eq 1000
-        expect(canvas_for_video.duration).to eq 100
-      end
-    end
-
-    describe 'audio object' do
-      let(:canvas_for_audio) { described_class.new({
-        "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/2",
-        "label" => "Track 2",
-        "description" => "foo",
-        "duration" => 45,
-        "content" => [anno_page]
-        })}
-      it 'validates' do
-        expect{canvas_for_audio.validate}.not_to raise_error
-      end
-      it 'duration' do
-        expect(canvas_for_audio.duration).to eq 45
-      end
-      it 'description' do
-        expect(canvas_for_audio.description).to eq 'foo'
+      describe 'with extent info' do
+        let(:canvas_for_video) { described_class.new({
+          "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/1",
+          "label" => "Associate multiple Video representations as Choice",
+          "height" => 1000,
+          "width" => 1000,
+          "duration" => 100,
+          "content" => [anno_page]
+          }) }
+        it 'validates' do
+          expect{canvas_for_video.validate}.not_to raise_error
+        end
+        it 'height, width, duration' do
+          expect(canvas_for_video.height).to eq 1000
+          expect(canvas_for_video.width).to eq 1000
+          expect(canvas_for_video.duration).to eq 100
+        end
       end
     end
-
-    # TODO: still need Stanford examples
-
-    # file
-    # Audio
-    # video
-    # 3d object
-    # document
-    # citation
-    # image
-    # book
-
-    stanford_1 =        {
-          "type" => "Canvas",
-          "id" => "https://purl.stanford.edu/bc592pz8308/iiif3/canvas/0001",
-          "label" => "image",
-          "height" => 7579,
-          "width" => 10108,
-          "content" => [
-            {
-              "type" => "AnnotationPage",
-              "id" => "https://purl.stanford.edu/bc592pz8308/iiif3/annotation_page/0001",
-              "items" => [
-                {
-                  "type" => "Annotation",
-                  "motivation" => "painting",
-                  "id" => "https://purl.stanford.edu/bc592pz8308/iiif3/annotation/0001",
-                  "body" => {
-                    "type" => "Image",
-                    "id" => "https://stacks.stanford.edu/image/iiif/bc592pz8308%2Fbc592pz8308_05_0001/full/full/0/default.jpg",
-                    "format" => "image/jpeg",
-                    "height" => 7579,
-                    "width" => 10108,
-                    "service" => {
-                      "@context" => "http://iiif.io/api/image/2/context.json",
-                      "@id" => "https://stacks.stanford.edu/image/iiif/bc592pz8308%2Fbc592pz8308_05_0001",
-                      "id" => "https://stacks.stanford.edu/image/iiif/bc592pz8308%2Fbc592pz8308_05_0001",
-                      "profile" => "http://iiif.io/api/image/2/level1.json"
-                    }
-                  },
-                  "target" => "https://purl.stanford.edu/bc592pz8308/iiif3/canvas/0001"
-                }
-              ]
-            }
-          ]
-        }
-
   end
 
 end
