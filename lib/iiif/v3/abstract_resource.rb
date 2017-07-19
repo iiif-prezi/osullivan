@@ -27,11 +27,11 @@ module IIIF
       def any_type_keys
         # values *may* be multivalued
         # NOTE: for id: "Resources that do not require URIs [for ids] may be assigned blank node identifiers"
-        %w{ label description id attribution logo related see_also within }
+        %w{ label description id attribution logo viewing_hint related see_also within }
       end
 
       def string_only_keys
-        %w{ nav_date type format viewing_direction viewing_hint start_canvas }
+        %w{ nav_date type format viewing_direction start_canvas }
       end
 
       def array_only_keys
@@ -138,12 +138,15 @@ module IIIF
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
-        # Viewing Hint values
+        # Viewing Hint can be an Array ("Any resource type may have one or more viewing hints")
         if self.has_key?('viewing_hint')
-          unless self.legal_viewing_hint_values.include?(self['viewing_hint'])
-            m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values}"
-            raise IIIF::V3::Presentation::IllegalValueError, m
-          end
+          viewing_hint_val = self['viewing_hint']
+          [*viewing_hint_val].each { |vh_val|
+            unless self.legal_viewing_hint_values.include?(vh_val) || (vh_val.kind_of?(String) && vh_val =~ URI::regexp)
+                m = "viewingHint for #{self.class} must be one or more of #{self.legal_viewing_hint_values} or a URI"
+                raise IIIF::V3::Presentation::IllegalValueError, m
+            end
+          }
         end
         # Metadata is Array; each entry is a Hash containing (only) 'label' and 'value' properties
         if self.has_key?('metadata') && self['metadata']
@@ -196,7 +199,7 @@ module IIIF
             validate_uri(entry['id'], 'id') # raises IllegalValueError
           end
         end
-        #  rendering is Array; each entry is a Hash containing 'label' and 'format' keys
+        # rendering is Array; each entry is a Hash containing 'label' and 'format' keys
         if self.has_key?('rendering') && self['rendering']
           unless self['rendering'].all? { |entry| entry.kind_of?(Hash) }
             m = 'rendering must be an Array with Hash members'
@@ -209,6 +212,10 @@ module IIIF
               raise IIIF::V3::Presentation::IllegalValueError, m
             end
           end
+        end
+        # startCanvas is a String with a URI value
+        if self.has_key?('start_canvas') && self['start_canvas'].kind_of?(String)
+          validate_uri(self['start_canvas'], 'startCanvas') # raises IllegalValueError
         end
       end
 
