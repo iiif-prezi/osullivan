@@ -162,16 +162,16 @@ module IIIF
             end
           end
         end
-        # Thumbnail is Array; each entry is a Hash containing (at least) 'id' and 'type' keys
+        # Thumbnail is Array; each entry is a Hash or ImageResource containing (at least) 'id' and 'type' keys
         if self.has_key?('thumbnail') && self['thumbnail']
-          unless self['thumbnail'].all? { |entry| entry.kind_of?(Hash) }
-            m = 'thumbnail must be an Array with Hash members'
+          unless self['thumbnail'].all? { |entry| entry.kind_of?(IIIF::V3::Presentation::ImageResource) || entry.kind_of?(Hash) }
+            m = 'thumbnail must be an Array with Hash or ImageResource members'
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
           self['thumbnail'].each do |entry|
             thumb_keys = entry.keys
             unless thumb_keys.include?('id') && thumb_keys.include?('type')
-              m = 'thumbnail members must be a Hash including keys "id" and "type"'
+              m = 'thumbnail members must include keys "id" and "type"'
               raise IIIF::V3::Presentation::IllegalValueError, m
             end
           end

@@ -105,19 +105,27 @@ describe IIIF::V3::AbstractResource do
       end
     end
     describe 'thumbnail' do
-      it 'raises IllegalValueError for entry that is not a Hash' do
+      let (:exp_basic_err_msg) { "thumbnail must be an Array with Hash or ImageResource members" }
+      let (:exp_keys_msg) { 'thumbnail members must include keys "id" and "type"' }
+      it 'raises IllegalValueError for entry that is not a Hash or ImageResource object' do
         subject['thumbnail'] = ['error']
-        exp_err_msg = "thumbnail must be an Array with Hash members"
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_basic_err_msg)
       end
-      it 'does not raise error for entry with "id" and "type"' do
+      it 'does not raise error for entry Hash with "id" and "type"' do
         subject['thumbnail'] = [{ 'id' => 'bar', 'type' => 'foo', 'random' => 'xxx' }]
         expect { subject.validate }.not_to raise_error
       end
-      it 'raises IllegalValueError for entry that does not contain "id" and "type"' do
+      it 'raises IllegalValueError for entry Hash that does not contain "id" and "type"' do
         subject['thumbnail'] = [{ 'id' => 'bar' }]
-        exp_err_msg = 'thumbnail members must be a Hash including keys "id" and "type"'
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_keys_msg)
+      end
+      it 'does not raise error for entry ImageResource with "id"' do
+        subject['thumbnail'] = [IIIF::V3::Presentation::ImageResource.new({ 'id' => 'bar', 'label' => 'xxx' })]
+        expect { subject.validate }.not_to raise_error
+      end
+      it 'raises IllegalValueError for entry ImageResource without id' do
+        subject['thumbnail'] = [IIIF::V3::Presentation::ImageResource.new]
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_keys_msg)
       end
     end
     describe 'nav_date' do
