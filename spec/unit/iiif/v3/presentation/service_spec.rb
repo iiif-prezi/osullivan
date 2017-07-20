@@ -14,7 +14,7 @@ describe IIIF::V3::Presentation::Service do
           nav_date
           viewing_direction
           start_canvas
-          content_annotation
+          content_annotations
         }
       expect(subject.prohibited_keys).to include(*keys)
     end
