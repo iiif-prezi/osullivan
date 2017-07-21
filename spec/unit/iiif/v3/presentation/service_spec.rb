@@ -32,6 +32,12 @@ describe IIIF::V3::Presentation::Service do
     end
   end
 
+  describe '#any_type_keys' do
+    it 'profile' do
+      expect(subject.any_type_keys).to include('profile')
+    end
+  end
+
   let(:id_uri) { "https://example.org/image1" }
 
   describe '#initialize' do

@@ -24,6 +24,10 @@ module IIIF
           super + %w{ @context id @id }
         end
 
+        def any_type_keys
+          super + %w{ profile }
+        end
+
         def validate
           super
           if IIIF_IMAGE_V2_CONTEXT == self['@context']
