@@ -127,6 +127,13 @@ module IIIF
           end
         end
 
+        self.uri_only_keys.each do |k|
+          if self[k]
+            vals = *self[k]
+            vals.each { |val| validate_uri(val, k) }
+          end
+        end
+
         # Note:  self.define_methods_for_xxx_only_keys provides some validation at assignment time
         #  currently, there is NO validation when key values are assigned directly with hash syntax,
         #  e.g. my_image_resource['format'] = 'image/jpeg'
@@ -494,7 +501,7 @@ module IIIF
       private
       def validate_uri(val, key)
         unless val.kind_of?(String) && val =~ URI::regexp
-          m = "#{key} value must be a String containing a URI"
+          m = "#{key} value must be a String containing a URI for #{self.class}"
           raise IIIF::V3::Presentation::IllegalValueError, m
         end
       end
