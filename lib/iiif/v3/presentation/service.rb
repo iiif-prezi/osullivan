@@ -17,11 +17,15 @@ module IIIF
 
         def prohibited_keys
           super + CONTENT_RESOURCE_PROPERTIES + PAGING_PROPERTIES +
-            %w{ nav_date viewing_direction start_canvas content_annotation }
+            %w{ nav_date viewing_direction start_canvas content_annotations }
         end
 
         def uri_only_keys
           super + %w{ @context id @id }
+        end
+
+        def any_type_keys
+          super + %w{ profile }
         end
 
         def validate

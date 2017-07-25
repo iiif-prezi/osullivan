@@ -5,11 +5,7 @@ module IIIF
     module Presentation
       class ImageResource < Resource
 
-        TYPE = 'Image'
-
-        def int_only_keys
-          super + %w{ width height }
-        end
+        TYPE = 'Image'.freeze
 
         def initialize(hsh={})
           hsh['type'] = TYPE unless hsh.has_key? 'type'
@@ -17,9 +13,9 @@ module IIIF
         end
 
         class << self
-          IMAGE_API_DEFAULT_PARAMS = '/full/!200,200/0/default.jpg'
-          IMAGE_API_CONTEXT = 'http://iiif.io/api/image/2/context.json'
-          DEFAULT_FORMAT = 'image/jpeg'
+          IMAGE_API_DEFAULT_PARAMS = '/full/!200,200/0/default.jpg'.freeze
+          IMAGE_API_CONTEXT = 'http://iiif.io/api/image/2/context.json'.freeze
+          DEFAULT_FORMAT = 'image/jpeg'.freeze
           # Create a new ImageResource that includes a IIIF Image API Service
           # See http://iiif.io/api/presentation/2.0/#image-resources
           #

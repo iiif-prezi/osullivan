@@ -14,7 +14,7 @@ describe IIIF::V3::Presentation::Service do
           nav_date
           viewing_direction
           start_canvas
-          content_annotation
+          content_annotations
         }
       expect(subject.prohibited_keys).to include(*keys)
     end
@@ -29,6 +29,12 @@ describe IIIF::V3::Presentation::Service do
     end
     it 'id' do
       expect(subject.uri_only_keys).to include('id')
+    end
+  end
+
+  describe '#any_type_keys' do
+    it 'profile' do
+      expect(subject.any_type_keys).to include('profile')
     end
   end
 
