@@ -111,19 +111,24 @@ describe IIIF::V3::Presentation::Canvas do
   end
 
   describe 'realistic examples' do
+    let(:canvas_id) { 'http://example.org/iiif/book1/canvas/c1' }
     let(:minimal_canvas_object) { described_class.new({
-      "id" => "http://example.org/iiif/book1/canvas/c1",
+      "id" => canvas_id,
       'label' => "so minimal it's not here",
-      "height" => 1000,
-      "width" => 1000
+      'height' => 1000,
+      'width' => 1000
     })}
+    let(:anno_page) { IIIF::V3::Presentation::AnnotationPage.new(
+      "id" => "http://example.org/iiif/book1/page/p1/1",
+      'items' => []
+      ) }
     describe 'minimal canvas' do
       it 'validates' do
         expect{minimal_canvas_object.validate}.not_to raise_error
       end
       it 'has expected required values' do
         expect(minimal_canvas_object.type).to eq described_class::TYPE
-        expect(minimal_canvas_object.id).to eq "http://example.org/iiif/book1/canvas/c1"
+        expect(minimal_canvas_object.id).to eq canvas_id
         expect(minimal_canvas_object.label).to eq "so minimal it's not here"
         expect(minimal_canvas_object.height).to eq 1000
         expect(minimal_canvas_object.width).to eq 1000
@@ -137,14 +142,10 @@ describe IIIF::V3::Presentation::Canvas do
       it 'validates' do
         expect{canvas_object.validate}.not_to raise_error
       end
-      it 'has additional values' do
+      it 'has empty array for content' do
         expect(canvas_object.content).to eq []
       end
     end
-    let(:anno_page) { IIIF::V3::Presentation::AnnotationPage.new(
-      "id" => "http://example.org/iiif/book1/page/p1/1",
-      'items' => []
-      ) }
     describe 'minimal with content' do
       let(:canvas_object) {
         minimal_canvas_object['content'] = [anno_page, anno_page]
@@ -157,119 +158,161 @@ describe IIIF::V3::Presentation::Canvas do
         expect(canvas_object.content.size).to eq 2
         expect(canvas_object.content).to eq [anno_page, anno_page]
       end
-    end
 
-    describe 'file object' do
-      describe 'without extent info' do
-        let(:file_object) { described_class.new({
-          "id" => "https://example.org/bd742gh0511/iiif3/canvas/bd742gh0511_1",
-          "label" => "File 1",
+      describe 'stanford (purl code)' do
+        let(:canvas_object) {
+          c = described_class.new
+          c['id'] = canvas_id
+          c.label = 'label'
+          c.content << anno_page
+          c
+        }
+        describe 'non-image' do
+          it 'validates' do
+            expect{canvas_object.validate}.not_to raise_error
+          end
+          it 'has expected required values' do
+            expect(canvas_object.type).to eq described_class::TYPE
+            expect(canvas_object.id).to eq canvas_id
+            expect(canvas_object.label).to eq "label"
+          end
+          it 'has expected additional values' do
+            expect(canvas_object.content).to eq [anno_page]
+          end
+        end
+        describe 'image' do
+          let(:img_canvas) {
+            canvas_object.height = 666
+            canvas_object.width = 888
+            canvas_object
+          }
+          it 'validates' do
+            expect{img_canvas.validate}.not_to raise_error
+          end
+          it 'has expected required values' do
+            expect(img_canvas.type).to eq described_class::TYPE
+            expect(img_canvas.id).to eq canvas_id
+            expect(img_canvas.label).to eq "label"
+            expect(img_canvas.height).to eq 666
+            expect(img_canvas.width).to eq 888
+          end
+          it 'has expected additional values' do
+            expect(img_canvas.content).to eq [anno_page]
+          end
+        end
+      end
+
+      describe 'file object' do
+        describe 'without extent info' do
+          let(:file_object) { described_class.new({
+            "id" => "https://example.org/bd742gh0511/iiif3/canvas/bd742gh0511_1",
+            "label" => "File 1",
+            "content" => [anno_page]
+            })}
+          it 'validates' do
+            expect{file_object.validate}.not_to raise_error
+          end
+        end
+      end
+
+      describe 'image object' do
+        describe 'without extent info' do
+          let(:image_object) { described_class.new({
+            "id" => "https://example.org/yv090xk3108/iiif3/canvas/yv090xk3108_1",
+            "label" => "image",
+            "content" => [anno_page]
+            })}
+          it 'validates' do
+            expect{image_object.validate}.not_to raise_error
+          end
+        end
+        describe 'with extent given' do
+          let(:image_object) { described_class.new({
+            "id" => "https://example.org/yy816tv6021/iiif3/canvas/yy816tv6021_3",
+            "label" => "Image of media (1 of 2)",
+            "height" => 3456,
+            "width" => 5184,
+            "content" => [anno_page]
+            })}
+          it 'validates' do
+            expect{image_object.validate}.not_to raise_error
+          end
+        end
+      end
+
+      describe 'audio object' do
+        describe 'without duration' do
+          let(:canvas_for_audio) { described_class.new({
+            "id" => "https://example.org/xk681bt2506/iiif3/canvas/xk681bt2506_1",
+            "label" => "Audio file 1",
+            "content" => [anno_page]
+            })}
+          it 'validates' do
+            expect{canvas_for_audio.validate}.not_to raise_error
+          end
+        end
+        describe 'digerati example' do
+          let(:canvas_for_audio) { described_class.new({
+            "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/2",
+            "label" => "Track 2",
+            "description" => "foo",
+            "duration" => 45,
+            "content" => [anno_page]
+            })}
+          it 'validates' do
+            expect{canvas_for_audio.validate}.not_to raise_error
+          end
+          it 'duration' do
+            expect(canvas_for_audio.duration).to eq 45
+          end
+          it 'description' do
+            expect(canvas_for_audio.description).to eq 'foo'
+          end
+        end
+      end
+
+      describe '3d object' do
+        let(:canvas_3d_object) { described_class.new({
+          "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/3d",
+          "thumbnail" => [{'id' => "http://files.universalviewer.io/manifests/nelis/animal-skull/thumb.jpg",
+            'type' => 'Image'}],
+          "width" => 10000,
+          "height" => 10000,
+          "depth" => 10000,
+          "label" => "A stage for an object",
           "content" => [anno_page]
           })}
         it 'validates' do
-          expect{file_object.validate}.not_to raise_error
+          expect{canvas_3d_object.validate}.not_to raise_error
+        end
+        it 'thumbnail' do
+          expect(canvas_3d_object.thumbnail).to eq [{'id' => "http://files.universalviewer.io/manifests/nelis/animal-skull/thumb.jpg", 'type' => 'Image'}]
+        end
+        it 'depth' do
+          expect(canvas_3d_object.depth).to eq 10000
         end
       end
-    end
 
-    describe 'image object' do
-      describe 'without extent info' do
-        let(:image_object) { described_class.new({
-          "id" => "https://example.org/yv090xk3108/iiif3/canvas/yv090xk3108_1",
-          "label" => "image",
-          "content" => [anno_page]
-          })}
-        it 'validates' do
-          expect{image_object.validate}.not_to raise_error
-        end
-      end
-      describe 'with extent given' do
-        let(:image_object) { described_class.new({
-          "id" => "https://example.org/yy816tv6021/iiif3/canvas/yy816tv6021_3",
-          "label" => "Image of media (1 of 2)",
-          "height" => 3456,
-          "width" => 5184,
-          "content" => [anno_page]
-          })}
-        it 'validates' do
-          expect{image_object.validate}.not_to raise_error
-        end
-      end
-    end
-
-    describe 'audio object' do
-      describe 'without duration' do
-        let(:canvas_for_audio) { described_class.new({
-          "id" => "https://example.org/xk681bt2506/iiif3/canvas/xk681bt2506_1",
-          "label" => "Audio file 1",
-          "content" => [anno_page]
-          })}
-        it 'validates' do
-          expect{canvas_for_audio.validate}.not_to raise_error
-        end
-      end
-      describe 'digerati example' do
-        let(:canvas_for_audio) { described_class.new({
-          "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/2",
-          "label" => "Track 2",
-          "description" => "foo",
-          "duration" => 45,
-          "content" => [anno_page]
-          })}
-        it 'validates' do
-          expect{canvas_for_audio.validate}.not_to raise_error
-        end
-        it 'duration' do
-          expect(canvas_for_audio.duration).to eq 45
-        end
-        it 'description' do
-          expect(canvas_for_audio.description).to eq 'foo'
-        end
-      end
-    end
-
-    describe '3d object' do
-      let(:canvas_3d_object) { described_class.new({
-        "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/3d",
-        "thumbnail" => [{'id' => "http://files.universalviewer.io/manifests/nelis/animal-skull/thumb.jpg",
-          'type' => 'Image'}],
-        "width" => 10000,
-        "height" => 10000,
-        "depth" => 10000,
-        "label" => "A stage for an object",
-        "content" => [anno_page]
-        })}
-      it 'validates' do
-        expect{canvas_3d_object.validate}.not_to raise_error
-      end
-      it 'thumbnail' do
-        expect(canvas_3d_object.thumbnail).to eq [{'id' => "http://files.universalviewer.io/manifests/nelis/animal-skull/thumb.jpg", 'type' => 'Image'}]
-      end
-      it 'depth' do
-        expect(canvas_3d_object.depth).to eq 10000
-      end
-    end
-
-    describe 'video object' do
-      describe 'with extent info' do
-        let(:canvas_for_video) { described_class.new({
-          "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/1",
-          "label" => "Associate multiple Video representations as Choice",
-          "height" => 1000,
-          "width" => 1000,
-          "duration" => 100,
-          "content" => [anno_page]
-          }) }
-        it 'validates' do
-          expect{canvas_for_video.validate}.not_to raise_error
-        end
-        it 'height, width, duration' do
-          expect(canvas_for_video.height).to eq 1000
-          expect(canvas_for_video.width).to eq 1000
-          expect(canvas_for_video.duration).to eq 100
+      describe 'video object' do
+        describe 'with extent info' do
+          let(:canvas_for_video) { described_class.new({
+            "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/1",
+            "label" => "Associate multiple Video representations as Choice",
+            "height" => 1000,
+            "width" => 1000,
+            "duration" => 100,
+            "content" => [anno_page]
+            }) }
+          it 'validates' do
+            expect{canvas_for_video.validate}.not_to raise_error
+          end
+          it 'height, width, duration' do
+            expect(canvas_for_video.height).to eq 1000
+            expect(canvas_for_video.width).to eq 1000
+            expect(canvas_for_video.duration).to eq 100
+          end
         end
       end
     end
   end
-
 end
