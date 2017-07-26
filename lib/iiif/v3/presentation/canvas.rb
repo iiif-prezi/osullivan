@@ -45,6 +45,15 @@ module IIIF
               err_msg = 'All entries in the content list must be a IIIF::V3::Presentation::AnnotationPage'
               raise IIIF::V3::Presentation::IllegalValueError, err_msg
             end
+            content.each do |anno_page|
+              annos = anno_page['items']
+              if annos && annos.any?
+                unless annos.all? { |anno| anno.target == self.id }
+                  err_msg = 'URI of the canvas must be repeated in the target field of included Annotations'
+                  raise IIIF::V3::Presentation::IllegalValueError, err_msg
+                end
+              end
+            end
           end
 
           # "A canvas MUST have exactly one width and one height, or exactly one duration.
