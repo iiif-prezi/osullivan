@@ -57,20 +57,21 @@ describe IIIF::V3::Presentation::Canvas do
   end
 
   describe '#validate' do
+    let(:canvas_id) { 'http://example.org/iiif/book1/canvas/c1' }
     let(:exp_id_err_msg) { "id must be an http(s) URI without a fragment for #{described_class}" }
     before(:each) do
-      subject['id'] = 'http://www.example.org/my_canvas'
+      subject['id'] = canvas_id
       subject['label'] = 'foo'
     end
-    it 'raises an IllegalValueError if id is not URI' do
+    it 'raises IllegalValueError if id is not URI' do
       subject['id'] = 'foo'
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg)
     end
-    it 'raises an IllegalValueError if id is not http(s)' do
+    it 'raises IllegalValueError if id is not http(s)' do
       subject['id'] = 'ftp://www.example.org'
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg)
     end
-    it 'raises an IllegalValueError if id has a fragment' do
+    it 'raises IllegalValueError if id has a fragment' do
       subject['id'] = 'http://www.example.org#foo'
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg)
     end
@@ -78,20 +79,20 @@ describe IIIF::V3::Presentation::Canvas do
     # let(:exp_extent_err_msg) { "#{described_class} must have (a height and a width) and/or a duration" }
     #  (see sul-dlss/purl/issues/169)
     let(:exp_extent_err_msg) { "#{described_class} requires both height and width or neither" }
-    it 'raises an IllegalValueError if height is a string' do
+    it 'raises IllegalValueError if height is a string' do
       subject['height'] = 'foo'
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_extent_err_msg)
     end
-    it 'raises an IllegalValueError if height but no width' do
+    it 'raises IllegalValueError if height but no width' do
       subject['height'] = 666
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_extent_err_msg)
     end
-    it 'raises an IllegalValueError if width but no height' do
+    it 'raises IllegalValueError if width but no height' do
       subject['width'] = 666
       subject['duration'] = 66.6
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_extent_err_msg)
     end
-    it 'raises an IllegalValueError if no width, height or duration' do
+    it 'raises IllegalValueError if no width, height or duration' do
       # (see sul-dlss/purl/issues/169)
       skip('while this is in the current v3 spec, it does not make sense for some content (e.g. txt files)')
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_extent_err_msg)
@@ -108,6 +109,22 @@ describe IIIF::V3::Presentation::Canvas do
       exp_err_msg = "All entries in the content list must be a IIIF::V3::Presentation::AnnotationPage"
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
+
+    it 'IllegalValueError for content with annotation target not the canvas id' do
+      anno = IIIF::V3::Presentation::Annotation.new(
+        'id' => 'http://example.com/anno/666',
+        'target' => canvas_id)
+      anno_page = IIIF::V3::Presentation::AnnotationPage.new(
+        'id' => "http://example.org/iiif/book1/page/p1/1",
+        'items' => [anno])
+      subject['content'] = [anno_page]
+
+      expect { subject.validate }.not_to raise_error
+
+      anno['target'] = 'http://example.com/canvas/abc'
+      exp_err_msg = 'URI of the canvas must be repeated in the target field of included Annotations'
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    end
   end
 
   describe 'realistic examples' do
@@ -121,7 +138,7 @@ describe IIIF::V3::Presentation::Canvas do
     let(:anno_page) { IIIF::V3::Presentation::AnnotationPage.new(
       "id" => "http://example.org/iiif/book1/page/p1/1",
       'items' => []
-      ) }
+      )}
     describe 'minimal canvas' do
       it 'validates' do
         expect{minimal_canvas_object.validate}.not_to raise_error
