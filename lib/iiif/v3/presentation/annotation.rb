@@ -15,7 +15,7 @@ module IIIF
         end
 
         def any_type_keys
-          super + %w{ body }
+          super + %w{ body target }
         end
 
         def uri_only_keys

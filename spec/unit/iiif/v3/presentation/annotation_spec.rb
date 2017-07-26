@@ -42,6 +42,9 @@ describe IIIF::V3::Presentation::Annotation do
     it 'body' do
       expect(subject.any_type_keys).to include('body')
     end
+    it 'target' do
+      expect(subject.any_type_keys).to include('target')
+    end
   end
 
   describe '#uri_only_keys' do
