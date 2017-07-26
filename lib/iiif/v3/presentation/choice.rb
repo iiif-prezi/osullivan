@@ -3,7 +3,16 @@ module IIIF
     module Presentation
       class Choice < IIIF::V3::AbstractResource
 
-        TYPE = 'Choice'
+        TYPE = 'Choice'.freeze
+
+        def prohibited_keys
+          super + CONTENT_RESOURCE_PROPERTIES + PAGING_PROPERTIES +
+          %w{ nav_date viewing_direction start_canvas content_annotations }
+        end
+
+        def any_type_keys
+          super + %w{ default }
+        end
 
         def string_only_keys
           super + %w{ choice_hint }
@@ -29,7 +38,6 @@ module IIIF
         def validate
           super
 
-          # time mode values
           if self.has_key?('choice_hint')
             unless self.legal_choice_hint_values.include?(self['choice_hint'])
               m = "choiceHint for #{self.class} must be one of #{self.legal_choice_hint_values}."
