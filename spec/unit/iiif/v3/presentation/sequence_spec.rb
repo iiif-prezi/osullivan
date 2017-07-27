@@ -128,6 +128,26 @@ describe IIIF::V3::Presentation::Sequence do
         expect(sequence_object.id).to eq seq_id
         expect(sequence_object.label).to eq "Current order"
       end
+      describe 'with viewingDirection' do
+        let(:sequence_vd) {
+          sequence_object.viewingDirection = 'left-to-right'
+          sequence_object
+        }
+        it 'validates' do
+          expect{sequence_vd.validate}.not_to raise_error
+        end
+        it 'has expected required values' do
+          expect(sequence_vd.type).to eq 'Sequence'
+          expect(sequence_vd.canvases.size).to be 1
+          expect(sequence_vd.canvases.first).to eq canvas_object
+        end
+        it 'has expected string values' do
+          expect(sequence_vd.id).to eq seq_id
+          expect(sequence_vd.label).to eq "Current order"
+          expect(sequence_vd.viewing_direction).to eq 'left-to-right'
+          expect(sequence_vd.viewingDirection).to eq 'left-to-right'
+        end
+      end
     end
 
     describe 'example from http://prezi3.iiif.io/api/presentation/3.0' do
