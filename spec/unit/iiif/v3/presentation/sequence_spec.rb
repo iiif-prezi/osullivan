@@ -1,7 +1,10 @@
 describe IIIF::V3::Presentation::Sequence do
 
   describe '#required_keys' do
-    %w{ type items }.each do |k|
+    # NOTE:  relaxing requirement for items as Universal Viewer currently only accepts canvases
+    #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
+    # %w{ type items }.each do |k|
+    %w{ type }.each do |k|
       it k do
         expect(subject.required_keys).to include(k)
       end
@@ -23,6 +26,11 @@ describe IIIF::V3::Presentation::Sequence do
   describe '#array_only_keys' do
     it 'items' do
       expect(subject.array_only_keys).to include('items')
+    end
+    # NOTE:  also allowing sequences as Universal Viewer currently only accepts canvases
+    #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
+    it 'canvases' do
+      expect(subject.array_only_keys).to include('canvases')
     end
   end
 
@@ -49,15 +57,30 @@ describe IIIF::V3::Presentation::Sequence do
   end
 
   describe '#validate' do
-     it 'raises MissingRequiredKeyError for items as empty Array' do
-      subject['items'] = []
-      exp_err_msg = "The items list must have at least one entry (and it must be a IIIF::V3::Presentation::Canvas)"
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, exp_err_msg)
+    let(:req_key_msg) { "The (items or canvases) list must have at least one entry (and it must be a IIIF::V3::Presentation::Canvas)" }
+    let(:bad_val_msg) { "All entries in the (items or canvases) list must be a IIIF::V3::Presentation::Canvas" }
+    it 'raises MissingRequiredKeyError if no items or canvases key' do
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, req_key_msg)
     end
-    it 'raises IllegalValueError for items entry that is not a Canvas' do
-      subject['items'] = [IIIF::V3::Presentation::Canvas.new, IIIF::V3::Presentation::AnnotationPage.new]
-      exp_err_msg = "All entries in the items list must be a IIIF::V3::Presentation::Canvas"
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+    describe 'items' do
+      it 'raises MissingRequiredKeyError for items as empty Array' do
+        subject['items'] = []
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, req_key_msg)
+      end
+      it 'raises IllegalValueError for items entry that is not a Canvas' do
+        subject['items'] = [IIIF::V3::Presentation::Canvas.new, IIIF::V3::Presentation::AnnotationPage.new]
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, bad_val_msg)
+      end
+    end
+    describe 'canvases' do
+      it 'raises MissingRequiredKeyError for canvases as empty Array' do
+        subject['items'] = []
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, req_key_msg)
+      end
+      it 'raises IllegalValueError for canvases entry that is not a Canvas' do
+        subject['canvases'] = [IIIF::V3::Presentation::Canvas.new, IIIF::V3::Presentation::AnnotationPage.new]
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, bad_val_msg)
+      end
     end
   end
 
@@ -84,22 +107,25 @@ describe IIIF::V3::Presentation::Sequence do
     end
     
     describe 'example from Stanford purl' do
-      let!(:sequence_object) {IIIF::V3::Presentation::Sequence.new({
-        "id" => "https://example.org/abc666#sequence-1",
-        "label" => "Current order",
-        "type" => "Sequence",
-        "items" => [canvas_object]
-      })}
+      let(:seq_id) { 'https://example.org/abc666#sequence-1' }
+      let(:sequence_object) {
+        s = described_class.new({
+        "id" => seq_id,
+        "label" => "Current order"
+        })
+        s.canvases << canvas_object
+        s
+      }
       it 'validates' do
         expect{sequence_object.validate}.not_to raise_error
       end
       it 'has expected required values' do
         expect(sequence_object.type).to eq 'Sequence'
-        expect(sequence_object.items.size).to be 1
-        expect(sequence_object.items.first).to eq canvas_object
+        expect(sequence_object.canvases.size).to be 1
+        expect(sequence_object.canvases.first).to eq canvas_object
       end
       it 'has expected string values' do
-        expect(sequence_object.id).to eq "https://example.org/abc666#sequence-1"
+        expect(sequence_object.id).to eq seq_id
         expect(sequence_object.label).to eq "Current order"
       end
     end
