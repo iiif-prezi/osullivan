@@ -202,6 +202,14 @@ describe IIIF::V3::Presentation::Manifest do
         exp_err_msg = 'If there are multiple Sequences in a manifest then they must each have at least one label'
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
+      it 'raises no error for single Sequences without "label"' do
+        subject['id'] = manifest_id
+        subject.label = 'Book 1'
+        seq = IIIF::V3::Presentation::Sequence.new
+        seq['items'] = [IIIF::V3::Presentation::Canvas.new]
+        subject['sequences'] = [seq]
+        expect { subject.validate }.not_to raise_error
+      end
     end
 
     it 'raises IllegalValueError for structures entry that is not a Range' do
