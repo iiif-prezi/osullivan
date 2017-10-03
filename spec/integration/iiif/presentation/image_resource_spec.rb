@@ -1,4 +1,3 @@
-require 'pry'
 describe IIIF::Presentation::ImageResource do
   vcr_options = {
     cassette_name: 'pul_loris_cassette',
