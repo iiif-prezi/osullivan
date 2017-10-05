@@ -54,7 +54,7 @@ describe IIIF::Presentation::ImageResource do
           {
             'supports' => [
               'canonicalLinkHeader', 'profileLinkHeader', 'mirroring',
-              'rotationArbitrary', 'sizeAboveFull'
+              'rotationArbitrary', 'regionSquare', 'sizeAboveFull'
             ],
             'qualities' => ['default', 'bitonal', 'gray', 'color'],
             'formats'=>['jpg', 'png', 'gif', 'webp']
