@@ -7,8 +7,11 @@ module IIIF
       TYPE = 'oa:Annotation'
 
       def required_keys
-        super + %w{ motivation }
+        super + %w{ motivation on }
       end
+
+      def string_only_keys
+        super + %w{ on }
 
       def abstract_resource_only_keys
         super + [ { key: 'resource', type: IIIF::Presentation::Resource } ]
