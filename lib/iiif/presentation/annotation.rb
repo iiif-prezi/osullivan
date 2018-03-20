@@ -12,6 +12,7 @@ module IIIF
 
       def string_only_keys
         super + %w{ on }
+      end
 
       def abstract_resource_only_keys
         super + [ { key: 'resource', type: IIIF::Presentation::Resource } ]
