@@ -16,7 +16,7 @@ describe IIIF::Presentation::ImageResource do
     }
 
     let(:invalid_service_id) {
-      id = 'xxxx/4612422/00000001.jp2'
+      id = 'xxxx%2F4612422%2F00000001.jp2'
       "#{image_server}/#{id}"
     }
 
