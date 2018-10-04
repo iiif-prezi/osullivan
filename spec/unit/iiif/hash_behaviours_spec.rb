@@ -565,7 +565,5 @@ describe IIIF::HashBehaviours do
     end
   end
 
-  
-
 end
 
