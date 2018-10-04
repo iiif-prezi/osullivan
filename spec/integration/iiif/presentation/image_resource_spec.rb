@@ -80,8 +80,6 @@ describe IIIF::Presentation::ImageResource do
     describe 'respects the params we supply' do
       it ':resource_id' do
         r_id = 'http://example.edu/images/some.jpg' 
-        # 301 moved to
-        # r_id = 'https://libimages.princeton.edu/loris2/pudl0001%2F4612422%2F00000001.jp2/info.json'
 
         opts = { service_id: valid_service_id, resource_id: r_id}
         resource = described_class.create_image_api_image_resource(opts)
