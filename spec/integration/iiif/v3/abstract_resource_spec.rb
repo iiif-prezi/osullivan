@@ -9,26 +9,26 @@ describe IIIF::V3::AbstractResource do
   describe 'self.parse' do
     it 'works from a file' do
       s = described_class.parse(manifest_from_spec_path)
-      expect(s['label']).to eq 'Book 1'
+      expect(s['label']['en']).to include 'Book 1'
     end
     it 'works from a string of JSON' do
       file = File.open(manifest_from_spec_path, 'rb')
       json_string = file.read
       file.close
       s = described_class.parse(json_string)
-      expect(s['label']).to eq 'Book 1'
+      expect(s['label']['en']).to include 'Book 1'
     end
     describe 'works from a hash' do
       it 'plain old' do
         h = JSON.parse(IO.read(manifest_from_spec_path))
         s = described_class.parse(h)
-        expect(s['label']).to eq 'Book 1'
+        expect(s['label']['en']).to include 'Book 1'
       end
       it 'IIIF::OrderedHash' do
         h = JSON.parse(IO.read(manifest_from_spec_path))
         oh = IIIF::OrderedHash[h]
         s = described_class.parse(oh)
-        expect(s['label']).to eq 'Book 1'
+        expect(s['label']['en']).to include 'Book 1'
       end
     end
     it 'turns camels to snakes' do
