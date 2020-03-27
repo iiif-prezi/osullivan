@@ -5,7 +5,7 @@
   ],
   "id": "http://www.example.org/iiif/book1/manifest",
   "type": "Manifest",
-  "label": "Book 1",
+  "label": { "en": [ "Book 1" ] },
   "metadata": [
     {
       "label": "Author",

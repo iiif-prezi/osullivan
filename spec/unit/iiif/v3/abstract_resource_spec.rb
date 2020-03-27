@@ -50,7 +50,7 @@ describe IIIF::V3::AbstractResource do
     it 'can take any old hash' do
       hsh = JSON.parse(IO.read(manifest_from_spec_path))
       new_instance = abstract_resource_subclass.new(hsh)
-      expect(new_instance['label']).to eq 'Book 1'
+      expect(new_instance['label']['en']).to include 'Book 1'
     end
   end
 
