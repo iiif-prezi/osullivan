@@ -27,7 +27,7 @@ module IIIF
       def any_type_keys
         # values *may* be multivalued
         # NOTE: for id: "Resources that do not require URIs [for ids] may be assigned blank node identifiers"
-        %w{ description id logo viewing_hint related see_also within }
+        %w{ id logo viewing_hint related see_also within }
       end
 
       def string_only_keys
@@ -35,15 +35,11 @@ module IIIF
       end
 
       def array_only_keys
-        %w{ metadata rights thumbnail rendering first last next prev items }
-      end
-
-      def abstract_resource_only_keys
-        [ { key: 'service', type: IIIF::V3::Presentation::Service } ]
+        %w{ metadata rights thumbnail rendering first last next prev items service }
       end
 
       def hash_only_keys
-        %w{ label requiredStatement }
+        %w{ label requiredStatement summary }
       end
 
       def int_only_keys
@@ -84,7 +80,6 @@ module IIIF
         self.define_methods_for_hash_only_keys
         self.define_methods_for_int_only_keys
         self.define_methods_for_numeric_only_keys
-        self.define_methods_for_abstract_resource_only_keys
         self.define_methods_for_uri_only_keys
         self.snakeize_keys
       end
@@ -422,21 +417,6 @@ module IIIF
           unless val.kind_of?(Hash)
             m = "#{key} must be a Hash."
             raise IIIF::V3::Presentation::IllegalValueError, m
-          end
-        end
-      end
-
-      def define_methods_for_abstract_resource_only_keys
-        # values in this case: an array of hashes with { key: 'k', type: Class }
-        abstract_resource_only_keys.each do |hsh|
-          key = hsh[:key]
-          type = hsh[:type]
-
-          define_accessor_methods(key) do |k, val|
-            unless val.kind_of?(type)
-              m = "#{k} must be an #{type}."
-              raise IIIF::V3::Presentation::IllegalValueError, m
-            end
           end
         end
       end

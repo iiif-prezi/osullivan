@@ -272,7 +272,9 @@ describe IIIF::V3::Presentation::Canvas do
           let(:canvas_for_audio) { described_class.new({
             "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/2",
             "label" => "Track 2",
-            "description" => "foo",
+            'summary' => {
+              'en' => ['foo']
+            },
             "duration" => 45,
             "content" => [anno_page]
             })}
@@ -282,8 +284,8 @@ describe IIIF::V3::Presentation::Canvas do
           it 'duration' do
             expect(canvas_for_audio.duration).to eq 45
           end
-          it 'description' do
-            expect(canvas_for_audio.description).to eq 'foo'
+          it 'summary' do
+            expect(canvas_for_audio.summary['en'].first).to eq 'foo'
           end
         end
       end
