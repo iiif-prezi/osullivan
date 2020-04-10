@@ -134,7 +134,10 @@ describe IIIF::V3::Presentation::Manifest do
         ],
         "id" => "https://example.org/abc666/iiif3/manifest",
         "label" => {"en" => ["blah"]},
-        "attribution" => "bleah",
+        "requiredStatement" => {
+          "label": { "en": [ "Attribution" ] },
+          "value": { "en": [ "bleah" ] },
+        },
         "description" => "blargh",
         "items" => [canvas_object]
       })}
@@ -153,8 +156,10 @@ describe IIIF::V3::Presentation::Manifest do
         expect(manifest_object['@context']).to include(*IIIF::V3::Presentation::CONTEXT)
       end
       it 'has expected string values' do
-        expect(manifest_object.attribution).to eq "bleah"
         expect(manifest_object.description).to eq "blargh"
+      end
+      it 'has other values' do
+        expect(manifest_object['required_statement'][:value][:en].first).to eq 'bleah'
       end
     end
 
@@ -179,7 +184,10 @@ describe IIIF::V3::Presentation::Manifest do
       let!(:manifest_object) { described_class.new({
         "id" => "https://example.org/abc666/iiif3/manifest",
         "label" => {"en" => ["blah"]},
-        "attribution" => "bleah",
+        "requiredStatement" => {
+          "label": { "en": [ "Attribution" ] },
+          "value": { "en": [ "bleah" ] },
+        },
         "description" => "blargh",
         "items" => [canvas_object],
         "logo" => {
@@ -218,10 +226,10 @@ describe IIIF::V3::Presentation::Manifest do
         expect(manifest_object.items.first).to eq canvas_object
       end
       it 'has expected string values' do
-        expect(manifest_object.attribution).to eq "bleah"
         expect(manifest_object.description).to eq "blargh"
       end
       it 'has expected additional content' do
+        expect(manifest_object['required_statement'][:value][:en].first).to eq 'bleah'
         expect(manifest_object.logo.keys.size).to be 2
         expect(manifest_object.seeAlso.keys.size).to be 2
         expect(manifest_object.metadata.size).to be 2
@@ -233,7 +241,10 @@ describe IIIF::V3::Presentation::Manifest do
           {
             "id" => "https://example.org/abc666/iiif3/manifest",
             "label" => {"en" => ["blah"]},
-            "attribution" => "bleah",
+            "requiredStatement" => {
+              "label": { "en": [ "Attribution" ] },
+              "value": { "en": [ "bleah" ] },
+            },
             "logo" => {
               "id" => "https://example.org/logo/full/400,/0/default.jpg",
               "service" => logo_service
@@ -267,10 +278,10 @@ describe IIIF::V3::Presentation::Manifest do
           expect(manifest_object.items.first).to eq canvas_object
         end
         it 'has expected string values' do
-          expect(manifest_object.attribution).to eq "bleah"
           expect(manifest_object.description).to eq "blargh"
         end
         it 'has expected additional content' do
+          expect(manifest_object['required_statement'][:value][:en].first).to eq 'bleah'
           expect(manifest_object.logo.keys.size).to be 2
           expect(manifest_object.seeAlso.keys.size).to be 2
           expect(manifest_object.metadata.size).to be 2
@@ -321,7 +332,10 @@ describe IIIF::V3::Presentation::Manifest do
         "rights" => [{
           "id" =>"http://example.org/license.html",
           "format" => "text/html"}],
-        "attribution" => {"en" => ["Provided by Example Organization"]},
+        "requiredStatement" => {
+          "label": { "en": [ "Attribution" ] },
+          "value": { "en": [ "bleah" ] },
+        },
         "logo" => {
           "id" => "http://example.org/logos/institution1.jpg",
           "service" => {
