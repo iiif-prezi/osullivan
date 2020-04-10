@@ -27,7 +27,7 @@ module IIIF
       def any_type_keys
         # values *may* be multivalued
         # NOTE: for id: "Resources that do not require URIs [for ids] may be assigned blank node identifiers"
-        %w{ description id attribution logo viewing_hint related see_also within }
+        %w{ description id logo viewing_hint related see_also within }
       end
 
       def string_only_keys
@@ -43,7 +43,7 @@ module IIIF
       end
 
       def hash_only_keys
-        %w{ label }
+        %w{ label requiredStatement }
       end
 
       def int_only_keys
