@@ -106,7 +106,6 @@ describe IIIF::V3::Presentation::ImageResource do
             expect(img_service_obj.id).to eq img_id
             expect(img_service_obj['@id']).to eq img_id
             expect(img_service_obj.profile).to eq IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_LEVEL1_PROFILE
-            expect(img_service_obj['@context']).to eq IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_CONTEXT
             expect(img_service_obj.service.class).to eq Array
             expect(img_service_obj.service.size).to eq 1
 

@@ -4,7 +4,6 @@ describe IIIF::V3::Presentation::Annotation do
   let(:content_type) { 'dctypes:Text' }
   let(:mimetype) { 'application/tei+xml' }
   let(:image_2_api_service) { IIIF::V3::Presentation::Service.new({
-      '@context' => IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_CONTEXT,
       'id' => content_id,
       '@id' => content_id,
       'profile' => IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_LEVEL1_PROFILE
@@ -148,28 +147,6 @@ describe IIIF::V3::Presentation::Annotation do
         img_resource_without_id['id'] = 'ftp://example.com/somewhere'
         img_body_anno.body = img_resource_without_id
         expect { img_body_anno.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError, http_uri_err_msg
-      end
-
-      let(:service_context_err_msg) {
-        "when #{described_class} body is a kind of IIIF::V3::Presentation::ImageResource, ImageResource's service @context must include http://iiif.io/api/image/2/context.json"
-      }
-      it 'raises IllegalValueError if no @context field in ImageResource service' do
-        img_content_resource['service']['@context'] = nil
-        img_body_anno.body = img_content_resource
-        expect { img_body_anno.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError, service_context_err_msg
-      end
-      it 'raises IllegalValueError if @context in ImageResource service doesn\'t include reference to IIIF Image API context doc' do
-        img_content_resource['service']['@context'] = 'http://example.com/context.json'
-        img_body_anno.body = img_content_resource
-        expect { img_body_anno.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError, service_context_err_msg
-        img_content_resource['service']['@context'] = ['http://example.com/context.json', 'http://example.com/context2.json']
-        img_body_anno.body = img_content_resource
-        expect { img_body_anno.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError, service_context_err_msg
-      end
-      it 'does not raise error if @context in ImageResource service includes reference to IIIF Image API context doc' do
-        img_content_resource['service']['@context'] = ['http://example.com/context.json', IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_CONTEXT]
-        img_body_anno.body = img_content_resource
-        expect { img_body_anno.validate }.not_to raise_error
       end
     end
   end

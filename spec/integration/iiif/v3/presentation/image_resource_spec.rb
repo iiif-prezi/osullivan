@@ -29,14 +29,11 @@ describe IIIF::V3::Presentation::ImageResource do
       it 'when copy_info is false' do
         opts = { service_id: valid_service_id }
         resource = described_class.create_image_api_image_resource(opts)
-        # expect(resource['@context']).to eq 'http://iiif.io/api/presentation/2/context.json'
-        # @context is only added when we call to_json...
         expect(resource['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
         expect(resource['type']).to eq 'Image'
         expect(resource.format).to eq "image/jpeg"
         expect(resource.width).to eq 3047
         expect(resource.height).to eq 7200
-        expect(resource.service['@context']).to eq 'http://iiif.io/api/image/2/context.json'
         expect(resource.service['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
         expect(resource.service['profile']).to eq 'http://iiif.io/api/image/2/level2.json'
       end
@@ -49,7 +46,6 @@ describe IIIF::V3::Presentation::ImageResource do
         expect(resource.format).to eq "image/jpeg"
         expect(resource.width).to eq 3047
         expect(resource.height).to eq 7200
-        expect(resource.service['@context']).to eq 'http://iiif.io/api/image/2/context.json'
         expect(resource.service['profile']).to eq [
           'http://iiif.io/api/image/2/level2.json',
           {
