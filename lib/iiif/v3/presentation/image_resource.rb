@@ -14,7 +14,6 @@ module IIIF
 
         class << self
           IMAGE_API_DEFAULT_PARAMS = '/full/!200,200/0/default.jpg'.freeze
-          IMAGE_API_CONTEXT = 'http://iiif.io/api/image/2/context.json'.freeze
           DEFAULT_FORMAT = 'image/jpeg'.freeze
           # Create a new ImageResource that includes a IIIF Image API Service
           # See http://iiif.io/api/presentation/2.0/#image-resources
@@ -80,7 +79,6 @@ module IIIF
               resource.service.merge!(remote_info)
               resource.service['id'] ||= resource.service.delete('@id')
             else
-              resource.service['@context'] = IMAGE_API_CONTEXT
               resource.service['id'] = service_id
               if profile.nil?
                 if remote_info['profile'].kind_of?(Array)

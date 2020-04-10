@@ -165,13 +165,12 @@ describe IIIF::V3::Presentation::Manifest do
 
     describe 'realistic example from Stanford purl manifests' do
       let!(:logo_service) { IIIF::V3::Presentation::Service.new({
-        "@context" => "http://iiif.io/api/image/2/context.json",
         "@id" => "https://example.org/logo",
+        "@type" => "ImageService2",
         "id" => "https://example.org/logo",
         "profile" => "http://iiif.io/api/image/2/level1.json"
         })}
       let!(:thumbnail_image_service) { IIIF::V3::Presentation::Service.new({
-        "@context" => IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_CONTEXT,
         "@id" => "https://example.org/image/iiif/abc666_05_0001",
         "id" => "https://example.org/image/iiif/abc666_05_0001",
         "profile" => IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_LEVEL1_PROFILE
@@ -321,8 +320,8 @@ describe IIIF::V3::Presentation::Manifest do
           "id" => "http://example.org/images/book1-page1/full/80,100/0/default.jpg",
           "type" => "Image",
           "service" => {
-            "@context" => "http://iiif.io/api/image/2/context.json",
             "id" => "http://example.org/images/book1-page1",
+            "type" => "ImageService2",
             "profile" => ["http://iiif.io/api/image/2/level1.json"]
           }
         }],
@@ -339,8 +338,8 @@ describe IIIF::V3::Presentation::Manifest do
         "logo" => {
           "id" => "http://example.org/logos/institution1.jpg",
           "service" => {
-              "@context" => "http://iiif.io/api/image/2/context.json",
               "id" => "http://example.org/service/inst1",
+              "type" => "ImageService2",
               "profile" => ["http://iiif.io/api/image/2/profiles/level2.json"]
           }
         },
@@ -349,7 +348,6 @@ describe IIIF::V3::Presentation::Manifest do
           "format" => "video/mpeg"
         }],
         "service" => [{
-          "@context" => "http://example.org/ns/jsonld/context.json",
           "id" => "http://example.org/service/example",
           "profile" => ["http://example.org/docs/example-service.html"]
         }],

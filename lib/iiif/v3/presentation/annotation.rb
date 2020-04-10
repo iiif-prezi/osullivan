@@ -59,14 +59,6 @@ module IIIF
               m = "when #{self.class} body is a kind of #{img_res_class_str}, ImageResource id must be an http(s) URI"
               raise IIIF::V3::Presentation::IllegalValueError, m
             end
-
-            body_service = *body_resource['service']
-            body_service_context = *body_resource['service']['@context']
-            expected_context = IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_CONTEXT
-            unless body_service && body_service_context && body_service_context.include?(expected_context)
-              m = "when #{self.class} body is a kind of #{img_res_class_str}, ImageResource's service @context must include #{expected_context}"
-              raise IIIF::V3::Presentation::IllegalValueError, m
-            end
           end
 
           if self.has_key?('time_mode')

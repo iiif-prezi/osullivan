@@ -50,7 +50,7 @@ describe IIIF::V3::Presentation::Service do
         'profile' => inner_service_profile
         })
       service_obj = described_class.new({
-        '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
+        'type' => described_class::IIIF_IMAGE_V2_TYPE,
         'id' => id_uri,
         'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE,
         'label' => label_val,
@@ -58,7 +58,7 @@ describe IIIF::V3::Presentation::Service do
       })
       expect(service_obj.keys.size).to eq 5
       expect(service_obj['id']).to eq id_uri
-      expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
+      expect(service_obj['type']).to eq described_class::IIIF_IMAGE_V2_TYPE
       expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
       expect(service_obj['label']).to eq label_val
       expect(service_obj['service'][0]['id']).to eq inner_service_id
@@ -91,31 +91,32 @@ describe IIIF::V3::Presentation::Service do
   end
 
   describe '#validate' do
-    describe '@context = IIIF_IMAGE_API_V2_CONTEXT' do
-      it 'must have a "@id"' do
+    describe 'type = IIIF_IMAGE_API_V2_TYPE' do
+      it 'must have a "@id" or "id"' do
         service_obj = described_class.new({
-          '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
-          'id' => id_uri,
+          'type' => described_class::IIIF_IMAGE_V2_TYPE,
+          'nope' => id_uri,
           'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
           })
-        exp_err_msg = '@id is required for IIIF::V3::Presentation::Service with @context http://iiif.io/api/image/2/context.json'
+        exp_err_msg = 'id or @id values are required for IIIF::V3::Presentation::Service with type or @type ImageService2'
         expect{service_obj.validate}.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, exp_err_msg)
       end
-      it 'must have a profile' do
+      it 'should have a profile' do
         service_obj = described_class.new({
-          '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
+          '@type' => described_class::IIIF_IMAGE_V2_TYPE,
           '@id' => id_uri
           })
-        exp_err_msg = 'profile is required for IIIF::V3::Presentation::Service with @context http://iiif.io/api/image/2/context.json'
+        exp_err_msg = 'profile should be present for IIIF::V3::Presentation::Service with type or @type ImageService2'
         expect{service_obj.validate}.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, exp_err_msg)
       end
-      it 'must have matching values for "@id" and "id" if both are specified' do
+      it 'should have matching values for "@id" and "id" if both are specified' do
         service_obj = described_class.new({
-          '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
+          '@type' => described_class::IIIF_IMAGE_V2_TYPE,
           '@id' => id_uri,
-          'id' => "#{id_uri}/foo"
+          'id' => "#{id_uri}/foo",
+          'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
           })
-        exp_err_msg = 'id and @id values must match for IIIF::V3::Presentation::Service with @context http://iiif.io/api/image/2/context.json'
+        exp_err_msg = 'id and @id values must match for IIIF::V3::Presentation::Service with type or @type ImageService2'
         expect{service_obj.validate}.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
     end
@@ -125,15 +126,15 @@ describe IIIF::V3::Presentation::Service do
     describe 'from Stanford purl manifests' do
       it 'iiif image v2 service' do
         service_obj = described_class.new({
-          '@context' => described_class::IIIF_IMAGE_V2_CONTEXT,
+          'type' => described_class::IIIF_IMAGE_V2_TYPE,
           'id' => id_uri,
           '@id' => id_uri,
           'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
         })
         expect{service_obj.validate}.not_to raise_error
         expect(service_obj.keys.size).to eq 4
-        expect(service_obj.keys).to include('@context', '@id', 'id', 'profile')
-        expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
+        expect(service_obj.keys).to include('type', '@id', 'id', 'profile')
+        expect(service_obj['type']).to eq described_class::IIIF_IMAGE_V2_TYPE
         expect(service_obj['id']).to eq id_uri
         expect(service_obj['@id']).to eq id_uri
         expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
@@ -183,7 +184,7 @@ describe IIIF::V3::Presentation::Service do
           })
         expect{middle.validate}.not_to raise_error
         outer = described_class.new({
-          "@context" => described_class::IIIF_IMAGE_V2_CONTEXT,
+            "@type" => described_class::IIIF_IMAGE_V2_TYPE,
             "@id" => "https://example.org/iiif/yy816tv6021_img_1",
             "id" => "https://example.org/iiif/yy816tv6021_img_1",
             "profile" => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE,
@@ -195,7 +196,7 @@ describe IIIF::V3::Presentation::Service do
     describe 'example from http://prezi3.iiif.io/api/presentation/3.0' do
       it 'iiif image v2' do
         service_obj = described_class.new({
-          "@context" => "http://iiif.io/api/image/2/context.json",
+          "type" => described_class::IIIF_IMAGE_V2_TYPE,
           "id" => "http://example.org/images/book1-page2",
           "@id" => "http://example.org/images/book1-page2",
           "profile" => "http://iiif.io/api/image/2/level1.json",
@@ -204,7 +205,7 @@ describe IIIF::V3::Presentation::Service do
           "tiles" => [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
         })
         expect(service_obj.keys.size).to eq 7
-        expect(service_obj['@context']).to eq described_class::IIIF_IMAGE_V2_CONTEXT
+        expect(service_obj['type']).to eq described_class::IIIF_IMAGE_V2_TYPE
         expect(service_obj['id']).to eq 'http://example.org/images/book1-page2'
         expect(service_obj['@id']).to eq 'http://example.org/images/book1-page2'
         expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
