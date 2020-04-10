@@ -138,7 +138,7 @@ describe IIIF::V3::Presentation::Manifest do
           "label": { "en": [ "Attribution" ] },
           "value": { "en": [ "bleah" ] },
         },
-        "description" => "blargh",
+        'summary' => { 'en' => ['blargh'] },
         "items" => [canvas_object]
       })}
       it 'validates' do
@@ -155,11 +155,9 @@ describe IIIF::V3::Presentation::Manifest do
         expect(manifest_object['@context'].size).to be 2
         expect(manifest_object['@context']).to include(*IIIF::V3::Presentation::CONTEXT)
       end
-      it 'has expected string values' do
-        expect(manifest_object.description).to eq "blargh"
-      end
       it 'has other values' do
         expect(manifest_object['required_statement'][:value][:en].first).to eq 'bleah'
+        expect(manifest_object.summary['en'].first).to eq 'blargh'
       end
     end
 
@@ -187,7 +185,7 @@ describe IIIF::V3::Presentation::Manifest do
           "label": { "en": [ "Attribution" ] },
           "value": { "en": [ "bleah" ] },
         },
-        "description" => "blargh",
+        'summary' => { 'en' => ['blargh'] },
         "items" => [canvas_object],
         "logo" => {
           "id" => "https://example.org/logo/full/400,/0/default.jpg",
@@ -224,11 +222,9 @@ describe IIIF::V3::Presentation::Manifest do
         expect(manifest_object.items.size).to be 1
         expect(manifest_object.items.first).to eq canvas_object
       end
-      it 'has expected string values' do
-        expect(manifest_object.description).to eq "blargh"
-      end
       it 'has expected additional content' do
         expect(manifest_object['required_statement'][:value][:en].first).to eq 'bleah'
+        expect(manifest_object.summary['en'].first).to eq 'blargh'
         expect(manifest_object.logo.keys.size).to be 2
         expect(manifest_object.seeAlso.keys.size).to be 2
         expect(manifest_object.metadata.size).to be 2
@@ -261,7 +257,7 @@ describe IIIF::V3::Presentation::Manifest do
             { 'label' => 'title', 'value' => 'who wants to know?' },
             { 'label' => 'PublishDate', 'value' => 'sometime' }
           ]
-          m.description = 'blargh'
+          m.summary = { 'en' => ['blargh'] }
           m.thumbnail = [thumbnail_image]
           m.items << canvas_object
           m
@@ -276,11 +272,9 @@ describe IIIF::V3::Presentation::Manifest do
           expect(manifest_object.items.size).to be 1
           expect(manifest_object.items.first).to eq canvas_object
         end
-        it 'has expected string values' do
-          expect(manifest_object.description).to eq "blargh"
-        end
         it 'has expected additional content' do
           expect(manifest_object['required_statement'][:value][:en].first).to eq 'bleah'
+          expect(manifest_object.summary['en'].first).to eq 'blargh'
           expect(manifest_object.logo.keys.size).to be 2
           expect(manifest_object.seeAlso.keys.size).to be 2
           expect(manifest_object.metadata.size).to be 2
@@ -315,7 +309,7 @@ describe IIIF::V3::Presentation::Manifest do
           {"label" => {"en" => ["Source"]},
            "value" => {"@none" => ["<span>From: <a href=\"http://example.org/db/1.html\">Some Collection</a></span>"]}}
         ],
-        "description" => {"en" => ["A longer description of this example book. It should give some real information."]},
+        "summary" => {"en" => ["A longer description of this example book. It should give some real information."]},
         "thumbnail" => [{
           "id" => "http://example.org/images/book1-page1/full/80,100/0/default.jpg",
           "type" => "Image",

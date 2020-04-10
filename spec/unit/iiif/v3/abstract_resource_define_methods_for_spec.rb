@@ -25,9 +25,6 @@ end
 
 describe AbstractResourceSubClass do
 
-  describe '*define_methods_for_abstract_resource_only_keys' do
-    it_behaves_like 'it has the appropriate methods for abstract_resource_only_keys v3'
-  end
   describe "*define_methods_for_any_type_keys" do
     # shared_example expects fixed_values;  these are roughly based on Stanford purl code
     # (see https://github.com/sul-dlss/purl/blob/master/app/models/iiif3_presentation_manifest.rb)
