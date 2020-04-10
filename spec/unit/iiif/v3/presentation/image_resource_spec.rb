@@ -27,7 +27,7 @@ describe IIIF::V3::Presentation::ImageResource do
           thumb['type'] = 'Image'
           thumb['id'] = thumb_id
           thumb.format = img_mimetype
-          thumb.service = image_v2_service
+          thumb.service = [image_v2_service]
           thumb
         }
         it 'validates' do
@@ -39,7 +39,7 @@ describe IIIF::V3::Presentation::ImageResource do
         end
         it 'has expected additional values' do
           expect(thumb_object.format).to eq img_mimetype
-          expect(thumb_object.service).to eq image_v2_service
+          expect(thumb_object.service.first).to eq image_v2_service
         end
       end
       describe 'full size per purl code' do
@@ -50,7 +50,7 @@ describe IIIF::V3::Presentation::ImageResource do
           img.format = img_mimetype
           img.height = height
           img.width = width
-          img.service = image_v2_service
+          img.service = [image_v2_service]
           img
         }
         describe 'world visible' do
@@ -65,16 +65,15 @@ describe IIIF::V3::Presentation::ImageResource do
             expect(image_object.format).to eq img_mimetype
             expect(image_object.height).to eq height
             expect(image_object.width).to eq width
-            expect(image_object.service).to eq image_v2_service
+            expect(image_object.service.first).to eq image_v2_service
           end
           it 'has expected service value' do
-            img_service_obj = image_object.service
+            img_service_obj = image_object.service.first
             expect(img_service_obj.class).to eq IIIF::V3::Presentation::Service
             expect(img_service_obj.keys.size).to eq 4
             expect(img_service_obj.id).to eq img_id
             expect(img_service_obj['@id']).to eq img_id
             expect(img_service_obj.profile).to eq IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_LEVEL1_PROFILE
-            expect(img_service_obj['@context']).to eq IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_CONTEXT
           end
         end
         describe 'requires login' do
@@ -93,20 +92,19 @@ describe IIIF::V3::Presentation::ImageResource do
           }
           let(:image_object_w_login) {
             img = image_object
-            img.service['service'] = [login_service]
+            img.service.first['service'] = [login_service]
             img
           }
           it 'validates' do
             expect{image_object_w_login.validate}.not_to raise_error
           end
           it 'has expected service value' do
-            img_service_obj = image_object_w_login.service
+            img_service_obj = image_object_w_login.service.first
             expect(img_service_obj.class).to eq IIIF::V3::Presentation::Service
             expect(img_service_obj.keys.size).to eq 5
             expect(img_service_obj.id).to eq img_id
             expect(img_service_obj['@id']).to eq img_id
             expect(img_service_obj.profile).to eq IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_LEVEL1_PROFILE
-            expect(img_service_obj['@context']).to eq IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_CONTEXT
             expect(img_service_obj.service.class).to eq Array
             expect(img_service_obj.service.size).to eq 1
 

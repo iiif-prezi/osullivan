@@ -29,16 +29,13 @@ describe IIIF::V3::Presentation::ImageResource do
       it 'when copy_info is false' do
         opts = { service_id: valid_service_id }
         resource = described_class.create_image_api_image_resource(opts)
-        # expect(resource['@context']).to eq 'http://iiif.io/api/presentation/2/context.json'
-        # @context is only added when we call to_json...
         expect(resource['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
         expect(resource['type']).to eq 'Image'
         expect(resource.format).to eq "image/jpeg"
         expect(resource.width).to eq 3047
         expect(resource.height).to eq 7200
-        expect(resource.service['@context']).to eq 'http://iiif.io/api/image/2/context.json'
-        expect(resource.service['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
-        expect(resource.service['profile']).to eq 'http://iiif.io/api/image/2/level2.json'
+        expect(resource.service.first['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
+        expect(resource.service.first['profile']).to eq 'http://iiif.io/api/image/2/level2.json'
       end
       it 'copies over all teh infos (when copy_info is true)' do
         opts = { service_id: valid_service_id, copy_info: true }
@@ -49,8 +46,7 @@ describe IIIF::V3::Presentation::ImageResource do
         expect(resource.format).to eq "image/jpeg"
         expect(resource.width).to eq 3047
         expect(resource.height).to eq 7200
-        expect(resource.service['@context']).to eq 'http://iiif.io/api/image/2/context.json'
-        expect(resource.service['profile']).to eq [
+        expect(resource.service.first['profile']).to eq [
           'http://iiif.io/api/image/2/level2.json',
           {
             'supports' => [
@@ -61,11 +57,11 @@ describe IIIF::V3::Presentation::ImageResource do
             'formats'=>['jpg', 'png', 'gif', 'webp']
           }
         ]
-        expect(resource.service['tiles']).to eq [ {
+        expect(resource.service.first['tiles']).to eq [ {
           'width' =>  1024,
           'scaleFactors' =>  [ 1, 2, 4, 8, 16, 32 ]
         } ]
-        expect(resource.service['sizes']).to eq [
+        expect(resource.service.first['sizes']).to eq [
           {'width' => 96, 'height' =>  225 },
           {'width' => 191, 'height' =>  450 },
           {'width' => 381, 'height' =>  900 },
@@ -73,8 +69,8 @@ describe IIIF::V3::Presentation::ImageResource do
           {'width' => 1524, 'height' => 3600 },
           {'width' => 3047, 'height' =>  7200 }
         ]
-        expect(resource.service['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
-        expect(resource.service).not_to have_key('@id')
+        expect(resource.service.first['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
+        expect(resource.service.first).not_to have_key('@id')
       end
     end
 
@@ -101,7 +97,7 @@ describe IIIF::V3::Presentation::ImageResource do
         profile = 'http://iiif.io/api/image/2/level1.json'
         opts = { service_id: valid_service_id, profile: profile}
         resource = described_class.create_image_api_image_resource(opts)
-        expect(resource.service['profile']).to eq profile
+        expect(resource.service.first['profile']).to eq profile
       end
     end
 

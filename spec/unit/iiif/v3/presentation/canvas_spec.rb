@@ -131,7 +131,7 @@ describe IIIF::V3::Presentation::Canvas do
     let(:canvas_id) { 'http://example.org/iiif/book1/canvas/c1' }
     let(:minimal_canvas_object) { described_class.new({
       "id" => canvas_id,
-      'label' => "so minimal it's not here",
+      'label' => {"en" => ["so minimal it's not here"]},
       'height' => 1000,
       'width' => 1000
     })}
@@ -146,7 +146,7 @@ describe IIIF::V3::Presentation::Canvas do
       it 'has expected required values' do
         expect(minimal_canvas_object.type).to eq described_class::TYPE
         expect(minimal_canvas_object.id).to eq canvas_id
-        expect(minimal_canvas_object.label).to eq "so minimal it's not here"
+        expect(minimal_canvas_object.label['en']).to include "so minimal it's not here"
         expect(minimal_canvas_object.height).to eq 1000
         expect(minimal_canvas_object.width).to eq 1000
       end
@@ -180,7 +180,7 @@ describe IIIF::V3::Presentation::Canvas do
         let(:canvas_object) {
           c = described_class.new
           c['id'] = canvas_id
-          c.label = 'label'
+          c.label = {'en' => ['label']}
           c.content << anno_page
           c
         }
@@ -191,7 +191,7 @@ describe IIIF::V3::Presentation::Canvas do
           it 'has expected required values' do
             expect(canvas_object.type).to eq described_class::TYPE
             expect(canvas_object.id).to eq canvas_id
-            expect(canvas_object.label).to eq "label"
+            expect(canvas_object.label['en']).to include "label"
           end
           it 'has expected additional values' do
             expect(canvas_object.content).to eq [anno_page]
@@ -209,7 +209,7 @@ describe IIIF::V3::Presentation::Canvas do
           it 'has expected required values' do
             expect(img_canvas.type).to eq described_class::TYPE
             expect(img_canvas.id).to eq canvas_id
-            expect(img_canvas.label).to eq "label"
+            expect(img_canvas.label['en']).to include "label"
             expect(img_canvas.height).to eq 666
             expect(img_canvas.width).to eq 888
           end
@@ -223,7 +223,7 @@ describe IIIF::V3::Presentation::Canvas do
         describe 'without extent info' do
           let(:file_object) { described_class.new({
             "id" => "https://example.org/bd742gh0511/iiif3/canvas/bd742gh0511_1",
-            "label" => "File 1",
+            "label" => {"en" => ["File 1"]},
             "content" => [anno_page]
             })}
           it 'validates' do
@@ -236,7 +236,7 @@ describe IIIF::V3::Presentation::Canvas do
         describe 'without extent info' do
           let(:image_object) { described_class.new({
             "id" => "https://example.org/yv090xk3108/iiif3/canvas/yv090xk3108_1",
-            "label" => "image",
+            "label" => {"en" => ["image"]},
             "content" => [anno_page]
             })}
           it 'validates' do
@@ -246,7 +246,7 @@ describe IIIF::V3::Presentation::Canvas do
         describe 'with extent given' do
           let(:image_object) { described_class.new({
             "id" => "https://example.org/yy816tv6021/iiif3/canvas/yy816tv6021_3",
-            "label" => "Image of media (1 of 2)",
+            "label" => {"en" => ["Image of media (1 of 2)"]},
             "height" => 3456,
             "width" => 5184,
             "content" => [anno_page]
@@ -261,7 +261,7 @@ describe IIIF::V3::Presentation::Canvas do
         describe 'without duration' do
           let(:canvas_for_audio) { described_class.new({
             "id" => "https://example.org/xk681bt2506/iiif3/canvas/xk681bt2506_1",
-            "label" => "Audio file 1",
+            "label" => {"en" => ["Audio file 1"]},
             "content" => [anno_page]
             })}
           it 'validates' do
@@ -272,7 +272,9 @@ describe IIIF::V3::Presentation::Canvas do
           let(:canvas_for_audio) { described_class.new({
             "id" => "http://tomcrane.github.io/scratch/manifests/3/canvas/2",
             "label" => "Track 2",
-            "description" => "foo",
+            'summary' => {
+              'en' => ['foo']
+            },
             "duration" => 45,
             "content" => [anno_page]
             })}
@@ -282,8 +284,8 @@ describe IIIF::V3::Presentation::Canvas do
           it 'duration' do
             expect(canvas_for_audio.duration).to eq 45
           end
-          it 'description' do
-            expect(canvas_for_audio.description).to eq 'foo'
+          it 'summary' do
+            expect(canvas_for_audio.summary['en'].first).to eq 'foo'
           end
         end
       end

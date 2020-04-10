@@ -14,7 +14,7 @@ describe IIIF::Presentation::Manifest do
       'type' => 'a:SubClass',
       'id' => 'http://example.com/prefix/manifest/123',
       'context' => IIIF::Presentation::CONTEXT,
-      'label' => 'Book 1',
+      'label' => {'en' => ['Book 1']},
       'description' => 'A longer description of this example book. It should give some real information.',
       'thumbnail' => {
         '@id' => 'http://www.example.org/images/book1-page1/full/80,100/0/default.jpg',

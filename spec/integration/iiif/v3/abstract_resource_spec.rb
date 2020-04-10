@@ -9,26 +9,26 @@ describe IIIF::V3::AbstractResource do
   describe 'self.parse' do
     it 'works from a file' do
       s = described_class.parse(manifest_from_spec_path)
-      expect(s['label']).to eq 'Book 1'
+      expect(s['label']['en']).to include 'Book 1'
     end
     it 'works from a string of JSON' do
       file = File.open(manifest_from_spec_path, 'rb')
       json_string = file.read
       file.close
       s = described_class.parse(json_string)
-      expect(s['label']).to eq 'Book 1'
+      expect(s['label']['en']).to include 'Book 1'
     end
     describe 'works from a hash' do
       it 'plain old' do
         h = JSON.parse(IO.read(manifest_from_spec_path))
         s = described_class.parse(h)
-        expect(s['label']).to eq 'Book 1'
+        expect(s['label']['en']).to include 'Book 1'
       end
       it 'IIIF::OrderedHash' do
         h = JSON.parse(IO.read(manifest_from_spec_path))
         oh = IIIF::OrderedHash[h]
         s = described_class.parse(oh)
-        expect(s['label']).to eq 'Book 1'
+        expect(s['label']['en']).to include 'Book 1'
       end
     end
     it 'turns camels to snakes' do
@@ -62,28 +62,16 @@ describe IIIF::V3::AbstractResource do
         },
         "items": [
           {
-            "id":"http://www.example.org/iiif/book1/sequence/normal",
-            "type": "Sequence",
-            "label": "Current Page Order",
-
-            "viewingDirection":"left-to-right",
-            "viewingHint":"paged",
-            "startCanvas": "http://www.example.org/iiif/book1/canvas/p2",
-
-            "items": [
+            "id": "http://example.com/canvas",
+            "type": "Canvas",
+            "width": 10,
+            "height": 20,
+            "label": "My Canvas",
+            "content": [
               {
-                "id": "http://example.com/canvas",
-                "type": "Canvas",
-                "width": 10,
-                "height": 20,
-                "label": "My Canvas",
-                "content": [
-                  {
-                    "id": "http://example.com/content",
-                    "type": "AnnotationPage",
-                    "motivation": "painting"
-                  }
-                ]
+                "id": "http://example.com/content",
+                "type": "AnnotationPage",
+                "motivation": "painting"
               }
             ]
           }
@@ -125,7 +113,7 @@ describe IIIF::V3::AbstractResource do
     it 'turns each member of "items" into an instance of Sequence' do
       parsed = described_class.from_ordered_hash(fixture)
       parsed['items'].each do |s|
-        expect(s.class).to be IIIF::V3::Presentation::Sequence
+        expect(s.class).to be IIIF::V3::Presentation::Canvas
       end
     end
     it 'turns each member of sequences/items into an instance of Canvas' do
