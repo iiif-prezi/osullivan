@@ -44,16 +44,12 @@ module IIIF
             raise IIIF::V3::Presentation::IllegalValueError, err_msg
           end
 
-          # Sequence object list
-          # NOTE: allowing 'items' or 'sequences' as Universal Viewer currently only accepts sequences
-          #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
-          unless (self['items'] && self['items'].any?) ||
-            (self['sequences'] && self['sequences'].any?)
-            m = 'The (items or sequences) list must have at least one entry (and it must be a IIIF::V3::Presentation::Sequence)'
+          # Items object list
+          unless self&.[]('items')&.any?
+            m = 'The items list must have at least one entry (and it must be a IIIF::V3::Presentation::Canvas)'
             raise IIIF::V3::Presentation::MissingRequiredKeyError, m
           end
-          validate_sequence_list(self['items']) if self['items']
-          validate_sequence_list(self['sequences']) if self['sequences']
+          validate_items_list(self['items']) if self['items']
 
           # TODO: when embedding a sequence without any extensions within a manifest, the sequence must not have the @context field.
 
@@ -69,32 +65,15 @@ module IIIF
 
         # NOTE: allowing 'items' or 'sequences' as Universal Viewer currently only accepts sequences
         #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
-        def validate_sequence_list(sequence_array)
-          unless sequence_array.size >= 1
-            m = 'The (items or sequences) list must have at least one entry (and it must be a IIIF::V3::Presentation::Sequence)'
+        def validate_items_list(items_array)
+          unless items_array.size >= 1
+            m = 'The items list must have at least one entry (and it must be a IIIF::V3::Presentation::Canvas)'
             raise IIIF::V3::Presentation::MissingRequiredKeyError, m
           end
 
-          unless sequence_array.all? { |entry| entry.instance_of?(IIIF::V3::Presentation::Sequence) }
-            m = 'All entries in the (items or sequences) list must be a IIIF::V3::Presentation::Sequence'
+          unless items_array.all? { |entry| entry.instance_of?(IIIF::V3::Presentation::Canvas) }
+            m = 'All entries in the items list must be a IIIF::V3::Presentation::Canvas'
             raise IIIF::V3::Presentation::IllegalValueError, m
-          end
-
-          default_sequence = sequence_array.first
-          # NOTE: allowing 'items' or 'canvases' as Universal Viewer currently only accepts canvases
-          #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
-          canvas_array = default_sequence['items'] || default_sequence['canvases']
-          unless canvas_array && canvas_array.size >= 1 &&
-            canvas_array.all? { |entry| entry.instance_of?(IIIF::V3::Presentation::Canvas) }
-            m = 'The default Sequence (the first entry of (items or sequences)) must be written out in full within the Manifest file'
-            raise IIIF::V3::Presentation::IllegalValueError, m
-          end
-
-          if sequence_array.size > 1
-            unless sequence_array.all? { |entry| entry['label'] }
-              m = 'If there are multiple Sequences in a manifest then they must each have at least one label'
-              raise IIIF::V3::Presentation::IllegalValueError, m
-            end
           end
         end
       end

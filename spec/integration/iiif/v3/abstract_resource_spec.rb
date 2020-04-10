@@ -62,28 +62,16 @@ describe IIIF::V3::AbstractResource do
         },
         "items": [
           {
-            "id":"http://www.example.org/iiif/book1/sequence/normal",
-            "type": "Sequence",
-            "label": "Current Page Order",
-
-            "viewingDirection":"left-to-right",
-            "viewingHint":"paged",
-            "startCanvas": "http://www.example.org/iiif/book1/canvas/p2",
-
-            "items": [
+            "id": "http://example.com/canvas",
+            "type": "Canvas",
+            "width": 10,
+            "height": 20,
+            "label": "My Canvas",
+            "content": [
               {
-                "id": "http://example.com/canvas",
-                "type": "Canvas",
-                "width": 10,
-                "height": 20,
-                "label": "My Canvas",
-                "content": [
-                  {
-                    "id": "http://example.com/content",
-                    "type": "AnnotationPage",
-                    "motivation": "painting"
-                  }
-                ]
+                "id": "http://example.com/content",
+                "type": "AnnotationPage",
+                "motivation": "painting"
               }
             ]
           }
@@ -125,7 +113,7 @@ describe IIIF::V3::AbstractResource do
     it 'turns each member of "items" into an instance of Sequence' do
       parsed = described_class.from_ordered_hash(fixture)
       parsed['items'].each do |s|
-        expect(s.class).to be IIIF::V3::Presentation::Sequence
+        expect(s.class).to be IIIF::V3::Presentation::Canvas
       end
     end
     it 'turns each member of sequences/items into an instance of Canvas' do

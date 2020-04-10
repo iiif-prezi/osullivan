@@ -72,142 +72,31 @@ describe IIIF::V3::Presentation::Manifest do
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
 
-    let(:seq_list_err) { 'The (items or sequences) list must have at least one entry (and it must be a IIIF::V3::Presentation::Sequence)' }
-    let(:seq_entry_err) { 'All entries in the (items or sequences) list must be a IIIF::V3::Presentation::Sequence' }
-    let(:def_seq_err) { 'The default Sequence (the first entry of (items or sequences)) must be written out in full within the Manifest file' }
+    let(:item_list_err) { 'The items list must have at least one entry (and it must be a IIIF::V3::Presentation::Canvas)' }
+    let(:item_entry_err) { 'All entries in the items list must be a IIIF::V3::Presentation::Canvas' }
 
     it 'raises MissingRequiredKeyError if no items or sequences key' do
       subject['id'] = manifest_id
       subject.label = {'en' => ['Book 1']}
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, seq_list_err)
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, item_list_err)
     end
     describe 'items' do
       it 'raises MissingRequiredKeyError for items entry without values' do
         subject['id'] = manifest_id
         subject.label = {'en' => ['Book 1']}
         subject['items'] = []
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, seq_list_err)
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, item_list_err)
       end
       it 'raises IllegalValueError for items entry that is not a Sequence' do
         subject['id'] = manifest_id
         subject.label = {'en' => ['Book 1']}
         subject['items'] = [IIIF::V3::Presentation::Sequence.new, IIIF::V3::Presentation::Canvas.new]
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, seq_entry_err)
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, item_entry_err)
       end
-      describe 'raises IllegalValueError for default Sequence that is not written out' do
-        it 'Sequence has "items"' do
-          subject['id'] = manifest_id
-          subject.label = {'en' => ['Book 1']}
-          seq = IIIF::V3::Presentation::Sequence.new
-          seq['items'] = []
-          subject['items'] = [seq]
-          expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, def_seq_err)
-        end
-        # NOTE:  also allowing canvases as Universal Viewer currently only accepts canvases
-        #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
-        it 'Sequence has "canvases"' do
-          subject['id'] = manifest_id
-          subject.label = {'en' => ['Book 1']}
-          seq = IIIF::V3::Presentation::Sequence.new
-          seq['canvases'] = []
-          subject['items'] = [seq]
-          expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, def_seq_err)
-        end
-      end
-      it 'raises no error for Sequence with populated "items"' do
-        seq = IIIF::V3::Presentation::Sequence.new
-        seq['items'] = [IIIF::V3::Presentation::Canvas.new]
-        subject['items'] = [seq]
+      it 'raises no error items populated with canvases' do
+        subject['items'] = [IIIF::V3::Presentation::Canvas.new]
         subject['id'] = manifest_id
         subject.label = {'en' => ['Book 1']}
-        expect { subject.validate }.not_to raise_error
-      end
-      it 'raises no error for Sequence with populated "canvases"' do
-        seq = IIIF::V3::Presentation::Sequence.new
-        seq['canvases'] = [IIIF::V3::Presentation::Canvas.new]
-        subject['items'] = [seq]
-        subject['id'] = manifest_id
-        subject.label = {'en' => ['Book 1']}
-        expect { subject.validate }.not_to raise_error
-      end
-      it 'raises IllegalValueError for Sequences without "label" if there are multiple Sequences' do
-        subject['id'] = manifest_id
-        subject.label = {'en' => ['Book 1']}
-        seq1 = IIIF::V3::Presentation::Sequence.new
-        seq1['items'] = [IIIF::V3::Presentation::Canvas.new]
-        seq2 = IIIF::V3::Presentation::Sequence.new
-        seq2['label'] = {'en' => ['label2']}
-        subject['items'] = [seq1, seq2]
-        exp_err_msg = 'If there are multiple Sequences in a manifest then they must each have at least one label'
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
-      end
-    end
-    describe 'sequences' do
-      it 'raises MissingRequiredKeyError for sequences entry without values' do
-        subject['id'] = manifest_id
-        subject.label = {'en' => ['Book 1']}
-        subject['sequences'] = []
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, seq_list_err)
-      end
-      it 'raises IllegalValueError for sequences entry that is not a Sequence' do
-        subject['id'] = manifest_id
-        subject.label = {'en' => ['Book 1']}
-        subject['sequences'] = [IIIF::V3::Presentation::Sequence.new, IIIF::V3::Presentation::Canvas.new]
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, seq_entry_err)
-      end
-      describe 'raises IllegalValueError for default Sequence that is not written out' do
-        it 'Sequence has "items"' do
-          subject['id'] = manifest_id
-          subject.label = {'en' => ['Book 1']}
-          seq = IIIF::V3::Presentation::Sequence.new
-          seq['items'] = []
-          subject['sequences'] = [seq]
-          expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, def_seq_err)
-        end
-        # NOTE:  also allowing canvases as Universal Viewer currently only accepts canvases
-        #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
-        it 'Sequence has "canvases"' do
-          subject['id'] = manifest_id
-          subject.label = {'en' => ['Book 1']}
-          seq = IIIF::V3::Presentation::Sequence.new
-          seq['canvases'] = []
-          subject['sequences'] = [seq]
-          expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, def_seq_err)
-        end
-      end
-      it 'raises no error for Sequence with populated "items"' do
-        seq = IIIF::V3::Presentation::Sequence.new
-        seq['items'] = [IIIF::V3::Presentation::Canvas.new]
-        subject['sequences'] = [seq]
-        subject['id'] = manifest_id
-        subject.label = {'en' => ['Book 1']}
-        expect { subject.validate }.not_to raise_error
-      end
-      it 'raises no error for Sequence with populated "canvases"' do
-        seq = IIIF::V3::Presentation::Sequence.new
-        seq['canvases'] = [IIIF::V3::Presentation::Canvas.new]
-        subject['sequences'] = [seq]
-        subject['id'] = manifest_id
-        subject.label = {'en' => ['Book 1']}
-        expect { subject.validate }.not_to raise_error
-      end
-      it 'raises IllegalValueError for Sequences without "label" if there are multiple Sequences' do
-        subject['id'] = manifest_id
-        subject.label = {'en' => ['Book 1']}
-        seq1 = IIIF::V3::Presentation::Sequence.new
-        seq1['items'] = [IIIF::V3::Presentation::Canvas.new]
-        seq2 = IIIF::V3::Presentation::Sequence.new
-        seq2['label'] = {'en' => ['label2']}
-        subject['sequences'] = [seq1, seq2]
-        exp_err_msg = 'If there are multiple Sequences in a manifest then they must each have at least one label'
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
-      end
-      it 'raises no error for single Sequences without "label"' do
-        subject['id'] = manifest_id
-        subject.label = {'en' => ['Book 1']}
-        seq = IIIF::V3::Presentation::Sequence.new
-        seq['items'] = [IIIF::V3::Presentation::Canvas.new]
-        subject['sequences'] = [seq]
         expect { subject.validate }.not_to raise_error
       end
     end
@@ -215,9 +104,7 @@ describe IIIF::V3::Presentation::Manifest do
     it 'raises IllegalValueError for structures entry that is not a Range' do
       subject['id'] = manifest_id
       subject.label = {'en' => ['Book 1']}
-      seq = IIIF::V3::Presentation::Sequence.new
-      seq['items'] = [IIIF::V3::Presentation::Canvas.new]
-      subject['items'] = [seq]
+      subject['items'] = [IIIF::V3::Presentation::Canvas.new]
       subject['structures'] = [IIIF::V3::Presentation::Sequence.new]
       exp_err_msg = "All entries in the structures list must be a IIIF::V3::Presentation::Range"
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
@@ -225,9 +112,7 @@ describe IIIF::V3::Presentation::Manifest do
     it 'raises no error when structures entry is a Range' do
       subject['id'] = manifest_id
       subject.label = {'en' => ['Book 1']}
-      seq = IIIF::V3::Presentation::Sequence.new
-      seq['items'] = [IIIF::V3::Presentation::Canvas.new]
-      subject['items'] = [seq]
+      subject['items'] = [IIIF::V3::Presentation::Canvas.new]
       subject['structures'] = [IIIF::V3::Presentation::Range.new]
       expect { subject.validate }.not_to raise_error
     end
@@ -241,11 +126,6 @@ describe IIIF::V3::Presentation::Manifest do
       "width" => 10108,
       "content" => []
     })}
-    let!(:default_sequence_object) {IIIF::V3::Presentation::Sequence.new({
-      "id" => "https://example.org/abc666#sequence-1",
-      "label" => {'en' => ['Current order']},
-      "items" => [canvas_object]
-    })}
     describe 'realistic(?) minimal manifest' do
       let!(:manifest_object) { described_class.new({
         "@context" => [
@@ -256,7 +136,7 @@ describe IIIF::V3::Presentation::Manifest do
         "label" => {"en" => ["blah"]},
         "attribution" => "bleah",
         "description" => "blargh",
-        "items" => [default_sequence_object]
+        "items" => [canvas_object]
       })}
       it 'validates' do
         expect{manifest_object.validate}.not_to raise_error
@@ -266,7 +146,7 @@ describe IIIF::V3::Presentation::Manifest do
         expect(manifest_object.id).to eq "https://example.org/abc666/iiif3/manifest"
         expect(manifest_object.label['en']).to include "blah"
         expect(manifest_object.items.size).to be 1
-        expect(manifest_object.items.first).to eq default_sequence_object
+        expect(manifest_object.items.first).to eq canvas_object
       end
       it 'has expected context' do
         expect(manifest_object['@context'].size).to be 2
@@ -301,7 +181,7 @@ describe IIIF::V3::Presentation::Manifest do
         "label" => {"en" => ["blah"]},
         "attribution" => "bleah",
         "description" => "blargh",
-        "sequences" => [default_sequence_object],
+        "items" => [canvas_object],
         "logo" => {
           "id" => "https://example.org/logo/full/400,/0/default.jpg",
           "service" => logo_service
@@ -334,10 +214,8 @@ describe IIIF::V3::Presentation::Manifest do
         expect(manifest_object.type).to eq 'Manifest'
         expect(manifest_object.id).to eq "https://example.org/abc666/iiif3/manifest"
         expect(manifest_object.label['en']).to include "blah"
-        # NOTE:  using sequences as Universal Viewer currently only accepts sequences
-        #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
-        expect(manifest_object.sequences.size).to be 1
-        expect(manifest_object.sequences.first).to eq default_sequence_object
+        expect(manifest_object.items.size).to be 1
+        expect(manifest_object.items.first).to eq canvas_object
       end
       it 'has expected string values' do
         expect(manifest_object.attribution).to eq "bleah"
@@ -351,15 +229,6 @@ describe IIIF::V3::Presentation::Manifest do
       end
 
       describe 'from stanford purl CODE' do
-        let!(:seq_object) {
-          s = IIIF::V3::Presentation::Sequence.new({
-          'id' => 'https://example.org/abc666#sequence-1',
-          "label" => {"en" => ["Current order"]},
-          })
-          s.viewingDirection = 'left-to-right'
-          s.canvases << canvas_object
-          s
-        }
         let!(:manifest_data) {
           {
             "id" => "https://example.org/abc666/iiif3/manifest",
@@ -384,7 +253,7 @@ describe IIIF::V3::Presentation::Manifest do
           ]
           m.description = 'blargh'
           m.thumbnail = [thumbnail_image]
-          m.sequences << seq_object
+          m.items << canvas_object
           m
         }
         it 'manifest validates' do
@@ -394,10 +263,8 @@ describe IIIF::V3::Presentation::Manifest do
           expect(manifest_object.type).to eq 'Manifest'
           expect(manifest_object.id).to eq "https://example.org/abc666/iiif3/manifest"
           expect(manifest_object.label['en']).to include "blah"
-          # NOTE:  using sequences as Universal Viewer currently only accepts sequences
-          #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
-          expect(manifest_object.sequences.size).to be 1
-          expect(manifest_object.sequences.first).to eq seq_object
+          expect(manifest_object.items.size).to be 1
+          expect(manifest_object.items.first).to eq canvas_object
         end
         it 'has expected string values' do
           expect(manifest_object.attribution).to eq "bleah"
@@ -486,7 +353,7 @@ describe IIIF::V3::Presentation::Manifest do
           "id" => "http://example.org/collections/books/",
           "type" => "Collection"
         }],
-        "items" => [default_sequence_object],
+        "items" => [canvas_object],
         "structures" => [range_object]
       })}
       it 'validates' do
