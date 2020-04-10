@@ -147,14 +147,14 @@ describe IIIF::V3::Presentation::Resource do
           }
           let(:resource_object_w_login) {
             resource = resource_object
-            resource.service = login_service
+            resource.service = [login_service]
             resource
           }
           it 'validates' do
             expect{resource_object_w_login.validate}.not_to raise_error
           end
           it 'has expected service value' do
-            service_obj = resource_object_w_login.service
+            service_obj = resource_object_w_login.service.first
             expect(service_obj.class).to eq IIIF::V3::Presentation::Service
             expect(service_obj.keys.size).to eq 4
             expect(service_obj.id).to eq 'https://example.org/auth/iiif'

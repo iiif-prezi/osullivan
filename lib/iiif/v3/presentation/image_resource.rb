@@ -74,22 +74,23 @@ module IIIF
             resource.format = format
             resource.width = width.nil? ? remote_info['width'] : width
             resource.height = height.nil? ? remote_info['height'] : height
-            resource.service = Service.new
+            resource_service = Service.new
             if copy_info
-              resource.service.merge!(remote_info)
-              resource.service['id'] ||= resource.service.delete('@id')
+              resource_service.merge!(remote_info)
+              resource_service['id'] ||= resource_service.delete('@id')
             else
-              resource.service['id'] = service_id
+              resource_service['id'] = service_id
               if profile.nil?
                 if remote_info['profile'].kind_of?(Array)
-                  resource.service['profile'] = remote_info['profile'][0]
+                  resource_service['profile'] = remote_info['profile'][0]
                 else
-                  resource.service['profile'] = remote_info['profile']
+                  resource_service['profile'] = remote_info['profile']
                 end
               else
-                resource.service['profile'] = profile
+                resource_service['profile'] = profile
               end
             end
+            resource.service = [resource_service]
             return resource
           end
 
