@@ -46,8 +46,7 @@ module IIIF
       end
 
       # Initialize a Presentation node
-      # @param [Hash] hsh - Anything in this hash will be added to the Object.'
-      #   Order is only guaranteed if an ActiveSupport::OrderedHash is passed.
+      # @param [Hash] hsh - Anything in this hash will be added to the Object.
       # @param [boolean] include_context (default: false). Pass true if the'
       #   context should be included.
       def initialize(hsh={})
