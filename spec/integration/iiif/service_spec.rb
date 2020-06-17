@@ -106,6 +106,13 @@ describe IIIF::Service do
       expect(parsed['service'].class).to be expected_klass
     end
 
+    it 'works with arrays of services' do
+      expected_klass = IIIF::Service
+      fixture['service'] = [fixture['service']]
+      parsed = described_class.from_ordered_hash(fixture)
+      expect(parsed['service'].first.class).to be expected_klass
+    end
+
     it 'round-trips' do
       fp = '/tmp/osullivan-spec.json'
       parsed = described_class.from_ordered_hash(fixture)

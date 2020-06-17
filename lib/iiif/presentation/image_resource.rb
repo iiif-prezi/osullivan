@@ -103,7 +103,12 @@ module IIIF
         def get_info(svc_id)
           conn = Faraday.new("#{svc_id}/info.json") do |c|
             c.use Faraday::Response::RaiseError
-            c.use Faraday::Adapter::NetHttp
+
+            if c.respond_to? :adapter
+              c.adapter Faraday.default_adapter
+            else
+              c.use Faraday::Adapter::NetHttp
+            end
           end
           resp = conn.get # raises exceptions that indicate HTTP problems
           JSON.parse(resp.body)

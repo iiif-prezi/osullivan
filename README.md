@@ -82,7 +82,7 @@ puts manifest.to_json(pretty: true, force: true) # force: true skips validations
 ## Parsing Existing Objects
 
 Use `IIIF::Service#parse`. It will figure out what the object
-should be, based on `@type`, and fall back to `ActiveSupport::OrderedHash` when
+should be, based on `@type`, and fall back to `Hash` when
 it can't e.g.:
 
 ```ruby
@@ -133,7 +133,7 @@ puts obj.class
 puts obj.see_also.class
 
 > IIIF::Presentation::Manifest
-> ActiveSupport::OrderedHash
+> Hash
 ```
 
 ## Validation and Exceptions
