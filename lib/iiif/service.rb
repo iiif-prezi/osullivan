@@ -206,17 +206,13 @@ module IIIF
 
       hsh.keys.each do |key|
         new_key = key.underscore == key ? key : key.underscore
-        if new_key == 'service'
-          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Service)
-        elsif new_key == 'resource'
-          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
-        elsif hsh[key].kind_of?(Hash)
-          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key])
-        elsif hsh[key].kind_of?(Array)
+        if hsh[key].kind_of?(Array)
           new_object[new_key] = []
           hsh[key].each do |member|
             if new_key == 'service'
               new_object[new_key] << IIIF::Service.from_ordered_hash(member, IIIF::Service)
+            elsif new_key == 'resource'
+              new_object[new_key] << IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
             elsif member.kind_of?(Hash)
               new_object[new_key] << IIIF::Service.from_ordered_hash(member)
             else
@@ -224,6 +220,12 @@ module IIIF
               # Again, no nested arrays, right?
             end
           end
+        elsif new_key == 'service'
+          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Service)
+        elsif new_key == 'resource'
+          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
+        elsif hsh[key].kind_of?(Hash)
+          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key])
         else
           new_object[new_key] = hsh[key]
         end
