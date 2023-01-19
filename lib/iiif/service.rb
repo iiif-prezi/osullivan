@@ -33,9 +33,9 @@ module IIIF
       # Parse from a file path, string, or existing hash
       def parse(s)
         ordered_hash = nil
-        if s.kind_of?(String) && File.exists?(s)
+        if s.kind_of?(String) && File.exist?(s)
           ordered_hash = IIIF::OrderedHash[JSON.parse(IO.read(s))]
-        elsif s.kind_of?(String) && !File.exists?(s)
+        elsif s.kind_of?(String) && !File.exist?(s)
           ordered_hash = IIIF::OrderedHash[JSON.parse(s)]
         elsif s.kind_of?(Hash)
           ordered_hash = IIIF::OrderedHash[s]
