@@ -4,10 +4,10 @@ module IIIF
   module Presentation
     class Collection < AbstractResource
 
-      TYPE = 'sc:Collection'
+      TYPE = 'Collection'
 
       def required_keys
-        super + %w{ @id label }
+        super + %w{ id label }
       end
 
       def array_only_keys
@@ -15,13 +15,13 @@ module IIIF
       end
 
       def initialize(hsh={})
-        hsh['@type'] = TYPE unless hsh.has_key? '@type'
+        hsh['type'] = TYPE unless hsh.has_key? 'type'
         super(hsh)
       end
 
       def validate
         # each member of collections and manifests must be a Hash
-        # each member of collections and manifests MUST have @id, @type, and label
+        # each member of collections and manifests MUST have id, type, and label
       end
 
     end

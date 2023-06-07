@@ -2,26 +2,26 @@ describe IIIF::Presentation::Collection do
 
   let(:fixed_values) do 
     {
-      '@context' => 'http://iiif.io/api/presentation/2/context.json',
-      '@id' => 'http://example.org/iiif/collection/top',
-      '@type' => 'sc:Collection',
+      '@context' => 'http://iiif.io/api/presentation/3/context.json',
+      'id' => 'http://example.org/iiif/collection/top',
+      'type' => 'Collection',
       'label' => 'Top Level Collection for Example Organization',
       'description' => 'Description of Collection',
       'attribution' => 'Provided by Example Organization',
 
       'collections' => [
-        { '@id' => 'http://example.org/iiif/collection/part1',
-          '@type' => 'sc:Collection',
+        { 'id' => 'http://example.org/iiif/collection/part1',
+          'type' => 'Collection',
           'label' => 'Sub Collection 1'
          },
-         { '@id' => 'http://example.org/iiif/collection/part2',
-           '@type' => 'sc:Collection',
+         { 'id' => 'http://example.org/iiif/collection/part2',
+           'type' => 'Collection',
            'label' => 'Sub Collection 2'
           }
       ],
       'manifests' => [
-        { '@id' => 'http://example.org/iiif/book1/manifest',
-          '@type' => 'sc:Manifest',
+        { 'id' => 'http://example.org/iiif/book1/manifest',
+          'type' => 'Manifest',
           'label' =>  'Book 1'
         }
       ]
@@ -29,8 +29,8 @@ describe IIIF::Presentation::Collection do
   end
 
   describe '#initialize' do
-    it 'sets @type to sc:Collection by default' do
-      expect(subject['@type']).to eq 'sc:Collection'
+    it 'sets type to Collection by default' do
+      expect(subject['type']).to eq 'Collection'
     end
   end
 

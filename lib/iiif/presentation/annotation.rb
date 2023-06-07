@@ -15,8 +15,8 @@ module IIIF
       end
 
       def initialize(hsh={})
-        hsh['@type'] = TYPE unless hsh.has_key? '@type'
-        hsh['motivation'] = 'sc:painting' unless hsh.has_key? 'motivation'
+        hsh['type'] = TYPE unless hsh.has_key? 'type'
+        hsh['motivation'] = 'painting' unless hsh.has_key? 'motivation'
         super(hsh)
       end
 

@@ -2,8 +2,8 @@ describe IIIF::Presentation::Range do
 
   let(:fixed_values) do 
     {
-      '@id' => 'http://www.example.org/iiif/book1/range/r1',
-      '@type' => 'sc:Range',
+      'id' => 'http://www.example.org/iiif/book1/range/r1',
+      'type' => 'Range',
       'label' => 'Introduction',
       'ranges' => [
         'http://www.example.org/iiif/book1/range/r1-1',
@@ -18,8 +18,8 @@ describe IIIF::Presentation::Range do
   end
 
   describe '#initialize' do
-    it 'sets @type to sc:Range by default' do
-      expect(subject['@type']).to eq 'sc:Range'
+    it 'sets type to Range by default' do
+      expect(subject['type']).to eq 'Range'
     end
   end
 

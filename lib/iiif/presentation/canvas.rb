@@ -6,10 +6,10 @@ module IIIF
 
       # TODO (?) a simple 'Image Canvas' constructor.
 
-      TYPE = 'sc:Canvas'
+      TYPE = 'Canvas'
 
       def required_keys
-        super + %w{ @id width height label }
+        super + %w{ id width height label }
       end
 
       def any_type_keys
@@ -30,7 +30,7 @@ module IIIF
       end
 
       def initialize(hsh={})
-        hsh['@type'] = TYPE unless hsh.has_key? '@type'
+        hsh['type'] = TYPE unless hsh.has_key? 'type'
         super(hsh)
       end
 

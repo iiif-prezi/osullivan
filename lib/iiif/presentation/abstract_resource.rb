@@ -7,7 +7,7 @@ module IIIF
       # Every subclass should override the following five methods where
       # appropriate, see Subclasses for how.
       def required_keys
-        %w{ @type }
+        %w{ type }
       end
 
       def any_type_keys # these are allowed on all classes

@@ -1,11 +1,13 @@
 {
-  "@context": "http://iiif.io/api/presentation/2/context.json",
-  "@type": "sc:Manifest",
-  "@id": "http://www.example.org/iiif/book1/manifest",
+  "@context": "http://iiif.io/api/presentation/3/context.json",
+  "type": "Manifest",
+  "id": "http://www.example.org/iiif/book1/manifest",
   "label": "Book 1",
-  "service": {
-    "@context": "http://example.org/ns/jsonld/context.json",
-    "@id": "http://example.org/service/example",
-    "profile": "http://example.org/docs/example-service.html"
-  }
+  "service": [
+    {
+      "id": "https://example.org/service/example",
+      "type": "ExampleExtensionService",
+      "profile": "https://example.org/docs/example-service.html"
+    }
+  ]
 }
