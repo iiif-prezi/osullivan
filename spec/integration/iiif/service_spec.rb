@@ -1,7 +1,4 @@
-require 'active_support/inflector'
-require 'json'
-
-describe IIIF::Service do
+RSpec.describe IIIF::Service do
 
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
@@ -39,6 +36,7 @@ describe IIIF::Service do
   end
 
   describe 'self#from_ordered_hash' do
+    subject(:parsed) { described_class.from_ordered_hash(fixture) }
     let(:fixture) { JSON.parse('{
         "@context": "http://iiif.io/api/presentation/2/context.json",
         "@id": "http://example.com/manifest",
@@ -87,35 +85,28 @@ describe IIIF::Service do
       }')
     }
     it 'doesn\'t raise a NoMethodError when we check the keys' do
-      expect { described_class.from_ordered_hash(fixture) }.to_not raise_error
+      expect { parsed }.to_not raise_error
     end
+
     it 'turns the fixture into a Manifest instance' do
-      expected_klass = IIIF::Presentation::Manifest
-      parsed = described_class.from_ordered_hash(fixture)
-      expect(parsed.class).to be expected_klass
+      expect(parsed).to be_a IIIF::Presentation::Manifest
     end
+
     it 'turns keys without "@type" into an OrderedHash' do
-      expected_klass = IIIF::OrderedHash
-      parsed = described_class.from_ordered_hash(fixture)
-      expect(parsed['some_other_thing'].class).to be expected_klass
+      expect(parsed['some_other_thing']).to be_a IIIF::OrderedHash
     end
 
     it 'turns services into Services' do
-     expected_klass = IIIF::Service
-      parsed = described_class.from_ordered_hash(fixture)
-      expect(parsed['service'].class).to be expected_klass
+      expect(parsed['service']).to be_a IIIF::Service
     end
 
     it 'works with arrays of services' do
-      expected_klass = IIIF::Service
       fixture['service'] = [fixture['service']]
-      parsed = described_class.from_ordered_hash(fixture)
-      expect(parsed['service'].first.class).to be expected_klass
+      expect(parsed['service'].first).to be_a IIIF::Service
     end
 
     it 'round-trips' do
       fp = '/tmp/osullivan-spec.json'
-      parsed = described_class.from_ordered_hash(fixture)
       File.open(fp,'w') do |f|
         f.write(parsed.to_json)
       end
@@ -125,31 +116,25 @@ describe IIIF::Service do
       expect(parsed.to_ordered_hash.to_a - from_file.to_ordered_hash.to_a).to eq []
       expect(from_file.to_ordered_hash.to_a - parsed.to_ordered_hash.to_a).to eq []
     end
+
     it 'turns each memeber of "sequences" into an instance of Sequence' do
-      expected_klass = IIIF::Presentation::Sequence
-      parsed = described_class.from_ordered_hash(fixture)
-      parsed['sequences'].each do |s|
-        expect(s.class).to be expected_klass
-      end
-    end
-    it 'turns each member of sequences/canvaes in an instance of Canvas' do
-      expected_klass = IIIF::Presentation::Canvas
-      parsed = described_class.from_ordered_hash(fixture)
-      parsed['sequences'].each do |s|
-        s.canvases.each do |c|
-          expect(c.class).to be expected_klass
-        end
-      end
-    end
-    it 'turns the keys into snakes' do
-      expect(described_class.from_ordered_hash(fixture).has_key?('seeAlso')).to be_falsey
-      expect(described_class.from_ordered_hash(fixture).has_key?('see_also')).to be_truthy
-    end
-    it 'copies over plain-old key-values' do
-      parsed = described_class.from_ordered_hash(fixture)
-      expect(parsed['label']).to eq 'My Manifest'
+      expect(parsed['sequences']).to all be_a IIIF::Presentation::Sequence
     end
 
+    it 'turns each member of sequences/canvaes in an instance of Canvas' do
+      parsed['sequences'].each do |s|
+        expect(s.canvases).to all be_a IIIF::Presentation::Canvas
+      end
+    end
+
+    it 'turns the keys into snakes' do
+      expect(parsed.has_key?('seeAlso')).to be false
+      expect(parsed.has_key?('see_also')).to be true
+    end
+
+    it 'copies over plain-old key-values' do
+      expect(parsed['label']).to eq 'My Manifest'
+    end
   end
 
   describe '#to_ordered_hash' do
