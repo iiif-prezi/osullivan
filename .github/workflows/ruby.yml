@@ -9,9 +9,9 @@ name: Ruby
 
 on:
   push:
-    branches: [ "development" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "development" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
