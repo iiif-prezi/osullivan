@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'service')
 %w{
-abstract_resource
+  abstract_resource
   annotation
   annotation_list
   canvas
@@ -8,9 +8,10 @@ abstract_resource
   layer
   manifest
   resource
-    image_resource 
-  sequence 
-    range
+  image_resource 
+  sequence
+  service
+  range
 }.each do |f|
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end

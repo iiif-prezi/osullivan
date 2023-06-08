@@ -97,12 +97,12 @@ RSpec.describe IIIF::Service do
     end
 
     it 'turns services into Services' do
-      expect(parsed['service']).to be_a IIIF::Service
+      expect(parsed['service']).to be_a IIIF::Presentation::Service
     end
 
     it 'works with arrays of services' do
       fixture['service'] = [fixture['service']]
-      expect(parsed['service'].first).to be_a IIIF::Service
+      expect(parsed['service'].first).to be_a IIIF::Presentation::Service
     end
 
     it 'round-trips' do
