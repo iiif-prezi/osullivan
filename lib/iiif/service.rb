@@ -210,7 +210,7 @@ module IIIF
           new_object[new_key] = []
           hsh[key].each do |member|
             if new_key == 'service'
-              new_object[new_key] << IIIF::Service.from_ordered_hash(member, IIIF::Service)
+              new_object[new_key] << IIIF::Service.from_ordered_hash(member, IIIF::Presentation::Service)
             elsif new_key == 'resource'
               new_object[new_key] << IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
             elsif member.kind_of?(Hash)
@@ -221,7 +221,7 @@ module IIIF
             end
           end
         elsif new_key == 'service'
-          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Service)
+          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Service)
         elsif new_key == 'resource'
           new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
         elsif hsh[key].kind_of?(Hash)
