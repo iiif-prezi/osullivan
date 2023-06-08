@@ -2,9 +2,9 @@ describe IIIF::Presentation::Layer do
 
   let(:fixed_values) do
     {
-      '@context' => 'http://iiif.io/api/presentation/2/context.json',
-      '@id' => 'http://www.example.org/iiif/book1/layer/transcription',
-      '@type' => 'sc:Layer',
+      '@context' => 'http://iiif.io/api/presentation/3/context.json',
+      'id' => 'http://www.example.org/iiif/book1/layer/transcription',
+      'type' => 'Layer',
       'label' => 'Diplomatic Transcription',
       'otherContent' => [
         'http://www.example.org/iiif/book1/list/l1',
@@ -17,8 +17,8 @@ describe IIIF::Presentation::Layer do
 
 
   describe '#initialize' do
-    it 'sets @type' do
-      expect(subject['@type']).to eq 'sc:Layer'
+    it 'sets type' do
+      expect(subject['type']).to eq 'Layer'
     end
   end
 

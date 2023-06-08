@@ -13,7 +13,7 @@ module IIIF
       end
 
       def initialize(hsh={})
-        hsh['@type'] = TYPE unless hsh.has_key? '@type'
+        hsh['type'] = TYPE unless hsh.has_key? 'type'
         super(hsh)
       end
 
@@ -22,7 +22,7 @@ module IIIF
         IMAGE_API_CONTEXT = 'http://iiif.io/api/image/2/context.json'
         DEFAULT_FORMAT = 'image/jpeg'
         # Create a new ImageResource that includes a IIIF Image API Service
-        # See http://iiif.io/api/presentation/2.0/#image-resources
+        # See http://iiif.io/api/presentation/3.0/#image-resources
         #
         # Params
         #  * :service_id (required) - The base URI for the image on the image 
@@ -48,12 +48,12 @@ module IIIF
         # The result is something like this:
         #
         # {
-        #   "@id":"http://www.example.org/iiif/book1/res/page1.jpg",
-        #   "@type":"dctypes:Image",
+        #   "id":"http://www.example.org/iiif/book1/res/page1.jpg",
+        #   "type":"dctypes:Image",
         #   "format":"image/jpeg",
         #   "service": {
         #     "@context": "http://iiif.io/api/image/2/context.json",
-        #     "@id":"http://www.example.org/images/book1-page1",
+        #     "id":"http://www.example.org/images/book1-page1",
         #     "profile":"http://iiif.io/api/image/2/profiles/level2.json",
         #   },
         #   "height":2000,
@@ -76,7 +76,7 @@ module IIIF
           remote_info = get_info(service_id) if !have_whp || copy_info
 
           resource = self.new
-          resource['@id'] = resource_id
+          resource['id'] = resource_id
           resource.format = format
           resource.width = width.nil? ? remote_info['width'] : width
           resource.height = height.nil? ? remote_info['height'] : height
@@ -85,7 +85,7 @@ module IIIF
             resource.service.merge!(remote_info)
           else
             resource.service['@context'] = IMAGE_API_CONTEXT
-            resource.service['@id'] = service_id
+            resource.service['id'] = service_id
             if profile.nil?
               if remote_info['profile'].kind_of?(Array)
                 resource.service['profile'] = remote_info['profile'][0]

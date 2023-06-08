@@ -4,10 +4,10 @@ module IIIF
   module Presentation
     class AnnotationList < AbstractResource
 
-      TYPE = 'sc:AnnotationList'
+      TYPE = 'AnnotationList'
 
       def required_keys
-        super + %w{ @id }
+        super + %w{ id }
       end
 
       def array_only_keys; 
@@ -15,7 +15,7 @@ module IIIF
       end
 
       def initialize(hsh={})
-        hsh['@type'] = TYPE unless hsh.has_key? '@type'
+        hsh['type'] = TYPE unless hsh.has_key? 'type'
         super(hsh)
       end
 

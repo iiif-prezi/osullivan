@@ -4,10 +4,10 @@ module IIIF
   module Presentation
     class Manifest < AbstractResource
 
-      TYPE = 'sc:Manifest'
+      TYPE = 'Manifest'
 
       def required_keys
-        super + %w{ @id label }
+        super + %w{ id label }
       end
 
       def string_only_keys
@@ -15,7 +15,7 @@ module IIIF
       end
 
       def array_only_keys
-        super + %w{ sequences structures }
+        super + %w{ structures }
       end
 
       def legal_viewing_hint_values
@@ -23,12 +23,12 @@ module IIIF
       end
 
       def initialize(hsh={})
-        hsh['@type'] = TYPE unless hsh.has_key? '@type'
+        hsh['type'] = TYPE unless hsh.has_key? 'type'
         super(hsh)
       end
 
       def validate
-        # TODO: check types of sequences and structure members
+        # TODO: check types of structure members
 
         super
       end

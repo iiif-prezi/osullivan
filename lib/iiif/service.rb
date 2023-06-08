@@ -8,7 +8,7 @@ module IIIF
   class Service
     include IIIF::HashBehaviours
 
-    # Anything goes! SHOULD have @id and profile, MAY have label
+    # Anything goes! SHOULD have id and profile, MAY have label
     # Consider subclassing this for typical services...
     def required_keys; %w{ }; end
     def any_type_keys; %w{ }; end
@@ -106,15 +106,14 @@ module IIIF
     def to_ordered_hash(opts={})
       force = opts.fetch(:force, false)
       sort_json_ld_keys = opts.fetch(:sort_json_ld_keys, true)
-
       unless force
         self.validate
       end
 
       export_hash = IIIF::OrderedHash.new
-
+      boosted_keys = ['@context', 'id', 'type']
       if sort_json_ld_keys
-        self.keys.select { |k| k.start_with?('@') }.sort!.each do |k|
+        self.keys.select { |k| boosted_keys.include?(k) }.sort!.each do |k|
           export_hash[k] = self.data[k]
         end
       end
@@ -125,8 +124,8 @@ module IIIF
         force: force
       }
       self.keys.each do |k|
-        unless sort_json_ld_keys && k.start_with?('@')
-          if self.data[k].respond_to?(:to_ordered_hash) #.respond_to?(:to_ordered_hash)
+        unless sort_json_ld_keys && boosted_keys.include?(k)
+          if self.data[k].respond_to?(:to_ordered_hash)
             export_hash[k] = self.data[k].to_ordered_hash(sub_opts)
 
           elsif self.data[k].kind_of?(Hash)
@@ -196,23 +195,28 @@ module IIIF
       export_hash
     end
 
-    def self.from_ordered_hash(hsh, default_klass=IIIF::OrderedHash)
+    def self.from_ordered_hash(hsh, default_klass=IIIF::OrderedHash, forced_class: nil)
       # Create a new object (new_object)
-      type = nil
-      if hsh.has_key?('@type')
-        type = IIIF::Service.get_descendant_class_by_jld_type(hsh['@type'])
-      end
-      new_object = type.nil? ? default_klass.new : type.new
-
+      type = if forced_class
+               forced_class
+             elsif hsh.has_key?('type')
+               IIIF::Service.get_descendant_class_by_jld_type(hsh['type']) || default_klass
+             else
+               default_klass
+             end
+      new_object = type.new
       hsh.keys.each do |key|
         new_key = key.underscore == key ? key : key.underscore
+
         if hsh[key].kind_of?(Array)
           new_object[new_key] = []
           hsh[key].each do |member|
-            if new_key == 'service'
+            if hsh['type'] == 'Manifest' && (new_key == 'service' || new_key == 'services')
               new_object[new_key] << IIIF::Service.from_ordered_hash(member, IIIF::Presentation::Service)
             elsif new_key == 'resource'
               new_object[new_key] << IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
+            elsif new_key == 'items' && hsh['type'] == 'Range' &&  member['type'] == 'Canvas'
+              new_object[new_key] << IIIF::Service.from_ordered_hash(member, forced_class: IIIF::Presentation::Start)
             elsif member.kind_of?(Hash)
               new_object[new_key] << IIIF::Service.from_ordered_hash(member)
             else
@@ -221,7 +225,10 @@ module IIIF
             end
           end
         elsif new_key == 'service'
+          raise
           new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Service)
+        elsif new_key == 'start'
+          new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], forced_class: IIIF::Presentation::Start)
         elsif new_key == 'resource'
           new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
         elsif hsh[key].kind_of?(Hash)

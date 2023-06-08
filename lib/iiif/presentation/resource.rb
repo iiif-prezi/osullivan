@@ -5,7 +5,7 @@ module IIIF
     class Resource < AbstractResource
 
       def required_keys
-        %w{ @id }
+        %w{ id }
       end
 
       def string_only_keys

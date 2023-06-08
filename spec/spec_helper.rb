@@ -2,6 +2,7 @@ require 'iiif/presentation'
 require 'simplecov'
 require 'coveralls'
 require 'debug'
+
 Dir["#{File.dirname(__FILE__)}/unit/iiif/presentation/shared_examples/*.rb"].each do |f|
   require f
 end

@@ -4,10 +4,10 @@ module IIIF
   module Presentation
     class Layer < AbstractResource
 
-      TYPE = 'sc:Layer'
+      TYPE = 'Layer'
 
       def required_keys
-        super + %w{ @id label }
+        super + %w{ id label }
       end
 
       def array_only_keys
@@ -19,7 +19,7 @@ module IIIF
       end
 
       def initialize(hsh={})
-        hsh['@type'] = TYPE unless hsh.has_key? '@type'
+        hsh['type'] = TYPE unless hsh.has_key? 'type'
         super(hsh)
       end
 

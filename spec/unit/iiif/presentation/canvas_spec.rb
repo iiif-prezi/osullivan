@@ -2,9 +2,9 @@ describe IIIF::Presentation::Canvas do
 
   let(:fixed_values) do
     {
-      "@context" => "http://iiif.io/api/presentation/2/context.json",
-      "@id" => "http://www.example.org/iiif/book1/canvas/p1",
-      "@type" => "sc:Canvas",
+      "@context" => "http://iiif.io/api/presentation/3/context.json",
+      "id" => "http://www.example.org/iiif/book1/canvas/p1",
+      "type" => "Canvas",
       "label" => "p. 1",
       "height" => 1000,
       "width" => 750,
@@ -15,8 +15,8 @@ describe IIIF::Presentation::Canvas do
 
 
   describe '#initialize' do
-    it 'sets @type' do
-      expect(subject['@type']).to eq 'sc:Canvas'
+    it 'sets type' do
+      expect(subject['type']).to eq 'Canvas'
     end
   end
 

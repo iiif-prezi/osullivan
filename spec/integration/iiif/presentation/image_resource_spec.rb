@@ -1,4 +1,4 @@
-describe IIIF::Presentation::ImageResource do
+RSpec.describe IIIF::Presentation::ImageResource do
   vcr_options = {
     cassette_name: 'pul_loris_cassette',
     record: :new_episodes,
@@ -30,27 +30,27 @@ describe IIIF::Presentation::ImageResource do
       it 'when copy_info is false' do
         opts = { service_id: valid_service_id }
         resource = described_class.create_image_api_image_resource(opts)
-        # expect(resource['@context']).to eq 'http://iiif.io/api/presentation/2/context.json'
+        # expect(resource['@context']).to eq 'http://iiif.io/api/presentation/3/context.json'
         # @context is only added when we call to_json...
-        expect(resource['@id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
-        expect(resource['@type']).to eq 'dctypes:Image'
+        expect(resource['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
+        expect(resource['type']).to eq 'dctypes:Image'
         expect(resource.format).to eq "image/jpeg"
         expect(resource.width).to eq 3047
         expect(resource.height).to eq 7200
         expect(resource.service['@context']).to eq 'http://iiif.io/api/image/2/context.json'
-        expect(resource.service['@id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
+        expect(resource.service['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
         expect(resource.service['profile']).to eq 'http://iiif.io/api/image/2/level2.json'
       end
       it 'copies over all the info (when copy_info is true)' do
         opts = { service_id: valid_service_id, copy_info: true }
         resource = described_class.create_image_api_image_resource(opts)
-        expect(resource['@id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
-        expect(resource['@type']).to eq 'dctypes:Image'
+        expect(resource['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2/full/!200,200/0/default.jpg'
+        expect(resource['type']).to eq 'dctypes:Image'
         expect(resource.format).to eq "image/jpeg"
         expect(resource.width).to eq 3047
         expect(resource.height).to eq 7200
         expect(resource.service['@context']).to eq 'http://iiif.io/api/image/2/context.json'
-        expect(resource.service['@id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
+        expect(resource.service['id']).to eq 'https://libimages.princeton.edu/loris/pudl0001%2F4612422%2F00000001.jp2'
         expect(resource.service['profile']).to eq [
           'http://iiif.io/api/image/2/level2.json',
           {
@@ -83,7 +83,7 @@ describe IIIF::Presentation::ImageResource do
 
         opts = { service_id: valid_service_id, resource_id: r_id}
         resource = described_class.create_image_api_image_resource(opts)
-        expect(resource['@id']).to eq r_id
+        expect(resource['id']).to eq r_id
       end
       it ':width' do
         width = 42
