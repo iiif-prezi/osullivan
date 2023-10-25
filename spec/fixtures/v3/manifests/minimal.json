@@ -1,0 +1,49 @@
+{
+  "@context": [
+    "http://iiif.io/api/presentation/3/context.json",
+    "http://www.w3.org/ns/anno.jsonld"
+  ],
+  "type": "Manifest",
+  "id": "http://www.example.org/iiif/book1/manifest",
+  "label": "Book 1",
+  "sequences": [
+    {
+      "id": "http://www.example.org/iiif/book1/sequence/normal",
+      "label": "Current Page Order",
+      "canvases": [
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p1",
+          "type": "Canvas",
+          "label": "p. 1",
+          "height": 1000,
+          "width": 750,
+          "content": [
+            {
+              "id": "http://www.example.org/iiif/book1/page/p1",
+              "type": "AnnotationPage",
+              "items": [
+                {
+                  "type": "Annotation",
+                  "motivation": "painting",
+                  "target": "http://www.example.org/iiif/book1/canvas/p1",
+                  "body": {
+                    "id": "http://www.example.org/iiif/book1/res/page1.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "height": 2000,
+                    "width": 1500,
+                    "service": {
+                      "@context": "http://iiif.io/api/image/2/context.json",
+                      "id": "http://www.example.org/images/book1-page1",
+                      "profile": "http://iiif.io/api/image/2/level1.json"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

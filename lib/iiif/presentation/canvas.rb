@@ -25,6 +25,10 @@ module IIIF
         super + %w{ width height }
       end
 
+      def numeric_only_keys
+        super + %w{ duration }
+      end
+
       def legal_viewing_hint_values
         super + %w{ non-paged }
       end

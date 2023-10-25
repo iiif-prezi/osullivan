@@ -1,0 +1,195 @@
+{
+  "@context": [
+    "http://iiif.io/api/presentation/3/context.json",
+    "http://www.w3.org/ns/anno.jsonld"
+  ],
+  "id": "http://www.example.org/iiif/book1/manifest",
+  "type": "Manifest",
+  "label": { "en": [ "Book 1" ] },
+  "metadata": [
+    {
+      "label": "Author",
+      "value": "Anne Author"
+    },
+    {
+      "label": "Published",
+      "value": [
+        {
+          "@value": "Paris, circa 1400",
+          "@language": "en"
+        },
+        {
+          "@value": "Paris, environ 14eme siecle",
+          "@language": "fr"
+        }
+      ]
+    }
+  ],
+  "description": "A longer description of this example book. It should give some real information.",
+  "rights": "http://www.example.org/license.html",
+  "attribution": "Provided by Example Organization",
+  "service": {
+    "@context": "http://example.org/ns/jsonld/context.json",
+    "id": "http://example.org/service/example",
+    "profile": "http://example.org/docs/example-service.html"
+  },
+  "seeAlso": {
+    "id": "http://www.example.org/library/catalog/book1.marc",
+    "format": "application/marc"
+  },
+  "within": "http://www.example.org/collections/books/",
+  "sequences": [
+    {
+      "id": "http://www.example.org/iiif/book1/sequence/normal",
+      "type": "Sequence",
+      "label": "Current Page Order",
+      "viewingDirection": "left-to-right",
+      "viewingHint": "paged",
+      "canvases": [
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p1",
+          "type": "Canvas",
+          "label": "p. 1",
+          "height": 1000,
+          "width": 750,
+          "content": [
+            {
+              "id": "http://www.example.org/iiif/book1/page/p1",
+              "type": "AnnotationPage",
+              "items": [
+                {
+                  "type": "Annotation",
+                  "motivation": "painting",
+                  "target": "http://www.example.org/iiif/book1/canvas/p1",
+                  "body": {
+                    "id": "http://www.example.org/iiif/book1/res/page1.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "height": 2000,
+                    "width": 1500,
+                    "service": {
+                      "@context": "http://iiif.io/api/image/2/context.json",
+                      "id": "http://www.example.org/images/book1-page1",
+                      "profile": "http://iiif.io/api/image/2/level1.json"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "http://www.example.org/iiif/book1/page/p666",
+              "type": "AnnotationPage"
+            }
+          ]
+        },
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p2",
+          "type": "Canvas",
+          "label": "p. 2",
+          "height": 1000,
+          "width": 750,
+          "content": [
+            {
+              "id": "http://www.example.org/iiif/book1/page/p1",
+              "type": "AnnotationPage",
+              "items": [
+                {
+                  "type": "Annotation",
+                  "motivation": "painting",
+                  "body": {
+                    "id": "http://www.example.org/images/book1-page2/full/1500,2000/0/default.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "height": 2000,
+                    "width": 1500,
+                    "service": {
+                      "@context": "http://iiif.io/api/image/2/context.json",
+                      "id": "http://www.example.org/images/book1-page2",
+                      "profile": "http://iiif.io/api/image/2/level1.json",
+                      "height": 8000,
+                      "width": 6000,
+                      "tiles": [
+                        {
+                          "width": 512,
+                          "scaleFactors": [
+                            1,
+                            2,
+                            4,
+                            8,
+                            16
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "target": "http://www.example.org/iiif/book1/canvas/p2"
+                }
+              ]
+            },
+            {
+              "id": "http://www.example.org/iiif/book1/list/p2",
+              "type": "AnnotationPage"
+            }
+          ]
+        },
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p3",
+          "type": "Canvas",
+          "label": "p. 3",
+          "height": 1000,
+          "width": 750,
+          "content": [
+            {
+              "id": "http://www.example.org/iiif/book1/page/p1",
+              "type": "AnnotationPage",
+              "items": [
+                {
+                  "type": "Annotation",
+                  "motivation": "painting",
+                  "target": "http://www.example.org/iiif/book1/canvas/p3",
+                  "body": {
+                    "id": "http://www.example.org/iiif/book1/res/page3.jpg",
+                    "type": "Image",
+                    "format": "image/jpeg",
+                    "height": 2000,
+                    "width": 1500,
+                    "service": {
+                      "@context": "http://iiif.io/api/image/2/context.json",
+                      "id": "http://www.example.org/images/book1-page3",
+                      "profile": "http://iiif.io/api/image/2/level1.json"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "http://www.example.org/iiif/book1/page/p333",
+              "type": "AnnotationPage"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "structures": [
+    {
+      "id": "http://www.example.org/iiif/book1/range/r1",
+      "type": "Range",
+      "label": "Introduction",
+      "members": [
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p1",
+          "type": "Canvas"
+        },
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p2",
+          "type": "Canvas"
+        },
+        {
+          "id": "http://www.example.org/iiif/book1/canvas/p3#xywh=0,0,750,300",
+          "type": "Canvas"
+        }
+      ]
+    }
+  ]
+}
