@@ -57,9 +57,9 @@ module IIIF
         end
 
         def features
-          coordinates.map.with_index do |coordinate, index|
+          coordinates.map.with_index(1) do |coordinate, index|
             {
-              id: "#{base_uri}/iiif/feature/#{index + 1}",
+              id: "#{base_uri}/iiif/feature/#{index}",
               type: 'Feature',
               properties: {},
               geometry: coordinate.is_a?(Rect) ? polygon_geometry(coordinate) : point_geometry(coordinate)
@@ -89,6 +89,12 @@ module IIIF
           }
         end
 
+        # @param [BigDecimal] coordinate value from geocoord gem
+        # @return [String] string formatted with max 6 digits after the decimal point
+        # The to_f ensures removal of scientific notation of BigDecimal before converting to a string.
+        # examples:
+        # input value is BigDecimal("-23.9") or "0.239e2", output value is "-23.9" as string
+        # input value is BigDecimal("23.9424213434") or "0.239424213434e2", output value is "23.942421" as string
         def format(decimal)
           decimal.truncate(6).to_f.to_s
         end
