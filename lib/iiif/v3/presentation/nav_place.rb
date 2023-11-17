@@ -11,8 +11,13 @@ module IIIF
           @base_uri = base_uri
         end
 
+        # @return [Boolean] indicates if coordinate_texts passed in are valid
+        def valid?
+          !(coordinates.nil? || coordinates.empty?)
+        end
+
         def build
-          return if coordinates.nil? || coordinates.empty?
+          raise ArgumentError.new('invalid coordinates') unless valid?
 
           {
             id: "#{base_uri}/feature-collection/1",
