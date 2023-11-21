@@ -1,5 +1,5 @@
 describe IIIF::V3::Presentation::NavPlace do
-  let(:subject) { described_class.new(coordinate_texts:, base_uri:) }
+  let(:subject) { described_class.new(coordinate_texts: coordinate_texts, base_uri: base_uri) }
   let(:base_uri) { "https://purl.stanford.edu" }
   let(:invalid_coordinates) { ["bogus", "stuff", "is", "here"] }
   let(:valid_coordinates) do
