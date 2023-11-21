@@ -11,6 +11,7 @@ require_relative '../ordered_hash'
   choice
   collection
   manifest
+  nav_place
   resource
   image_resource
   sequence
