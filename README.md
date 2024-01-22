@@ -44,13 +44,13 @@ canvas.label = 'My Canvas'
 service = IIIF::Presentation::Resource.new('@context' => 'http://iiif.io/api/image/2/context.json', 'profile' => 'http://iiif.io/api/image/2/level2.json', '@id' => "http://images.exampl.com/loris2/my-image")
 
 image = IIIF::Presentation::ImageResource.new()
-i['@id'] = "http://images.exampl.com/loris2/my-image/full/#{canvas.width},#{canvas.height}/0/default.jpg"
-i.format = "image/jpeg"
-i.width = canvas.width
-i.height = canvas.height
-i.service = service
+image['@id'] = "http://images.exampl.com/loris2/my-image/full/#{canvas.width},#{canvas.height}/0/default.jpg"
+image.format = "image/jpeg"
+image.width = canvas.width
+image.height = canvas.height
+image.service = service
 
-images = IIIF::Presentation::Resource.new('@type' => 'oa:Annotation', 'motivation' => 'sc:painting', '@id' => "#{canvas['@id']}/images", 'resource' => i)
+images = IIIF::Presentation::Resource.new('@type' => 'oa:Annotation', 'motivation' => 'sc:painting', '@id' => "#{canvas['@id']}/images", 'resource' => image)
 
 canvas.images << images
 
