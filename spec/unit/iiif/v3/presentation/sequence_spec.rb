@@ -193,7 +193,7 @@ describe IIIF::V3::Presentation::Sequence do
           }
         }],
         'attribution' => 'Provided by Example Organization',
-        'rights' => [{'id' => 'http://www.example.org/license.html'}],
+        'rights' => 'http://www.example.org/license.html',
         'logo' => 'http://www.example.org/logos/institution1.jpg',
         'see_also' => 'http://www.example.org/library/catalog/book1.xml',
         'service' => {

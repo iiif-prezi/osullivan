@@ -35,7 +35,7 @@ module IIIF
       end
 
       def array_only_keys
-        %w{ metadata rights thumbnail rendering first last next prev items service }
+        %w{ metadata thumbnail rendering first last next prev items service homepage provider }
       end
 
       def hash_only_keys
@@ -51,7 +51,7 @@ module IIIF
       end
 
       def uri_only_keys
-        %w{ }
+        %w{ rights }
       end
 
       # Not every subclass is allowed to have viewingDirect, but when it is,
@@ -185,20 +185,6 @@ module IIIF
           rescue ArgumentError
             m = "nav_date must be of form YYYY-MM-DDThh:mm:ssZ"
             raise IIIF::V3::Presentation::IllegalValueError, m
-          end
-        end
-        # rights is Array; each entry is a Hash containing 'id' with a URI value
-        if self.has_key?('rights')
-          unless self['rights'].all? { |entry| entry.kind_of?(Hash) }
-            m = 'rights must be an Array with Hash members'
-            raise IIIF::V3::Presentation::IllegalValueError, m
-          end
-          self['rights'].each do |entry|
-            unless entry.keys.include?('id')
-              m = 'rights members must be a Hash including "id"'
-              raise IIIF::V3::Presentation::IllegalValueError, m
-            end
-            validate_uri(entry['id'], 'id') # raises IllegalValueError
           end
         end
         # rendering is Array; each entry is a Hash containing 'label' and 'format' keys
@@ -346,9 +332,7 @@ module IIIF
 
         hsh.keys.each do |key|
           new_key = key.underscore == key ? key : key.underscore
-          if new_key == 'service'
-            new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Service)
-          elsif new_key == 'body'
+          if new_key == 'body'
             new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Resource)
           elsif hsh[key].kind_of?(Hash)
             new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key])

@@ -140,23 +140,9 @@ describe IIIF::V3::AbstractResource do
       end
     end
     describe 'rights' do
-      it 'raises IllegalValueError for entry that is not a Hash' do
-        subject['rights'] = ['error']
-        exp_err_msg = "rights must be an Array with Hash members"
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
-      end
-      it 'does not raise error for entry with "id" that is URI' do
-        subject['rights'] = [{ 'id' => 'http://example.org/rights', 'format' => 'text/html' }]
-        expect { subject.validate }.not_to raise_error
-      end
-      it 'raises IllegalValueError for entry with "id" that is not URI' do
-        subject['rights'] = [{ 'id' => 'bar', 'format' => 'text/html' }]
-        exp_err_msg = "id value must be a String containing a URI for #{subject.class}"
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
-      end
-      it 'raises IllegalValueError for entry that does not contain "id"' do
-        subject['rights'] = [{ 'whoops' => 'http://example.org/rights' }]
-        exp_err_msg = 'rights members must be a Hash including "id"'
+      it 'raises IllegalValueError for entry that is not URI' do
+        subject['rights'] = 'foo'
+        exp_err_msg = "rights value must be a String containing a URI for #{subject.class}"
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
     end

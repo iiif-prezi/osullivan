@@ -322,9 +322,7 @@ describe IIIF::V3::Presentation::Manifest do
         "viewingDirection" => "right-to-left",
         "viewingHint" => ["paged"],
         "navDate" => "1856-01-01T00:00:00Z",
-        "rights" => [{
-          "id" =>"http://example.org/license.html",
-          "format" => "text/html"}],
+        "rights" => "http://example.org/license.html",
         "requiredStatement" => {
           "label": { "en": [ "Attribution" ] },
           "value": { "en": [ "bleah" ] },
