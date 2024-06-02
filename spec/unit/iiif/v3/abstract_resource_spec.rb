@@ -142,7 +142,7 @@ describe IIIF::V3::AbstractResource do
     describe 'rights' do
       it 'raises IllegalValueError for entry that is not URI' do
         subject['rights'] = 'foo'
-        exp_err_msg = "rights value must be a String containing a URI for #{subject.class}"
+        exp_err_msg = "rights value must be a String containing an http(s) URI for #{subject.class}"
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
     end
@@ -165,7 +165,7 @@ describe IIIF::V3::AbstractResource do
     describe 'startCanvas' do
       it 'raises IllegalValueError for entry that is not URI' do
         subject.startCanvas = 'foo'
-        exp_err_msg = "startCanvas value must be a String containing a URI for #{subject.class}"
+        exp_err_msg = "startCanvas value must be a String containing an http(s) URI for #{subject.class}"
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
     end

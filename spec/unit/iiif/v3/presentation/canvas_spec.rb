@@ -58,22 +58,23 @@ describe IIIF::V3::Presentation::Canvas do
 
   describe '#validate' do
     let(:canvas_id) { 'http://example.org/iiif/book1/canvas/c1' }
-    let(:exp_id_err_msg) { "id must be an http(s) URI without a fragment for #{described_class}" }
+    let(:exp_id_err_msg1) { "id value must be a String containing an http(s) URI for #{described_class}" }
+    let(:exp_id_err_msg2) { "id must be an http(s) URI without a fragment for #{described_class}" }
     before(:each) do
       subject['id'] = canvas_id
       subject['label'] = 'foo'
     end
     it 'raises IllegalValueError if id is not URI' do
       subject['id'] = 'foo'
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg)
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg1)
     end
     it 'raises IllegalValueError if id is not http(s)' do
       subject['id'] = 'ftp://www.example.org'
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg)
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg1)
     end
     it 'raises IllegalValueError if id has a fragment' do
       subject['id'] = 'http://www.example.org#foo'
-      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg)
+      expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_id_err_msg2)
     end
 
     # let(:exp_extent_err_msg) { "#{described_class} must have (a height and a width) and/or a duration" }

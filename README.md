@@ -174,7 +174,7 @@ and also if any required properties are missing when calling `to_json`
 canvas = IIIF::Presentation::Canvas.new('@id' => 'http://example.com/canvas')
 puts canvas.to_json(pretty: true)
 
-> A(n) width is required for each IIIF::Presentation::Canvas (IIIF::Presentation::MissingRequiredKeyError)
+> The key width is required for each IIIF::Presentation::Canvas (IIIF::Presentation::MissingRequiredKeyError)
 ```
 
 but you can skip this validation by adding `force: true`:

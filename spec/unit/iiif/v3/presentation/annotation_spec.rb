@@ -103,7 +103,7 @@ describe IIIF::V3::Presentation::Annotation do
       subject['target'] = 'foo'
     end
     it 'raises IllegalValueError if id is not URI' do
-      exp_err_msg = "id value must be a String containing a URI for #{described_class}"
+      exp_err_msg = "id value must be a String containing an http(s) URI for #{described_class}"
       subject['id'] = 'foo'
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
@@ -130,13 +130,18 @@ describe IIIF::V3::Presentation::Annotation do
         IIIF::V3::Presentation::ImageResource.new(
           'type' => content_type,
           'format' => mimetype
-        )}
+        )
+      }
+      let(:missing_id_err_msg) {
+        "The key id is required for each IIIF::V3::Presentation::ImageResource"
+      }
       let(:http_uri_err_msg) {
-        "when #{described_class} body is a kind of IIIF::V3::Presentation::ImageResource, ImageResource id must be an http(s) URI"
+        "id value must be a String containing an http(s) URI for IIIF::V3::Presentation::ImageResource"
       }
       it 'raises IllegalValueError if no id field in ImageResource' do
         img_body_anno.body = img_resource_without_id
-        expect { img_body_anno.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError, http_uri_err_msg
+        puts "img_body_anno.body: #{img_body_anno.body}"
+        expect { img_body_anno.validate }.to raise_error IIIF::V3::Presentation::MissingRequiredKeyError, missing_id_err_msg
       end
       it 'raises IllegalValueError if id in ImageResource isn\'t URI' do
         img_resource_without_id['id'] = 'foo'

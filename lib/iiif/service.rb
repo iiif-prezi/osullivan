@@ -62,7 +62,7 @@ module IIIF
       # * type check AbstractResource-only values
       self.required_keys.each do |k|
         unless self.has_key?(k)
-          m = "A(n) #{k} is required for each #{self.class}"
+          m = "The key #{k} is required for each #{self.class}"
           raise IIIF::Presentation::MissingRequiredKeyError, m
         end
       end

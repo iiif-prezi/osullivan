@@ -34,11 +34,6 @@ module IIIF
         def validate
           super
 
-          unless self['id'] =~ /^https?:/
-            err_msg = "id must be an http(s) URI for #{self.class}"
-            raise IIIF::V3::Presentation::IllegalValueError, err_msg
-          end
-
           items = self['items']
           if items && items.any?
             unless items.all? { |entry| entry.instance_of?(IIIF::V3::Presentation::Annotation) }

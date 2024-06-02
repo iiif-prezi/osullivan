@@ -34,7 +34,7 @@ module IIIF
           super
 
           id_uri = URI.parse(self['id'])
-          unless self['id'] =~ /^https?:/ && id_uri.fragment.nil?
+          unless id_uri.fragment.nil?
             err_msg = "id must be an http(s) URI without a fragment for #{self.class}"
             raise IIIF::V3::Presentation::IllegalValueError, err_msg
           end

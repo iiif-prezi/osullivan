@@ -62,13 +62,13 @@ describe IIIF::V3::Presentation::AnnotationPage do
 
   describe '#validate' do
     it 'raises IllegalValueError if id is not URI' do
-      exp_err_msg = "id value must be a String containing a URI for #{described_class}"
+      exp_err_msg = "id value must be a String containing an http(s) URI for #{described_class}"
       subject['id'] = 'foo'
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
     it 'raises IllegalValueError if id is not http(s)' do
       subject['id'] = 'ftp://www.example.org'
-      exp_err_msg = "id must be an http(s) URI for #{described_class}"
+      exp_err_msg = "id value must be a String containing an http(s) URI for #{described_class}"
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
     it 'raises IllegalValueError for items entry that is not an Annotation' do

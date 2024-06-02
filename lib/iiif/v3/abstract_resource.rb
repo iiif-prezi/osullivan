@@ -26,8 +26,7 @@ module IIIF
 
       def any_type_keys
         # values *may* be multivalued
-        # NOTE: for id: "Resources that do not require URIs [for ids] may be assigned blank node identifiers"
-        %w{ id logo viewing_hint related see_also within }
+        %w{ logo viewing_hint related see_also within }
       end
 
       def string_only_keys
@@ -51,7 +50,7 @@ module IIIF
       end
 
       def uri_only_keys
-        %w{ rights }
+        %w{ id rights }
       end
 
       # Not every subclass is allowed to have viewingDirect, but when it is,
@@ -110,7 +109,7 @@ module IIIF
       def validate
         self.required_keys.each do |k|
           unless self.has_key?(k)
-            m = "A(n) #{k} is required for each #{self.class}"
+            m = "The key #{k} is required for each #{self.class}"
             raise IIIF::V3::Presentation::MissingRequiredKeyError, m
           end
         end
@@ -451,7 +450,9 @@ module IIIF
           end
           # Getter
           define_singleton_method(key) do
-            self[key] ||= []
+            if array_only_keys.include?(key) || any_type_keys.include?(key)
+              self[key] ||= []
+            end
             self[key]
           end
           if key.camelize(:lower) != key
@@ -464,8 +465,8 @@ module IIIF
 
       private
       def validate_uri(val, key)
-        unless val.kind_of?(String) && val =~ /\A#{URI::regexp}\z/
-          m = "#{key} value must be a String containing a URI for #{self.class}"
+        unless val.kind_of?(String) && val =~ /\A#{URI::regexp}\z/ && val =~ /^https?:/
+          m = "#{key} value must be a String containing an http(s) URI for #{self.class}"
           raise IIIF::V3::Presentation::IllegalValueError, m
         end
       end

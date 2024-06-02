@@ -12,10 +12,6 @@ module IIIF
           super + PAGING_PROPERTIES + %w{ nav_date viewing_direction start_canvas content_annotations}
         end
 
-        def uri_only_keys
-          super + %w{ id }
-        end
-
         def validate
           super
 

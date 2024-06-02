@@ -44,13 +44,13 @@ describe IIIF::V3::Presentation::Resource do
     it 'raises an IllegalValueError if id is not URI' do
       subject['id'] = 'foo'
       subject['type'] = 'image/jpeg'
-      exp_err_msg = "id value must be a String containing a URI for #{described_class}"
+      exp_err_msg = "id value must be a String containing an http(s) URI for #{described_class}"
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
     it 'raises an IllegalValueError if id is not http' do
       subject['id'] = 'ftp://www.example.org'
       subject['type'] = 'image/jpeg'
-      exp_err_msg = "id must be an http(s) URI for #{described_class}"
+      exp_err_msg = "id value must be a String containing an http(s) URI for #{described_class}"
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
     end
   end

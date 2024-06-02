@@ -52,13 +52,7 @@ module IIIF
             end
 
             body_resource = self['body']
-            body_id = body_resource['id']
-            if body_id && body_id =~ /^https?:/
-              validate_uri(body_id, 'anno body ImageResource id') # can raise IllegalValueError
-            else
-              m = "when #{self.class} body is a kind of #{img_res_class_str}, ImageResource id must be an http(s) URI"
-              raise IIIF::V3::Presentation::IllegalValueError, m
-            end
+            body_resource.validate
           end
 
           if self.has_key?('time_mode')
