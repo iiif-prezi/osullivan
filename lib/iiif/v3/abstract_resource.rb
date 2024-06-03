@@ -453,7 +453,7 @@ module IIIF
             if array_only_keys.include?(key) || any_type_keys.include?(key)
               self[key] ||= []
             end
-            self[key]
+            self.send('[]', key)
           end
           if key.camelize(:lower) != key
             define_singleton_method(key.camelize(:lower)) do
