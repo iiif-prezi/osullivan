@@ -158,7 +158,7 @@ module IIIF
           self['metadata'].each do |entry|
             md_keys = entry.keys
             unless md_keys.size == 2 && md_keys.include?('label') && md_keys.include?('value')
-              m = "metadata members must be a Hash of keys 'label' and 'value'"
+              m = "metadata members must be a Hash of keys 'label' and 'value', found #{md_keys}"
               raise IIIF::V3::Presentation::IllegalValueError, m
             end
           end

@@ -100,7 +100,7 @@ describe IIIF::V3::AbstractResource do
       end
       it 'raises IllegalValueError for entry that does not contain exactly "label" and "value"' do
         subject['metadata'] = [{ 'label' => 'bar', 'bar' => 'foo' }]
-        exp_err_msg = "metadata members must be a Hash of keys 'label' and 'value'"
+        exp_err_msg = "metadata members must be a Hash of keys 'label' and 'value', found [\"label\", \"bar\"]"
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
     end
