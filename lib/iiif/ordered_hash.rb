@@ -86,7 +86,7 @@ module IIIF
 
     # Covert snake_case keys to camelCase
     def camelize_keys
-      self.keys.each_with_index do |key, i|
+      self.keys.map { |key| key.to_s }.each_with_index do |key, i|
         if key != key.camelize(:lower)
           self.insert(i, key.camelize(:lower), self[key])
           self.delete(key)
@@ -97,7 +97,7 @@ module IIIF
 
     # Covert camelCase keys to snake_case
     def snakeize_keys
-      self.keys.each_with_index do |key, i|
+      self.keys.map { |key| key.to_s }.each_with_index do |key, i|
         if key != key.underscore
           self.insert(i, key.underscore, self[key])
           self.delete(key)
