@@ -1,7 +1,7 @@
 module IIIF
   module V3
     module Presentation
-      class Agent < Resource
+      class Agent < IIIF::V3::Presentation::Resource
 
         TYPE = 'Agent'.freeze
 
