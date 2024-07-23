@@ -13,6 +13,7 @@ require_relative '../ordered_hash'
   manifest
   nav_place
   resource
+  agent
   image_resource
   sequence
   range
