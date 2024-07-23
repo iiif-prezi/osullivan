@@ -8,6 +8,10 @@ module IIIF
           super + %w{ id }
         end
 
+        def array_only_keys
+          super + %w{ language }
+        end
+
         def prohibited_keys
           super + PAGING_PROPERTIES + %w{ nav_date viewing_direction start_canvas content_annotations}
         end
