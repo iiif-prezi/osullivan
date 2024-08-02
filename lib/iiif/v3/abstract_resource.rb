@@ -321,11 +321,18 @@ module IIIF
         export_hash
       end
 
-      def self.from_ordered_hash(hsh, default_klass=IIIF::OrderedHash)
+      def self.from_ordered_hash(hsh, default_klass=IIIF::OrderedHash, collection=false)
         # Create a new object (new_object)
         type = nil
         if hsh.has_key?('type')
-          type = IIIF::V3::AbstractResource.get_descendant_class_by_jld_type(hsh['type'])
+          if collection && hsh['type'] == 'Manifest'
+            type = IIIF::V3::Presentation::Resource
+          else
+            type = IIIF::V3::AbstractResource.get_descendant_class_by_jld_type(hsh['type'])
+          end
+          if type == IIIF::V3::Presentation::Collection
+            collection = true
+          end
         end
         new_object = type.nil? ? default_klass.new : type.new
 
@@ -341,7 +348,7 @@ module IIIF
               if new_key == 'service'
                 new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member, IIIF::V3::Presentation::Service)
               elsif member.kind_of?(Hash)
-                new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member)
+                new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member, collection)
               else
                 new_object[new_key] << member
                 # Again, no nested arrays, right?
