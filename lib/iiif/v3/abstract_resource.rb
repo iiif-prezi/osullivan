@@ -348,7 +348,7 @@ module IIIF
               if new_key == 'service'
                 new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member, IIIF::V3::Presentation::Service)
               elsif member.kind_of?(Hash)
-                new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member, collection: collection)
+                new_object[new_key] << IIIF::V3::AbstractResource.from_ordered_hash(member, IIIF::OrderedHash, collection)
               else
                 new_object[new_key] << member
                 # Again, no nested arrays, right?
