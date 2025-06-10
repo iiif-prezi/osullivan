@@ -49,6 +49,25 @@ describe IIIF::V3::Presentation::Range do
   end
 
   describe '#validate' do
+    let(:bad_val_msg) do
+      "All entries in the (items or canvases) array must be one of #{IIIF::V3::Presentation::Range::VALID_ITEM_TYPES.join(', ')}"
+    end
+    describe 'items' do
+      it 'raises IllegalValueError for items entry that is not valid type' do
+        subject['id'] = 'test_range'
+        subject['label'] = { 'en' => ['Test Range'] }
+        subject['items'] = [IIIF::V3::Presentation::Range.new('id' => 'child_range', 'label' => ['Child Label']),
+                            IIIF::V3::Presentation::AnnotationPage.new]
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, bad_val_msg)
+      end
+    end
+    describe 'canvases' do
+      it 'raises IllegalValueError for canvases entry that is not valid type' do
+        subject['id'] = 'test_range'
+        subject['label'] = { 'en' => ['Test Range'] }
+        subject['canvases'] = [IIIF::V3::Presentation::Canvas.new, IIIF::V3::Presentation::AnnotationPage.new]
+        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, bad_val_msg)
+      end
+    end
   end
-
 end
