@@ -40,7 +40,7 @@ module IIIF
         def validate_list(canvas_array)
           return if canvas_array.all? { |entry| VALID_ITEM_TYPES.include?(entry.class) }
 
-          m = "All entries in the (items or canvases) array must be: #{VALID_ITEM_TYPES.join(', ')}"
+          m = "All entries in the (items or canvases) array must be one of #{VALID_ITEM_TYPES.join(', ')}"
           raise IIIF::V3::Presentation::IllegalValueError, m
         end
       end
