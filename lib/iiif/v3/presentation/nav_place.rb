@@ -6,8 +6,7 @@ module IIIF
       class NavPlace < IIIF::V3::AbstractResource
         Rect = Struct.new(:coord1, :coord2)
 
-        COORD_REGEX = /(?<hemisphere>[NSEW]) (?<degrees>\d+)[°⁰*] ?(?<minutes>\d+)?[ʹ']? ?(?<seconds>\d+)?[ʺ"]?/
-
+        COORD_REGEX = /(?:(?<hemisphere>[NSEW])\s*)?(?<degrees>\d+)[°⁰*](?:\s*(?<minutes>\d+)[\'ʹ′])?(?:\s*(?<seconds>\d+)["ʺ″])?(?:\s*(?<hemisphere>[NSEW]))?/
         def initialize(coordinate_texts:, base_uri:)
           @coordinate_texts = coordinate_texts
           @base_uri = base_uri

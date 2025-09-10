@@ -6,7 +6,9 @@ describe IIIF::V3::Presentation::NavPlace do
     ["W 23°54'00\"--E 53°36'00\"/N 71°19'00\"--N 33°30'00\"",
     'E 103°48ʹ/S 3°46ʹ).',
     'X 103°48ʹ/Y 3°46ʹ).',
-    'In decimal degrees: (E 138.0--W 074.0/N 073.0--N 041.2).']
+    'In decimal degrees: (E 138.0--W 074.0/N 073.0--N 041.2).', # currently invalid therefore doesn't show up in nav_place
+    '23°54′00″W -- 53°36′00″E / 71°19′00″N -- 33°30′00″N'
+    ]
   end
   let(:nav_place) do
     { id: 'https://purl.stanford.edu/feature-collection/1',
@@ -23,7 +25,21 @@ describe IIIF::V3::Presentation::NavPlace do
                 { id: 'https://purl.stanford.edu/iiif/feature/2',
                   type: 'Feature',
                   properties: {},
-                  geometry: { type: 'Point', coordinates: ['103.8', '-3.766666'] } }] }
+                  geometry: { type: 'Point', coordinates: ['103.8', '-3.766666'] } },
+                { id: 'https://purl.stanford.edu/iiif/feature/3',
+                  type: 'Feature',
+                  properties: {},
+                  geometry: { coordinates: ['103.8', '3.766666'], type: "Point" } },
+                { id: 'https://purl.stanford.edu/iiif/feature/4',
+                  type: 'Feature',
+                  properties: {},
+                  geometry: { type: 'Polygon',
+                              coordinates: [[['-23.9', '71.316666'],
+                                              ['53.6', '71.316666'],
+                                              ['53.6', '33.5'],
+                                              ['-23.9', '33.5'],
+                                              ['-23.9', '71.316666']]] } }
+                ] }
   end
 
   describe '#build' do
