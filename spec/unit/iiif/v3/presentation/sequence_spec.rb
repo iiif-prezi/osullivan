@@ -57,8 +57,7 @@ describe IIIF::V3::Presentation::Sequence do
   end
 
   describe '#validate' do
-    let(:req_key_msg) { "The (items or canvases) list must have at least one entry (and it must be a IIIF::V3::Presentation::Canvas)" }
-    let(:bad_val_msg) { "All entries in the (items or canvases) list must be a IIIF::V3::Presentation::Canvas" }
+    let(:req_key_msg) { "The (items or canvases) list must have at least one entry." }
     it 'raises MissingRequiredKeyError if no items or canvases key' do
       expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, req_key_msg)
     end
@@ -67,19 +66,11 @@ describe IIIF::V3::Presentation::Sequence do
         subject['items'] = []
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, req_key_msg)
       end
-      it 'raises IllegalValueError for items entry that is not a Canvas' do
-        subject['items'] = [IIIF::V3::Presentation::Canvas.new, IIIF::V3::Presentation::AnnotationPage.new]
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, bad_val_msg)
-      end
     end
     describe 'canvases' do
       it 'raises MissingRequiredKeyError for canvases as empty Array' do
         subject['items'] = []
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, req_key_msg)
-      end
-      it 'raises IllegalValueError for canvases entry that is not a Canvas' do
-        subject['canvases'] = [IIIF::V3::Presentation::Canvas.new, IIIF::V3::Presentation::AnnotationPage.new]
-        expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, bad_val_msg)
       end
     end
   end
