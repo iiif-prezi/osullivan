@@ -12,7 +12,7 @@ describe IIIF::V3::Presentation::Annotation do
     'id' => content_id,
     'type' => content_type,
     'format' => mimetype,
-    'service' => image_2_api_service
+    'service' => [image_2_api_service]
     )}
 
   describe '#required_keys' do
@@ -183,14 +183,16 @@ describe IIIF::V3::Presentation::Annotation do
         let(:img_mime) { 'image/jpeg' }
         let(:img_h) { 2000 }
         let(:img_w) { 1500 }
-        let(:img_hw_resource) { IIIF::V3::Presentation::ImageResource.new(
-          'id' => content_id,
-          'type' => img_type,
-          'format' => img_mime,
-          'height' => img_h,
-          'width' => img_w,
-          'service' => image_2_api_service
-          )}
+        let(:img_hw_resource)  do
+          IIIF::V3::Presentation::ImageResource.new(
+            'id' => content_id,
+            'type' => img_type,
+            'format' => img_mime,
+            'height' => img_h,
+            'width' => img_w,
+            'service' => [image_2_api_service]
+          )
+        end
         let(:my_anno) {
           anno = described_class.new
           anno['id'] = anno_id
@@ -209,22 +211,23 @@ describe IIIF::V3::Presentation::Annotation do
 
         describe 'and service with height and width and tiles' do
           let(:tiles_val) { [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}] }
-          let(:service) {
+          let(:service) do
             s = image_2_api_service
             s['height'] = 8000
             s['width'] = 6000
             s['tiles'] = tiles_val
-            s
-          }
+            [s]
+          end
           it 'validates' do
             img_hw_resource['service'] = service
             expect{my_anno.validate}.not_to raise_error
           end
           it "body['service'] has expected additional values'" do
-            expect(my_anno['body']['service']).to eq service
-            expect(my_anno['body']['service']['height']).to eq 8000
-            expect(my_anno['body']['service']['width']).to eq 6000
-            expect(my_anno['body']['service']['tiles']).to eq tiles_val
+            annotation_service = my_anno['body']['service'].first
+            expect(annotation_service).to eq service.first
+            expect(annotation_service['height']).to eq 8000
+            expect(annotation_service['width']).to eq 6000
+            expect(annotation_service['tiles']).to eq tiles_val
           end
         end
       end

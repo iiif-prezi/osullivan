@@ -347,7 +347,9 @@ module IIIF
         hsh.keys.each do |key|
           new_key = key.underscore == key ? key : key.underscore
           if new_key == 'service'
-            new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Service)
+            new_object[new_key] = hsh[key].map do |entry|
+              IIIF::V3::AbstractResource.from_ordered_hash(entry, IIIF::V3::Presentation::Service)
+            end
           elsif new_key == 'body'
             new_object[new_key] = IIIF::V3::AbstractResource.from_ordered_hash(hsh[key], IIIF::V3::Presentation::Resource)
           elsif hsh[key].kind_of?(Hash)

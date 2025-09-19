@@ -177,21 +177,21 @@ describe IIIF::V3::Presentation::Sequence do
         'thumbnail' => [{
           'id' => 'http://www.example.org/images/book1-page1/full/80,100/0/default.jpg',
           'type' => 'Image',
-          'service'=> {
+          'service'=> [{
             '@context' => 'http://iiif.io/api/image/2/context.json',
             'id' => 'http://www.example.org/images/book1-page1',
             'profile' => 'http://iiif.io/api/image/2/level1.json'
-          }
+          }]
         }],
         'attribution' => 'Provided by Example Organization',
         'rights' => [{'id' => 'http://www.example.org/license.html'}],
         'logo' => 'http://www.example.org/logos/institution1.jpg',
         'see_also' => 'http://www.example.org/library/catalog/book1.xml',
-        'service' => {
+        'service' => [{
           '@context' => 'http://example.org/ns/jsonld/context.json',
           'id' =>  'http://example.org/service/example',
           'profile' => 'http://example.org/docs/example-service.html'
-        },
+        }],
         'related' => {
           'id' => 'http://www.example.org/videos/video-book1.mpg',
           'format' => 'video/mpeg'
