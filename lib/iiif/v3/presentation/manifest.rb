@@ -63,8 +63,6 @@ module IIIF
           end
         end
 
-        # NOTE: allowing 'items' or 'sequences' as Universal Viewer currently only accepts sequences
-        #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
         def validate_items_list(items_array)
           unless items_array.size >= 1
             m = 'The items list must have at least one entry (and it must be a IIIF::V3::Presentation::Canvas)'
