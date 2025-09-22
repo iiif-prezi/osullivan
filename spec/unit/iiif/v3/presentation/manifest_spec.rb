@@ -176,7 +176,7 @@ describe IIIF::V3::Presentation::Manifest do
       let!(:thumbnail_image) { IIIF::V3::Presentation::ImageResource.new({
         "id" => "https://example.org/image/iiif/abc666_05_0001/full/!400,400/0/default.jpg",
         "format" => "image/jpeg",
-        "service" => thumbnail_image_service
+        "service" => [thumbnail_image_service]
         })}
       let!(:manifest_object) { described_class.new({
         "id" => "https://example.org/abc666/iiif3/manifest",
@@ -189,7 +189,7 @@ describe IIIF::V3::Presentation::Manifest do
         "items" => [canvas_object],
         "logo" => {
           "id" => "https://example.org/logo/full/400,/0/default.jpg",
-          "service" => logo_service
+          "service" => [logo_service]
         },
         "seeAlso" => {
           "id" => "https://example.org/abc666.mods",
@@ -242,7 +242,7 @@ describe IIIF::V3::Presentation::Manifest do
             },
             "logo" => {
               "id" => "https://example.org/logo/full/400,/0/default.jpg",
-              "service" => logo_service
+              "service" => [logo_service]
             },
             "seeAlso" => {
               "id" => "https://example.org/abc666.mods",

@@ -131,7 +131,7 @@ describe IIIF::V3::Presentation::ImageResource do
           'format' => img_mimetype,
           'height' => height,
           'width' => width,
-          'service' => image_v2_service
+          'service' => [image_v2_service]
           })
       }
       describe 'simpler' do
@@ -146,7 +146,7 @@ describe IIIF::V3::Presentation::ImageResource do
           expect(image_object.format).to eq img_mimetype
           expect(image_object.height).to eq height
           expect(image_object.width).to eq width
-          expect(image_object.service).to eq image_v2_service
+          expect(image_object.service.first).to eq image_v2_service
         end
       end
       describe 'height and width in service' do
@@ -156,27 +156,27 @@ describe IIIF::V3::Presentation::ImageResource do
         #   "format": "image/jpeg",
         #   "height":2000,
         #   "width":1500,
-        #   "service": {
+        #   "service": [{
         #       "@context": "http://iiif.io/api/image/2/context.json",
         #       "id": "http://example.org/images/book1-page2",
         #       "profile": "http://iiif.io/api/image/2/level1.json",
         #       "height":8000,
         #       "width":6000,
         #       "tiles": [{"width": 512, "scaleFactors": [1,2,4,8,16]}]
-        #   }
+        #   }]
         # }
         let(:img_obj) {
           img = image_object
-          img.service['height'] = 6666
-          img.service['width'] = 9999
-          img.service['tiles'] = [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
+          img.service.first['height'] = 6666
+          img.service.first['width'] = 9999
+          img.service.first['tiles'] = [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
           img
         }
         it 'validates' do
           expect{img_obj.validate}.not_to raise_error
         end
         it 'has expected service value' do
-          service_obj = img_obj.service
+          service_obj = img_obj.service.first
           expect(service_obj.class).to eq IIIF::V3::Presentation::Service
           expect(service_obj.keys.size).to eq 7
           expect(service_obj['height']).to eq 6666

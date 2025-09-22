@@ -28,11 +28,13 @@
   "description": "A longer description of this example book. It should give some real information.",
   "rights": "http://www.example.org/license.html",
   "attribution": "Provided by Example Organization",
-  "service": {
-    "@context": "http://example.org/ns/jsonld/context.json",
-    "id": "http://example.org/service/example",
-    "profile": "http://example.org/docs/example-service.html"
-  },
+  "service": [
+    {
+      "@context": "http://example.org/ns/jsonld/context.json",
+      "id": "http://example.org/service/example",
+      "profile": "http://example.org/docs/example-service.html"
+    }
+  ],
   "seeAlso": {
     "id": "http://www.example.org/library/catalog/book1.marc",
     "format": "application/marc"
@@ -67,11 +69,13 @@
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
-                    "service": {
-                      "@context": "http://iiif.io/api/image/2/context.json",
-                      "id": "http://www.example.org/images/book1-page1",
-                      "profile": "http://iiif.io/api/image/2/level1.json"
-                    }
+                    "service": [
+                      {
+                        "@context": "http://iiif.io/api/image/2/context.json",
+                        "id": "http://www.example.org/images/book1-page1",
+                        "profile": "http://iiif.io/api/image/2/level1.json"
+                      }
+                    ]
                   }
                 }
               ]
@@ -102,25 +106,27 @@
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
-                    "service": {
-                      "@context": "http://iiif.io/api/image/2/context.json",
-                      "id": "http://www.example.org/images/book1-page2",
-                      "profile": "http://iiif.io/api/image/2/level1.json",
-                      "height": 8000,
-                      "width": 6000,
-                      "tiles": [
-                        {
-                          "width": 512,
-                          "scaleFactors": [
-                            1,
-                            2,
-                            4,
-                            8,
-                            16
-                          ]
-                        }
-                      ]
-                    }
+                    "service": [
+                      {
+                        "@context": "http://iiif.io/api/image/2/context.json",
+                        "id": "http://www.example.org/images/book1-page2",
+                        "profile": "http://iiif.io/api/image/2/level1.json",
+                        "height": 8000,
+                        "width": 6000,
+                        "tiles": [
+                          {
+                            "width": 512,
+                            "scaleFactors": [
+                              1,
+                              2,
+                              4,
+                              8,
+                              16
+                            ]
+                          }
+                        ]
+                      }
+                    ]
                   },
                   "target": "http://www.example.org/iiif/book1/canvas/p2"
                 }
@@ -153,11 +159,13 @@
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
-                    "service": {
-                      "@context": "http://iiif.io/api/image/2/context.json",
-                      "id": "http://www.example.org/images/book1-page3",
-                      "profile": "http://iiif.io/api/image/2/level1.json"
-                    }
+                    "service": [
+                      {
+                        "@context": "http://iiif.io/api/image/2/context.json",
+                        "id": "http://www.example.org/images/book1-page3",
+                        "profile": "http://iiif.io/api/image/2/level1.json"
+                      }
+                    ]
                   }
                 }
               ]

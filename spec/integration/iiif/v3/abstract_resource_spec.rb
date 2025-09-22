@@ -47,12 +47,14 @@ describe IIIF::V3::AbstractResource do
         "id": "http://example.com/manifest",
         "type": "Manifest",
         "label": "My Manifest",
-        "service": {
-          "@context": "http://iiif.io/api/image/2/context.json",
-          "@id":"http://www.example.org/images/book1-page1",
-          "id":"http://www.example.org/images/book1-page1",
-          "profile":"http://iiif.io/api/image/2/profiles/level2.json"
-        },
+        "service": [
+          {
+            "@context": "http://iiif.io/api/image/2/context.json",
+            "@id":"http://www.example.org/images/book1-page1",
+            "id":"http://www.example.org/images/book1-page1",
+            "profile":"http://iiif.io/api/image/2/profiles/level2.json"
+          }
+        ],
         "some_other_thing": {
           "foo" : "bar"
         },
@@ -95,7 +97,7 @@ describe IIIF::V3::AbstractResource do
     it 'turns services into Services' do
       expected_klass = IIIF::V3::Presentation::Service
       parsed = described_class.from_ordered_hash(fixture)
-      expect(parsed['service'].class).to be expected_klass
+      expect(parsed['service'].map(&:class).uniq).to contain_exactly expected_klass
     end
 
     it 'round-trips' do

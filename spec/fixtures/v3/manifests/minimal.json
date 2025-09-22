@@ -32,11 +32,13 @@
                     "format": "image/jpeg",
                     "height": 2000,
                     "width": 1500,
-                    "service": {
-                      "@context": "http://iiif.io/api/image/2/context.json",
-                      "id": "http://www.example.org/images/book1-page1",
-                      "profile": "http://iiif.io/api/image/2/level1.json"
-                    }
+                    "service": [
+                      {
+                        "@context": "http://iiif.io/api/image/2/context.json",
+                        "id": "http://www.example.org/images/book1-page1",
+                        "profile": "http://iiif.io/api/image/2/level1.json"
+                      }
+                    ]
                   }
                 }
               ]
