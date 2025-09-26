@@ -96,7 +96,7 @@ describe IIIF::V3::Presentation::Sequence do
         expect(sequence_object.items.first).to eq canvas_object
       end
     end
-    
+
     describe 'example from Stanford purl' do
       let(:seq_id) { 'https://example.org/abc666#sequence-1' }
       let(:sequence_object) {
@@ -184,7 +184,7 @@ describe IIIF::V3::Presentation::Sequence do
           }]
         }],
         'attribution' => 'Provided by Example Organization',
-        'rights' => [{'id' => 'http://www.example.org/license.html'}],
+        'rights' => 'Sample rights',
         'logo' => 'http://www.example.org/logos/institution1.jpg',
         'see_also' => 'http://www.example.org/library/catalog/book1.xml',
         'service' => [{

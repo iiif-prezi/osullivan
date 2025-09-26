@@ -31,11 +31,11 @@ module IIIF
       end
 
       def string_only_keys
-        %w{ nav_date type format viewing_direction start_canvas }
+        %w{ nav_date type format rights viewing_direction start_canvas }
       end
 
       def array_only_keys
-        %w{ metadata rights thumbnail rendering first last next prev items service }
+        %w{ metadata thumbnail rendering first last next prev items service }
       end
 
       def hash_only_keys
@@ -122,10 +122,9 @@ module IIIF
           end
         end
 
-        self.uri_only_keys.each do |k|
+        uri_only_keys.each do |k|
           if self[k]
-            vals = *self[k]
-            vals.each { |val| validate_uri(val, k) }
+            Array(self[k]).each { |val| validate_uri(val, k) }
           end
         end
 
@@ -187,20 +186,12 @@ module IIIF
             raise IIIF::V3::Presentation::IllegalValueError, m
           end
         end
-        # rights is Array; each entry is a Hash containing 'id' with a URI value
-        if self.has_key?('rights')
-          unless self['rights'].all? { |entry| entry.kind_of?(Hash) }
-            m = 'rights must be an Array with Hash members'
-            raise IIIF::V3::Presentation::IllegalValueError, m
-          end
-          self['rights'].each do |entry|
-            unless entry.keys.include?('id')
-              m = 'rights members must be a Hash including "id"'
-              raise IIIF::V3::Presentation::IllegalValueError, m
-            end
-            validate_uri(entry['id'], 'id') # raises IllegalValueError
-          end
+
+        if key?('rights') && !self['rights'].kind_of?(String)
+          m = 'rights must be a String'
+          raise IIIF::V3::Presentation::IllegalValueError, m
         end
+
         # rendering is Array; each entry is a Hash containing 'label' and 'format' keys
         if self.has_key?('rendering') && self['rendering']
           unless self['rendering'].all? { |entry| entry.kind_of?(Hash) }
