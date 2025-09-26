@@ -1,7 +1,6 @@
 require 'set'
 
 shared_examples 'it has the appropriate methods for any-type keys' do
-
   described_class.new.any_type_keys.each do |prop|
     describe "##{prop}=" do
       it "sets self['#{prop}']" do
@@ -29,5 +28,4 @@ shared_examples 'it has the appropriate methods for any-type keys' do
       end
     end
   end
-
 end

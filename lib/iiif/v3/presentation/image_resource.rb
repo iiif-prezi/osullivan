@@ -4,10 +4,9 @@ module IIIF
   module V3
     module Presentation
       class ImageResource < Resource
-
         TYPE = 'Image'.freeze
 
-        def initialize(hsh={})
+        def initialize(hsh = {})
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           super(hsh)
         end
@@ -54,8 +53,7 @@ module IIIF
           #   "width":1500
           # }
           #
-          def create_image_api_image_resource(params={})
-
+          def create_image_api_image_resource(params = {})
             service_id = params.fetch(:service_id)
             resource_id_default = "#{service_id}#{IMAGE_API_DEFAULT_PARAMS}"
             resource_id = params.fetch(:resource_id, resource_id_default)
@@ -69,7 +67,7 @@ module IIIF
 
             remote_info = get_info(service_id) if !have_whp || copy_info
 
-            resource = self.new
+            resource = new
             resource['id'] = resource_id
             resource.format = format
             resource.width = width.nil? ? remote_info['width'] : width
@@ -80,21 +78,22 @@ module IIIF
               resource_service['id'] ||= resource_service.delete('@id')
             else
               resource_service['id'] = service_id
-              if profile.nil?
-                if remote_info['profile'].kind_of?(Array)
-                  resource_service['profile'] = remote_info['profile'][0]
-                else
-                  resource_service['profile'] = remote_info['profile']
-                end
-              else
-                resource_service['profile'] = profile
-              end
+              resource_service['profile'] = if profile.nil?
+                                              if remote_info['profile'].is_a?(Array)
+                                                remote_info['profile'][0]
+                                              else
+                                                remote_info['profile']
+                                              end
+                                            else
+                                              profile
+                                            end
             end
             resource.service = [resource_service]
-            return resource
+            resource
           end
 
           protected
+
           def get_info(svc_id)
             conn = Faraday.new("#{svc_id}/info.json") do |c|
               c.use Faraday::Response::RaiseError

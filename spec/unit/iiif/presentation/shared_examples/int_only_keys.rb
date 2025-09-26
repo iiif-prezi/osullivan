@@ -1,9 +1,7 @@
 require 'set'
 
 shared_examples 'it has the appropriate methods for integer-only keys' do
-
   described_class.new.int_only_keys.each do |prop|
-
     describe "#{prop}=" do
       before(:all) do
         @ex = 7200
@@ -41,9 +39,5 @@ shared_examples 'it has the appropriate methods for integer-only keys' do
         end
       end
     end
-
   end
-
 end
-
-

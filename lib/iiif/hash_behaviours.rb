@@ -9,10 +9,9 @@ module IIIF
     #  * replace
 
     def_delegators :@data, :[], :[]=, :camelize_keys, :delete, :dig, :empty?,
-    :fetch, :has_key?, :has_value?, :include?, :insert, :insert_after,
-    :insert_before, :key, :key?, :keys, :length, :member?, :shift, :size,
-    :snakeize_keys, :store, :unshift, :value?, :values
-
+                   :fetch, :has_key?, :has_value?, :include?, :insert, :insert_after,
+                   :insert_before, :key, :key?, :keys, :length, :member?, :shift, :size,
+                   :snakeize_keys, :store, :unshift, :value?, :values
 
     ###
     # Methods that take a block and should return an instance (self or a new'
@@ -23,11 +22,11 @@ module IIIF
 
     SIMPLE_SELF_RETURNERS.each do |method_name|
       define_method(method_name) do |*arg, &block|
-        unless block.nil? # block_given? doesn't seem to work in this context
-          @data.send(method_name, *arg, &block)
-          return self
-        else
+        if block.nil?
           @data.send(method_name)
+        else # block_given? doesn't seem to work in this context
+          @data.send(method_name, *arg, &block)
+          self
         end
       end
     end
@@ -35,7 +34,7 @@ module IIIF
     # Clear is the only method that returns self but doesn't accept a block
     def clear
       @data.clear
-      return self
+      self
     end
 
     # Returns a new instance of this class containing the contents of'
@@ -52,20 +51,20 @@ module IIIF
     # If a block is specified the value for each duplicate key is determined'
     # by calling the block with the key, its value in hsh and its value in'
     # another_obj.
-    def merge another_obj
-      new_instance =  self.class.new
+    def merge(another_obj)
+      new_instance = self.class.new
       # self.clone # Would this be better? What happens to other attributes of the class?
       if block_given?
-        self.each do |k,v|
-          if another_obj.has_key? k
-            new_instance[k] = yield(k, self[k], another_obj[k])
-          else
-            new_instance[k] = v
-          end
+        each do |k, v|
+          new_instance[k] = if another_obj.has_key? k
+                              yield(k, self[k], another_obj[k])
+                            else
+                              v
+                            end
         end
       else
-        self.each { |k,v| new_instance[k] = v }
-        another_obj.each { |k,v| new_instance[k] = v }
+        each { |k, v| new_instance[k] = v }
+        another_obj.each { |k, v| new_instance[k] = v }
       end
       new_instance
     end
@@ -83,18 +82,18 @@ module IIIF
     # If a block is specified the value for each duplicate key is determined'
     # by calling the block with the key, its value in hsh and its value in'
     # another_obj.
-    def merge! another_obj
+    def merge!(another_obj)
       if block_given?
-        self.each do |k,v|
-          if another_obj.has_key? k
-            self[k] = yield(k, self[k], another_obj[k])
-          else
-            self[k] = v
-          end
+        each do |k, v|
+          self[k] = if another_obj.has_key? k
+                      yield(k, self[k], another_obj[k])
+                    else
+                      v
+                    end
         end
       else
-        self.each { |k,v| self[k] = v }
-        another_obj.each { |k,v| self[k] = v }
+        each { |k, v| self[k] = v }
+        another_obj.each { |k, v| self[k] = v }
       end
       self
     end
@@ -103,18 +102,16 @@ module IIIF
     # Deletes entries for which the supplied block evaluates to true.
     # Equivalent to #delete_if, but returns nil if there were no changes
     def reject!
-      if block_given?
-        return_nil = true
-        @data.each do |k, v|
-          if yield(k, v)
-            @data.delete(k)
-            return_nil = false
-          end
+      return data.reject! unless block_given?
+
+      return_nil = true
+      @data.each do |k, v|
+        if yield(k, v)
+          @data.delete(k)
+          return_nil = false
         end
-        return return_nil ? nil : self
-      else
-        return self.data.reject!
       end
+      return_nil ? nil : self
     end
 
     # Returns a new instance consisting of entries for which the block returns
@@ -123,9 +120,9 @@ module IIIF
     def select
       new_instance = self.class.new
       if block_given?
-        @data.each { |k,v| new_instance.data[k] = v if yield(k,v) }
+        @data.each { |k, v| new_instance.data[k] = v if yield(k, v) }
       end
-      return new_instance
+      new_instance
     end
 
     # Deletes entries for which the supplied block evaluates to false.
@@ -133,8 +130,8 @@ module IIIF
     def select!
       if block_given?
         return_nil = true
-        @data.each do |k,v|
-          unless yield(k,v)
+        @data.each do |k, v|
+          unless yield(k, v)
             @data.delete(k)
             return_nil = false
           end
@@ -143,8 +140,5 @@ module IIIF
       end
       self
     end
-
   end
-
 end
-

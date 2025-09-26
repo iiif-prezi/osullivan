@@ -2,36 +2,35 @@ module IIIF
   module V3
     module Presentation
       class Manifest < IIIF::V3::AbstractResource
-
         TYPE = 'Manifest'.freeze
 
         def required_keys
           # NOTE:  relaxing requirement for items as Universal Viewer currently only accepts sequences
           #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
           # super + %w{ id label items }
-          super + %w{ id label }
+          super + %w[id label]
         end
 
         def prohibited_keys
-          super + CONTENT_RESOURCE_PROPERTIES + PAGING_PROPERTIES + %w{ start_canvas content_annotation }
+          super + CONTENT_RESOURCE_PROPERTIES + PAGING_PROPERTIES + %w[start_canvas content_annotation]
         end
 
         def uri_only_keys
-          super + %w{ id }
+          super + %w[id]
         end
 
         def array_only_keys
           # NOTE: allowing 'items' or 'sequences' as Universal Viewer currently only accepts sequences
           #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
           # super + %w{ items structures }
-          super + %w{ items structures sequences }
+          super + %w[items structures sequences]
         end
 
         def legal_viewing_hint_values
-          %w{ individuals paged continuous auto-advance }
+          %w[individuals paged continuous auto-advance]
         end
 
-        def initialize(hsh={})
+        def initialize(hsh = {})
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           super(hsh)
         end
@@ -55,12 +54,11 @@ module IIIF
 
           # TODO: AnnotationLists must not be embedded within the manifest
 
-          if self['structures']
-            unless self['structures'].all? { |entry| entry.instance_of?(IIIF::V3::Presentation::Range)}
-              m = 'All entries in the structures list must be a IIIF::V3::Presentation::Range'
-              raise IIIF::V3::Presentation::IllegalValueError, m
-            end
-          end
+          return unless self['structures']
+          return if self['structures'].all? { |entry| entry.instance_of?(IIIF::V3::Presentation::Range) }
+
+          m = 'All entries in the structures list must be a IIIF::V3::Presentation::Range'
+          raise IIIF::V3::Presentation::IllegalValueError, m
         end
 
         def validate_items_list(items_array)
@@ -69,10 +67,10 @@ module IIIF
             raise IIIF::V3::Presentation::MissingRequiredKeyError, m
           end
 
-          unless items_array.all? { |entry| entry.instance_of?(IIIF::V3::Presentation::Canvas) }
-            m = 'All entries in the items list must be a IIIF::V3::Presentation::Canvas'
-            raise IIIF::V3::Presentation::IllegalValueError, m
-          end
+          return if items_array.all? { |entry| entry.instance_of?(IIIF::V3::Presentation::Canvas) }
+
+          m = 'All entries in the items list must be a IIIF::V3::Presentation::Canvas'
+          raise IIIF::V3::Presentation::IllegalValueError, m
         end
       end
     end

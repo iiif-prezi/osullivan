@@ -2,7 +2,6 @@ require 'active_support/inflector'
 require 'json'
 
 describe IIIF::V3::AbstractResource do
-
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'v3/manifests/complete_from_spec.json') }
 
@@ -39,7 +38,8 @@ describe IIIF::V3::AbstractResource do
   end
 
   describe 'self#from_ordered_hash' do
-    let(:fixture) { JSON.parse('{
+    let(:fixture) do
+      JSON.parse('{
         "@context": [
           "http://iiif.io/api/presentation/3/context.json",
           "http://www.w3.org/ns/anno.jsonld"
@@ -79,7 +79,7 @@ describe IIIF::V3::AbstractResource do
           }
         ]
       }')
-    }
+    end
     it 'doesn\'t raise a NoMethodError when we check the keys' do
       expect { described_class.from_ordered_hash(fixture) }.to_not raise_error
     end
@@ -103,7 +103,7 @@ describe IIIF::V3::AbstractResource do
     it 'round-trips' do
       fp = '/tmp/osullivan-spec.json'
       parsed = described_class.from_ordered_hash(fixture)
-      File.open(fp,'w') do |f|
+      File.open(fp, 'w') do |f|
         f.write(parsed.to_json)
       end
       from_file = IIIF::V3::Presentation::Service.parse('/tmp/osullivan-spec.json')
@@ -144,35 +144,37 @@ describe IIIF::V3::AbstractResource do
     let(:instantiated_class) { IIIF::V3::Presentation::Service.new }
 
     describe 'it puts the json-ld keys at the top' do
-      let(:extra_props) { [
-        ['label','foo'],
-        ['logo','http://example.com/logo.jpg'],
-        ['within','http://example.com/something']
-      ] }
-      let(:sorted_ld_keys) {
+      let(:extra_props) do
+        [
+          ['label', 'foo'],
+          ['logo', 'http://example.com/logo.jpg'],
+          ['within', 'http://example.com/something']
+        ]
+      end
+      let(:sorted_ld_keys) do
         instantiated_class.keys.select { |k| k.start_with?('@') }.sort!
-      }
-      before(:each) {
-        extra_props.reverse.each do |k,v|
-          instantiated_class.unshift(k,v)
+      end
+      before(:each) do
+        extra_props.reverse.each do |k, v|
+          instantiated_class.unshift(k, v)
         end
-      }
+      end
 
       it 'by default' do
-        (0..extra_props.length-1).each do |i|
+        (0..extra_props.length - 1).each do |i|
           expect(instantiated_class.keys[i]).to eq(extra_props[i][0])
         end
         oh = instantiated_class.to_ordered_hash
-        (0..sorted_ld_keys.length-1).each do |i|
+        (0..sorted_ld_keys.length - 1).each do |i|
           expect(oh.keys[i]).to eq(sorted_ld_keys[i])
         end
       end
       it 'unless you say not to' do
-        (0..extra_props.length-1).each do |i|
+        (0..extra_props.length - 1).each do |i|
           expect(instantiated_class.keys[i]).to eq(extra_props[i][0])
         end
         oh = instantiated_class.to_ordered_hash(sort_json_ld_keys: false)
-        (0..extra_props.length-1).each do |i|
+        (0..extra_props.length - 1).each do |i|
           expect(oh.keys[i]).to eq(extra_props[i][0])
         end
       end
@@ -200,5 +202,4 @@ describe IIIF::V3::AbstractResource do
       expect(ordered_hash.keys.include?('seeAlso')).to be_truthy
     end
   end
-
 end

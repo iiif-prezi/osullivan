@@ -1,5 +1,4 @@
 describe IIIF::V3::Presentation::Collection do
-
   let(:fixed_values) do
     {
       "@context" => [
@@ -15,18 +14,15 @@ describe IIIF::V3::Presentation::Collection do
       'collections' => [
         { 'id' => 'http://example.org/iiif/collection/part1',
           'type' => 'Collection',
-          'label' => 'Sub Collection 1'
-         },
-         { 'id' => 'http://example.org/iiif/collection/part2',
-           'type' => 'Collection',
-           'label' => 'Sub Collection 2'
-          }
+          'label' => 'Sub Collection 1' },
+        { 'id' => 'http://example.org/iiif/collection/part2',
+          'type' => 'Collection',
+          'label' => 'Sub Collection 2' }
       ],
       'manifests' => [
         { 'id' => 'http://example.org/iiif/book1/manifest',
           'type' => 'Manifest',
-          'label' => 'Book 1'
-        }
+          'label' => 'Book 1' }
       ]
     }
   end
@@ -51,5 +47,4 @@ describe IIIF::V3::Presentation::Collection do
 
   describe '#validate' do
   end
-
 end

@@ -3,28 +3,27 @@ require 'json'
 require_relative '../../../../lib/iiif/hash_behaviours'
 
 describe IIIF::V3::AbstractResource do
-
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'v3/manifests/complete_from_spec.json') }
   let(:abstract_resource_subclass) do
     Class.new(IIIF::V3::AbstractResource) do
       include IIIF::HashBehaviours
 
-      def initialize(hsh={})
+      def initialize(hsh = {})
         hsh['type'] = 'a:SubClass' unless hsh.has_key?('type')
         super(hsh)
       end
 
       def required_keys
-        super + %w{ id }
+        super + %w[id]
       end
 
       def prohibited_keys
-        super + %w{ verboten }
+        super + %w[verboten]
       end
 
       def legal_viewing_hint_values
-        %w{ viewing_hint1 viewing_hint2 }
+        %w[viewing_hint1 viewing_hint2]
       end
     end
   end
@@ -36,7 +35,7 @@ describe IIIF::V3::AbstractResource do
 
   describe '#required_keys' do
     it 'accumulate' do
-      expect(subject.required_keys).to eq %w{ type id }
+      expect(subject.required_keys).to eq %w[type id]
     end
   end
 
@@ -105,8 +104,8 @@ describe IIIF::V3::AbstractResource do
       end
     end
     describe 'thumbnail' do
-      let (:exp_basic_err_msg) { "thumbnail must be an Array with Hash or ImageResource members" }
-      let (:exp_keys_msg) { 'thumbnail members must include keys "id" and "type"' }
+      let(:exp_basic_err_msg) { "thumbnail must be an Array with Hash or ImageResource members" }
+      let(:exp_keys_msg) { 'thumbnail members must include keys "id" and "type"' }
       it 'raises IllegalValueError for entry that is not a Hash or ImageResource object' do
         subject['thumbnail'] = ['error']
         expect { subject.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_basic_err_msg)
@@ -202,13 +201,15 @@ describe IIIF::V3::AbstractResource do
       subject.metadata << {
         'label' => 'Published',
         'value' => [
-          {'@value'=> 'Paris, circa 1400', '@language'=>'en'},
-          {'@value'=> 'Paris, environ 14eme siecle', '@language'=>'fr'}
+          { '@value' => 'Paris, circa 1400', '@language' => 'en' },
+          { '@value' => 'Paris, environ 14eme siecle', '@language' => 'fr' }
         ]
       }
       expect(subject.metadata[0]['label']).to eq('Author')
       expect(subject.metadata[1]['value'].length).to eq(2)
-      expect(subject.metadata[1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
+      expect(subject.metadata[1]['value'].select do |e|
+        e['@language'] == 'fr'
+      end.last['@value']).to eq('Paris, environ 14eme siecle')
     end
 
     it 'roundtrips' do
@@ -219,17 +220,19 @@ describe IIIF::V3::AbstractResource do
       subject.metadata << {
         'label' => 'Published',
         'value' => [
-          {'@value'=> 'Paris, circa 1400', '@language'=>'en'},
-          {'@value'=> 'Paris, environ 14eme siecle', '@language'=>'fr'}
+          { '@value' => 'Paris, circa 1400', '@language' => 'en' },
+          { '@value' => 'Paris, environ 14eme siecle', '@language' => 'fr' }
         ]
       }
-      File.open('/tmp/osullivan-spec.json','w') do |f|
+      File.open('/tmp/osullivan-spec.json', 'w') do |f|
         f.write(subject.to_json)
       end
       parsed = subject.class.parse('/tmp/osullivan-spec.json')
       expect(parsed['metadata'][0]['label']).to eq('Author')
       expect(parsed['metadata'][1]['value'].length).to eq(2)
-      expect(parsed['metadata'][1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
+      expect(parsed['metadata'][1]['value'].select do |e|
+        e['@language'] == 'fr'
+      end.last['@value']).to eq('Paris, environ 14eme siecle')
       File.delete('/tmp/osullivan-spec.json')
     end
   end
@@ -289,5 +292,4 @@ describe IIIF::V3::AbstractResource do
       end
     end
   end
-
 end

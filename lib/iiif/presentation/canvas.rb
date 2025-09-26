@@ -3,37 +3,36 @@ require File.join(File.dirname(__FILE__), 'abstract_resource')
 module IIIF
   module Presentation
     class Canvas < AbstractResource
-
-      # TODO (?) a simple 'Image Canvas' constructor.
+      # TODO: (?) a simple 'Image Canvas' constructor.
 
       TYPE = 'sc:Canvas'
 
       def required_keys
-        super + %w{ @id width height label }
+        super + %w[@id width height label]
       end
 
       def any_type_keys
-        super + %w{  }
+        super + %w[]
       end
 
       def array_only_keys
-        super + %w{ images other_content }
+        super + %w[images other_content]
       end
 
       # TODO: test and validate
       def int_only_keys
-        super + %w{ width height }
+        super + %w[width height]
       end
 
       def numeric_only_keys
-        super + %w{ duration }
+        super + %w[duration]
       end
 
       def legal_viewing_hint_values
-        super + %w{ non-paged }
+        super + %w[non-paged]
       end
 
-      def initialize(hsh={})
+      def initialize(hsh = {})
         hsh['@type'] = TYPE unless hsh.has_key? '@type'
         super(hsh)
       end
@@ -43,7 +42,6 @@ module IIIF
         # all members of otherContent must be an annotation list
         super
       end
-
     end
   end
 end

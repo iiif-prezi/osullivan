@@ -1,5 +1,4 @@
 describe IIIF::Service do
-
   describe 'self#get_descendant_class_by_jld_type' do
     before do
       class DummyClass < IIIF::Service
@@ -24,5 +23,4 @@ describe IIIF::Service do
       end
     end
   end
-
 end

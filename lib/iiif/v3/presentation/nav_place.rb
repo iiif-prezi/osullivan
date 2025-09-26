@@ -6,7 +6,7 @@ module IIIF
       class NavPlace < IIIF::V3::AbstractResource
         Rect = Struct.new(:coord1, :coord2)
 
-        COORD_REGEX = /(?:(?<hemisphere>[NSEW])\s*)?(?<degrees>\d+)[°⁰*](?:\s*(?<minutes>\d+)[\'ʹ′])?(?:\s*(?<seconds>\d+)["ʺ″])?(?:\s*(?<hemisphere>[NSEW]))?/
+        COORD_REGEX = /(?:(?<hemisphere>[NSEW])\s*)?(?<degrees>\d+)[°⁰*](?:\s*(?<minutes>\d+)['ʹ′])?(?:\s*(?<seconds>\d+)["ʺ″])?(?:\s*(?<hemisphere>[NSEW]))?/
         def initialize(coordinate_texts:, base_uri:)
           @coordinate_texts = coordinate_texts
           @base_uri = base_uri
@@ -49,7 +49,7 @@ module IIIF
           return unless long_matcher && lat_matcher
 
           Geo::Coord.new(latd: lat_matcher[:degrees], latm: lat_matcher[:minutes], lats: lat_matcher[:seconds], lath: lat_matcher[:hemisphere],
-                        lngd: long_matcher[:degrees], lngm: long_matcher[:minutes], lngs: long_matcher[:seconds], lngh: long_matcher[:hemisphere])
+                         lngd: long_matcher[:degrees], lngm: long_matcher[:minutes], lngs: long_matcher[:seconds], lngh: long_matcher[:hemisphere])
         end
 
         def rect_for(coordinate_parts)

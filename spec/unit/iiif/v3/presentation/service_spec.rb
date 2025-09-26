@@ -1,5 +1,4 @@
 describe IIIF::V3::Presentation::Service do
-
   describe '#required_keys' do
     it '"type" is not required' do
       expect(subject.required_keys).not_to include('type')
@@ -9,13 +8,13 @@ describe IIIF::V3::Presentation::Service do
   describe '#prohibited_keys' do
     it 'contains the expected key names' do
       keys = described_class::CONTENT_RESOURCE_PROPERTIES +
-        described_class::PAGING_PROPERTIES +
-        %w{
-          nav_date
-          viewing_direction
-          start_canvas
-          content_annotations
-        }
+             described_class::PAGING_PROPERTIES +
+             %w[
+               nav_date
+               viewing_direction
+               start_canvas
+               content_annotations
+             ]
       expect(subject.prohibited_keys).to include(*keys)
     end
   end
@@ -46,16 +45,16 @@ describe IIIF::V3::Presentation::Service do
       inner_service_id = 'http://example.org/whatever'
       inner_service_profile = 'http://iiif.io/api/auth/1/token'
       inner_service_val = described_class.new({
-        'id' => inner_service_id,
-        'profile' => inner_service_profile
-        })
+                                                'id' => inner_service_id,
+                                                'profile' => inner_service_profile
+                                              })
       service_obj = described_class.new({
-        'type' => described_class::IIIF_IMAGE_V2_TYPE,
-        'id' => id_uri,
-        'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE,
-        'label' => label_val,
-        'service' => [inner_service_val]
-      })
+                                          'type' => described_class::IIIF_IMAGE_V2_TYPE,
+                                          'id' => id_uri,
+                                          'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE,
+                                          'label' => label_val,
+                                          'service' => [inner_service_val]
+                                        })
       expect(service_obj.keys.size).to eq 5
       expect(service_obj['id']).to eq id_uri
       expect(service_obj['type']).to eq described_class::IIIF_IMAGE_V2_TYPE
@@ -67,26 +66,26 @@ describe IIIF::V3::Presentation::Service do
     it 'allows both "id" and "@id" as keys' do
       id_uri = "https://stacks.stanford.edu/image/iiif/wy534zh7137%2FSULAIR_rosette"
       service_obj = described_class.new({
-        'id' => id_uri,
-        '@id' => id_uri
-      })
+                                          'id' => id_uri,
+                                          '@id' => id_uri
+                                        })
       expect(service_obj.keys.size).to eq 2
       expect(service_obj['id']).to eq id_uri
       expect(service_obj['@id']).to eq id_uri
     end
     it 'allows non-URI profile value' do
-      expect{
+      expect do
         described_class.new({
-          "profile" => [
-            "http://iiif.io/api/image/2/level2.json",
-            {
-              "formats" => [ "gif", "pdf" ],
-              "qualities" => [ "color", "gray" ],
-              "supports" => [ "canonicalLinkHeader", "rotationArbitrary", "http://example.com/feature" ]
-            }
-          ]
-        })
-      }.not_to raise_error
+                              "profile" => [
+                                "http://iiif.io/api/image/2/level2.json",
+                                {
+                                  "formats" => %w[gif pdf],
+                                  "qualities" => %w[color gray],
+                                  "supports" => ["canonicalLinkHeader", "rotationArbitrary", "http://example.com/feature"]
+                                }
+                              ]
+                            })
+      end.not_to raise_error
     end
   end
 
@@ -94,30 +93,30 @@ describe IIIF::V3::Presentation::Service do
     describe 'type = IIIF_IMAGE_API_V2_TYPE' do
       it 'must have a "@id" or "id"' do
         service_obj = described_class.new({
-          'type' => described_class::IIIF_IMAGE_V2_TYPE,
-          'nope' => id_uri,
-          'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
-          })
+                                            'type' => described_class::IIIF_IMAGE_V2_TYPE,
+                                            'nope' => id_uri,
+                                            'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+                                          })
         exp_err_msg = 'id or @id values are required for IIIF::V3::Presentation::Service with type or @type ImageService2'
-        expect{service_obj.validate}.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, exp_err_msg)
+        expect { service_obj.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, exp_err_msg)
       end
       it 'should have a profile' do
         service_obj = described_class.new({
-          '@type' => described_class::IIIF_IMAGE_V2_TYPE,
-          '@id' => id_uri
-          })
+                                            '@type' => described_class::IIIF_IMAGE_V2_TYPE,
+                                            '@id' => id_uri
+                                          })
         exp_err_msg = 'profile should be present for IIIF::V3::Presentation::Service with type or @type ImageService2'
-        expect{service_obj.validate}.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, exp_err_msg)
+        expect { service_obj.validate }.to raise_error(IIIF::V3::Presentation::MissingRequiredKeyError, exp_err_msg)
       end
       it 'should have matching values for "@id" and "id" if both are specified' do
         service_obj = described_class.new({
-          '@type' => described_class::IIIF_IMAGE_V2_TYPE,
-          '@id' => id_uri,
-          'id' => "#{id_uri}/foo",
-          'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
-          })
+                                            '@type' => described_class::IIIF_IMAGE_V2_TYPE,
+                                            '@id' => id_uri,
+                                            'id' => "#{id_uri}/foo",
+                                            'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+                                          })
         exp_err_msg = 'id and @id values must match for IIIF::V3::Presentation::Service with type or @type ImageService2'
-        expect{service_obj.validate}.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
+        expect { service_obj.validate }.to raise_error(IIIF::V3::Presentation::IllegalValueError, exp_err_msg)
       end
     end
   end
@@ -126,12 +125,12 @@ describe IIIF::V3::Presentation::Service do
     describe 'from Stanford purl manifests' do
       it 'iiif image v2 service' do
         service_obj = described_class.new({
-          'type' => described_class::IIIF_IMAGE_V2_TYPE,
-          'id' => id_uri,
-          '@id' => id_uri,
-          'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
-        })
-        expect{service_obj.validate}.not_to raise_error
+                                            'type' => described_class::IIIF_IMAGE_V2_TYPE,
+                                            'id' => id_uri,
+                                            '@id' => id_uri,
+                                            'profile' => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
+                                          })
+        expect { service_obj.validate }.not_to raise_error
         expect(service_obj.keys.size).to eq 4
         expect(service_obj.keys).to include('type', '@id', 'id', 'profile')
         expect(service_obj['type']).to eq described_class::IIIF_IMAGE_V2_TYPE
@@ -141,10 +140,10 @@ describe IIIF::V3::Presentation::Service do
       end
       it 'login service' do
         token_service = described_class.new({
-          'id' => 'https://example.org/image/iiif/token',
-          'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
-        })
-        expect{token_service.validate}.not_to raise_error
+                                              'id' => 'https://example.org/image/iiif/token',
+                                              'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+                                            })
+        expect { token_service.validate }.not_to raise_error
         expect(token_service.class).to eq described_class
         expect(token_service.keys.size).to eq 2
         expect(token_service.keys).to include('id', 'profile')
@@ -156,7 +155,7 @@ describe IIIF::V3::Presentation::Service do
           'label' => 'label value',
           'service' => [token_service]
         )
-        expect{service_obj.validate}.not_to raise_error
+        expect { service_obj.validate }.not_to raise_error
         expect(service_obj.keys.size).to eq 4
         expect(service_obj.keys).to include('id', 'profile', 'label', 'service')
         expect(service_obj['id']).to eq 'https://example.org/auth/iiif'
@@ -164,7 +163,7 @@ describe IIIF::V3::Presentation::Service do
         expect(service_obj['label']).to eq 'label value'
         inner_service = service_obj['service'][0]
         expect(inner_service.class).to eq described_class
-        expect{inner_service.validate}.not_to raise_error
+        expect { inner_service.validate }.not_to raise_error
         expect(inner_service.keys.size).to eq 2
         expect(inner_service.keys).to include('id', 'profile')
         expect(inner_service['id']).to eq 'https://example.org/image/iiif/token'
@@ -172,38 +171,38 @@ describe IIIF::V3::Presentation::Service do
       end
       it 'triply nested service' do
         inner = described_class.new({
-          'id' => 'https://example.org/image/iiif/token',
-          'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
-          })
-        expect{inner.validate}.not_to raise_error
+                                      'id' => 'https://example.org/image/iiif/token',
+                                      'profile' => described_class::IIIF_AUTHENTICATION_V1_TOKEN_PROFILE
+                                    })
+        expect { inner.validate }.not_to raise_error
         middle = described_class.new({
-          "id" => "https://example.org/auth/iiif",
-          "profile" => described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE,
-          "label" => "Stanford-affiliated? Login to view",
-          "service" => [inner]
-          })
-        expect{middle.validate}.not_to raise_error
+                                       "id" => "https://example.org/auth/iiif",
+                                       "profile" => described_class::IIIF_AUTHENTICATION_V1_LOGIN_PROFILE,
+                                       "label" => "Stanford-affiliated? Login to view",
+                                       "service" => [inner]
+                                     })
+        expect { middle.validate }.not_to raise_error
         outer = described_class.new({
-            "@type" => described_class::IIIF_IMAGE_V2_TYPE,
-            "@id" => "https://example.org/iiif/yy816tv6021_img_1",
-            "id" => "https://example.org/iiif/yy816tv6021_img_1",
-            "profile" => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE,
-            "service" => [middle]
-          })
-        expect{outer.validate}.not_to raise_error
+                                      "@type" => described_class::IIIF_IMAGE_V2_TYPE,
+                                      "@id" => "https://example.org/iiif/yy816tv6021_img_1",
+                                      "id" => "https://example.org/iiif/yy816tv6021_img_1",
+                                      "profile" => described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE,
+                                      "service" => [middle]
+                                    })
+        expect { outer.validate }.not_to raise_error
       end
     end
     describe 'example from http://prezi3.iiif.io/api/presentation/3.0' do
       it 'iiif image v2' do
         service_obj = described_class.new({
-          "type" => described_class::IIIF_IMAGE_V2_TYPE,
-          "id" => "http://example.org/images/book1-page2",
-          "@id" => "http://example.org/images/book1-page2",
-          "profile" => "http://iiif.io/api/image/2/level1.json",
-          "height" => 8000,
-          "width" => 6000,
-          "tiles" => [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
-        })
+                                            "type" => described_class::IIIF_IMAGE_V2_TYPE,
+                                            "id" => "http://example.org/images/book1-page2",
+                                            "@id" => "http://example.org/images/book1-page2",
+                                            "profile" => "http://iiif.io/api/image/2/level1.json",
+                                            "height" => 8000,
+                                            "width" => 6000,
+                                            "tiles" => [{ "width" => 512, "scaleFactors" => [1, 2, 4, 8, 16] }]
+                                          })
         expect(service_obj.keys.size).to eq 7
         expect(service_obj['type']).to eq described_class::IIIF_IMAGE_V2_TYPE
         expect(service_obj['id']).to eq 'http://example.org/images/book1-page2'
@@ -211,7 +210,7 @@ describe IIIF::V3::Presentation::Service do
         expect(service_obj['profile']).to eq described_class::IIIF_IMAGE_V2_LEVEL1_PROFILE
         expect(service_obj['height']).to eq 8000
         expect(service_obj['width']).to eq 6000
-        expect(service_obj['tiles']).to eq [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
+        expect(service_obj['tiles']).to eq [{ "width" => 512, "scaleFactors" => [1, 2, 4, 8, 16] }]
         # TODO:  note that this won't validate because "height is a prohibited key in IIIF::V3::Presentation::Service"
         # expect{service_obj.validate}.not_to raise_error
       end
