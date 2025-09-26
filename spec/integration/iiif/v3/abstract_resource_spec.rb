@@ -46,6 +46,7 @@ describe IIIF::V3::AbstractResource do
         ],
         "id": "http://example.com/manifest",
         "type": "Manifest",
+        "rights": "http://creativecommons.org/licenses/by/4.0/",
         "label": "My Manifest",
         "service": [
           {
