@@ -1,5 +1,5 @@
 require File.join(File.dirname(__FILE__), 'service')
-%w{
+%w[
   abstract_resource
   annotation
   annotation_list
@@ -8,11 +8,11 @@ require File.join(File.dirname(__FILE__), 'service')
   layer
   manifest
   resource
-  image_resource 
+  image_resource
   sequence
   service
   range
-}.each do |f|
+].each do |f|
   require File.join(File.dirname(__FILE__), 'presentation', f)
 end
 

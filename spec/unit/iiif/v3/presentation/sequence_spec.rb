@@ -1,10 +1,9 @@
 describe IIIF::V3::Presentation::Sequence do
-
   describe '#required_keys' do
     # NOTE:  relaxing requirement for items as Universal Viewer currently only accepts canvases
     #  see https://github.com/sul-dlss/osullivan/issues/27, sul-dlss/purl/issues/167
     # %w{ type items }.each do |k|
-    %w{ type }.each do |k|
+    %w[type].each do |k|
       it k do
         expect(subject.required_keys).to include(k)
       end
@@ -14,11 +13,11 @@ describe IIIF::V3::Presentation::Sequence do
   describe '#prohibited_keys' do
     it 'contains the expected key names' do
       keys = described_class::CONTENT_RESOURCE_PROPERTIES +
-        described_class::PAGING_PROPERTIES +
-        %w{
-          nav_date
-          content_annotations
-        }
+             described_class::PAGING_PROPERTIES +
+             %w[
+               nav_date
+               content_annotations
+             ]
       expect(subject.prohibited_keys).to include(*keys)
     end
   end
@@ -46,7 +45,7 @@ describe IIIF::V3::Presentation::Sequence do
     end
     it 'allows subclasses to override type' do
       subclass = Class.new(described_class) do
-        def initialize(hsh={})
+        def initialize(hsh = {})
           hsh = { 'type' => 'a:SubClass' }
           super(hsh)
         end
@@ -76,19 +75,23 @@ describe IIIF::V3::Presentation::Sequence do
   end
 
   describe 'realistic examples' do
-    let!(:canvas_object) { IIIF::V3::Presentation::Canvas.new({
-      "id" => "https://example.org/abc666/iiif3/canvas/0001",
-      "label" => "p. 1",
-      "height" => 7579,
-      "width" => 10108,
-      "content" => []
-      })}
+    let!(:canvas_object) do
+      IIIF::V3::Presentation::Canvas.new({
+                                           "id" => "https://example.org/abc666/iiif3/canvas/0001",
+                                           "label" => "p. 1",
+                                           "height" => 7579,
+                                           "width" => 10_108,
+                                           "content" => []
+                                         })
+    end
     describe 'minimal sequence' do
-      let!(:sequence_object) { described_class.new({
-        "items" => [canvas_object]
-      })}
+      let!(:sequence_object) do
+        described_class.new({
+                              "items" => [canvas_object]
+                            })
+      end
       it 'validates' do
-        expect{sequence_object.validate}.not_to raise_error
+        expect { sequence_object.validate }.not_to raise_error
       end
       it 'has expected required values' do
         expect(sequence_object.type).to eq 'Sequence'
@@ -96,19 +99,19 @@ describe IIIF::V3::Presentation::Sequence do
         expect(sequence_object.items.first).to eq canvas_object
       end
     end
-    
+
     describe 'example from Stanford purl' do
       let(:seq_id) { 'https://example.org/abc666#sequence-1' }
-      let(:sequence_object) {
+      let(:sequence_object) do
         s = described_class.new({
-        "id" => seq_id,
-        "label" => "Current order"
-        })
+                                  "id" => seq_id,
+                                  "label" => "Current order"
+                                })
         s.canvases << canvas_object
         s
-      }
+      end
       it 'validates' do
-        expect{sequence_object.validate}.not_to raise_error
+        expect { sequence_object.validate }.not_to raise_error
       end
       it 'has expected required values' do
         expect(sequence_object.type).to eq 'Sequence'
@@ -120,12 +123,12 @@ describe IIIF::V3::Presentation::Sequence do
         expect(sequence_object.label).to eq "Current order"
       end
       describe 'with viewingDirection' do
-        let(:sequence_vd) {
+        let(:sequence_vd) do
           sequence_object.viewingDirection = 'left-to-right'
           sequence_object
-        }
+        end
         it 'validates' do
-          expect{sequence_vd.validate}.not_to raise_error
+          expect { sequence_vd.validate }.not_to raise_error
         end
         it 'has expected required values' do
           expect(sequence_vd.type).to eq 'Sequence'
@@ -142,16 +145,18 @@ describe IIIF::V3::Presentation::Sequence do
     end
 
     describe 'example from http://prezi3.iiif.io/api/presentation/3.0' do
-      let!(:sequence_object) { described_class.new({
-        "id" => "http://example.org/iiif/book1/sequence/normal",
-        "label" => {"en" => "Current Page Order"},
-        "viewingDirection" => "left-to-right",
-        "viewingHint" => ["paged"],
-        "startCanvas" => canvas_object.id,
-        "items" => [canvas_object]
-      })}
+      let!(:sequence_object) do
+        described_class.new({
+                              "id" => "http://example.org/iiif/book1/sequence/normal",
+                              "label" => { "en" => "Current Page Order" },
+                              "viewingDirection" => "left-to-right",
+                              "viewingHint" => ["paged"],
+                              "startCanvas" => canvas_object.id,
+                              "items" => [canvas_object]
+                            })
+      end
       it 'validates' do
-        expect{sequence_object.validate}.not_to raise_error
+        expect { sequence_object.validate }.not_to raise_error
       end
       it 'has expected required values' do
         expect(sequence_object.type).to eq 'Sequence'
@@ -165,48 +170,50 @@ describe IIIF::V3::Presentation::Sequence do
       end
       it 'has expected additional content' do
         expect(sequence_object.viewingHint).to eq ["paged"]
-        expect(sequence_object.label).to eq ({"en" => "Current Page Order"})
+        expect(sequence_object.label).to eq({ "en" => "Current Page Order" })
       end
     end
 
     describe 'another example' do
-      let!(:sequence_object) { described_class.new({
-        "id" => "http://example.com/prefix/sequence/456",
-        'label' => 'Book 1',
-        'description' => 'A longer description of this example book. It should give some real information.',
-        'thumbnail' => [{
-          'id' => 'http://www.example.org/images/book1-page1/full/80,100/0/default.jpg',
-          'type' => 'Image',
-          'service'=> [{
-            '@context' => 'http://iiif.io/api/image/2/context.json',
-            'id' => 'http://www.example.org/images/book1-page1',
-            'profile' => 'http://iiif.io/api/image/2/level1.json'
-          }]
-        }],
-        'attribution' => 'Provided by Example Organization',
-        'rights' => [{'id' => 'http://www.example.org/license.html'}],
-        'logo' => 'http://www.example.org/logos/institution1.jpg',
-        'see_also' => 'http://www.example.org/library/catalog/book1.xml',
-        'service' => [{
-          '@context' => 'http://example.org/ns/jsonld/context.json',
-          'id' =>  'http://example.org/service/example',
-          'profile' => 'http://example.org/docs/example-service.html'
-        }],
-        'related' => {
-          'id' => 'http://www.example.org/videos/video-book1.mpg',
-          'format' => 'video/mpeg'
-        },
-        'within' => 'http://www.example.org/collections/books/',
-        # Sequence
-        'metadata' => [{'label'=>'Author', 'value'=>'Anne Author'}],
-        "items" => [canvas_object],
-        'start_canvas' => 'http://www.example.org/iiif/book1/canvas/p2',
-        "viewingDirection" => "left-to-right",
-        "viewingHint" => ["paged"],
-        "startCanvas" => canvas_object.id,
-      })}
+      let!(:sequence_object) do
+        described_class.new({
+                              "id" => "http://example.com/prefix/sequence/456",
+                              'label' => 'Book 1',
+                              'description' => 'A longer description of this example book. It should give some real information.',
+                              'thumbnail' => [{
+                                'id' => 'http://www.example.org/images/book1-page1/full/80,100/0/default.jpg',
+                                'type' => 'Image',
+                                'service' => [{
+                                  '@context' => 'http://iiif.io/api/image/2/context.json',
+                                  'id' => 'http://www.example.org/images/book1-page1',
+                                  'profile' => 'http://iiif.io/api/image/2/level1.json'
+                                }]
+                              }],
+                              'attribution' => 'Provided by Example Organization',
+                              'rights' => [{ 'id' => 'http://www.example.org/license.html' }],
+                              'logo' => 'http://www.example.org/logos/institution1.jpg',
+                              'see_also' => 'http://www.example.org/library/catalog/book1.xml',
+                              'service' => [{
+                                '@context' => 'http://example.org/ns/jsonld/context.json',
+                                'id' => 'http://example.org/service/example',
+                                'profile' => 'http://example.org/docs/example-service.html'
+                              }],
+                              'related' => {
+                                'id' => 'http://www.example.org/videos/video-book1.mpg',
+                                'format' => 'video/mpeg'
+                              },
+                              'within' => 'http://www.example.org/collections/books/',
+                              # Sequence
+                              'metadata' => [{ 'label' => 'Author', 'value' => 'Anne Author' }],
+                              "items" => [canvas_object],
+                              'start_canvas' => 'http://www.example.org/iiif/book1/canvas/p2',
+                              "viewingDirection" => "left-to-right",
+                              "viewingHint" => ["paged"],
+                              "startCanvas" => canvas_object.id
+                            })
+      end
       it 'validates' do
-        expect{sequence_object.validate}.not_to raise_error
+        expect { sequence_object.validate }.not_to raise_error
       end
     end
   end

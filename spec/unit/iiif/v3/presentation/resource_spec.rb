@@ -11,12 +11,12 @@ describe IIIF::V3::Presentation::Resource do
   describe '#prohibited_keys' do
     it 'contains the expected key names' do
       keys = described_class::PAGING_PROPERTIES +
-        %w{
-          nav_date
-          viewing_direction
-          start_canvas
-          content_annotations
-        }
+             %w[
+               nav_date
+               viewing_direction
+               start_canvas
+               content_annotations
+             ]
       expect(subject.prohibited_keys).to include(*keys)
     end
   end
@@ -30,7 +30,7 @@ describe IIIF::V3::Presentation::Resource do
   describe '#initialize' do
     it 'allows subclasses to override type' do
       subclass = Class.new(described_class) do
-        def initialize(hsh={})
+        def initialize(hsh = {})
           hsh = { 'type' => 'a:SubClass' }
           super(hsh)
         end
@@ -61,13 +61,15 @@ describe IIIF::V3::Presentation::Resource do
         let(:file_id) { 'http://example.org/iiif/book1/res/music.mp3' }
         let(:file_type) { 'dctypes:Sound' }
         let(:file_mimetype) { 'audio/mpeg' }
-        let(:resource_object) { IIIF::V3::Presentation::Resource.new({
-            'id' => file_id,
-            'type' => file_type,
-            'format' => file_mimetype
-        })}
+        let(:resource_object) do
+          IIIF::V3::Presentation::Resource.new({
+                                                 'id' => file_id,
+                                                 'type' => file_type,
+                                                 'format' => file_mimetype
+                                               })
+        end
         it 'validates' do
-          expect{resource_object.validate}.not_to raise_error
+          expect { resource_object.validate }.not_to raise_error
         end
         it 'has expected required values' do
           expect(resource_object.id).to eq file_id
@@ -82,13 +84,15 @@ describe IIIF::V3::Presentation::Resource do
         let(:file_id) { 'http://example.org/iiif/book1/res/tei-text-p1.xml' }
         let(:file_type) { 'dctypes:Text' }
         let(:file_mimetype) { 'application/tei+xml' }
-        let(:resource_object) { IIIF::V3::Presentation::Resource.new({
-            'id' => file_id,
-            'type' => file_type,
-            'format' => file_mimetype
-        })}
+        let(:resource_object) do
+          IIIF::V3::Presentation::Resource.new({
+                                                 'id' => file_id,
+                                                 'type' => file_type,
+                                                 'format' => file_mimetype
+                                               })
+        end
         it 'validates' do
-          expect{resource_object.validate}.not_to raise_error
+          expect { resource_object.validate }.not_to raise_error
         end
         it 'has expected required values' do
           expect(resource_object.id).to eq file_id
@@ -99,23 +103,22 @@ describe IIIF::V3::Presentation::Resource do
           expect(resource_object.service).to eq []
         end
       end
-
     end
     describe 'stanford' do
       describe 'non-image resource per purl code' do
         let(:file_id) { 'https://example.org/file/abc666/ocr.txt' }
         let(:file_type) { 'Document' }
         let(:file_mimetype) { 'text/plain' }
-        let(:resource_object) {
+        let(:resource_object) do
           resource = IIIF::V3::Presentation::Resource.new
           resource['id'] = file_id
           resource['type'] = file_type
           resource.format = file_mimetype
           resource
-        }
+        end
         describe 'world visible' do
           it 'validates' do
-            expect{resource_object.validate}.not_to raise_error
+            expect { resource_object.validate }.not_to raise_error
           end
           it 'has expected required values' do
             expect(resource_object.id).to eq file_id
@@ -134,7 +137,7 @@ describe IIIF::V3::Presentation::Resource do
           #     })}
           let(:service_label) { 'login message' }
           let(:token_service_id) { 'https://example.org/iiif/token' }
-          let(:login_service) {
+          let(:login_service) do
             IIIF::V3::Presentation::Service.new(
               'id' => 'https://example.org/auth/iiif',
               'profile' => 'http://iiif.io/api/auth/1/login',
@@ -144,14 +147,14 @@ describe IIIF::V3::Presentation::Resource do
                 'profile' => 'http://iiif.io/api/auth/1/token'
               }]
             )
-          }
-          let(:resource_object_w_login) {
+          end
+          let(:resource_object_w_login) do
             resource = resource_object
             resource.service = [login_service]
             resource
-          }
+          end
           it 'validates' do
-            expect{resource_object_w_login.validate}.not_to raise_error
+            expect { resource_object_w_login.validate }.not_to raise_error
           end
           it 'has expected service value' do
             service_obj = resource_object_w_login.service.first
@@ -170,5 +173,4 @@ describe IIIF::V3::Presentation::Resource do
       end
     end
   end
-
 end

@@ -1,5 +1,4 @@
 describe IIIF::OrderedHash do
-
   describe '#camelize_keys' do
     before(:each) do
       @uri = 'http://www.example.org/descriptions/book1.xml'
@@ -24,7 +23,6 @@ describe IIIF::OrderedHash do
       expect(subject.keys[see_also_position]).to eq 'seeAlso'
       expect(subject.keys[within_position]).to eq 'within'
     end
-
   end
 
   describe '#snakeize_keys' do
@@ -54,10 +52,9 @@ describe IIIF::OrderedHash do
   end
 
   describe 'insertion patches' do
+    let(:init_data) { [%w[wubble fred], %w[baz qux], %w[grault garply]] }
 
-    let (:init_data) { [ ['wubble', 'fred'], ['baz', 'qux'], ['grault','garply'] ] }
-    
-    subject do 
+    subject do
       hsh = described_class.new
       init_data.each { |e| hsh[e[0]] = e[1] }
       hsh
@@ -72,13 +69,13 @@ describe IIIF::OrderedHash do
         expect(subject[subject.keys[3]]).to eq 'garply'
       end
       it 'returns the instance' do
-        expect(subject.insert(1, 'quux','corge')).to eq subject
+        expect(subject.insert(1, 'quux', 'corge')).to eq subject
       end
       it 'raises IndexError if a negative index is too small' do
-        expect { subject.insert(-5, 'quux','corge') }.to raise_error IndexError
+        expect { subject.insert(-5, 'quux', 'corge') }.to raise_error IndexError
       end
       it 'puts index -1 on the end' do
-        subject.insert(-1, 'thud','wibble')
+        subject.insert(-1, 'thud', 'wibble')
         expect(subject[subject.keys.last]).to eq 'wibble'
       end
     end
@@ -86,11 +83,11 @@ describe IIIF::OrderedHash do
     describe '#insert_before' do
       it 'inserts in the expected place with a supplied key' do
         subject.insert_before(existing_key: 'grault', new_key: 'quux', value: 'corge')
-        expect(subject.keys).to eq ['wubble','baz','quux','grault']
+        expect(subject.keys).to eq %w[wubble baz quux grault]
       end
       it 'inserts in the expected place with a supplied block' do
-        subject.insert_before(new_key: 'quux', value: 'corge') { |k,v| k.start_with?('g') }
-        expect(subject.keys).to eq ['wubble','baz','quux','grault']
+        subject.insert_before(new_key: 'quux', value: 'corge') { |k, _v| k.start_with?('g') }
+        expect(subject.keys).to eq %w[wubble baz quux grault]
       end
       it 'returns the instance' do
         expect(subject.insert_before(existing_key: 'grault', new_key: 'quux', value: 'corge')).to be subject
@@ -100,7 +97,9 @@ describe IIIF::OrderedHash do
           expect { subject.insert_before(existing_key: 'foo', new_key: 'quux', value: 'corge') }.to raise_error KeyError
         end
         it 'when the supplied new key already exists' do
-          expect { subject.insert_before(existing_key: 'grault', new_key: 'wubble', value: 'corge') }.to raise_error KeyError
+          expect do
+            subject.insert_before(existing_key: 'grault', new_key: 'wubble', value: 'corge')
+          end.to raise_error KeyError
         end
       end
     end
@@ -108,11 +107,11 @@ describe IIIF::OrderedHash do
     describe '#insert_after' do
       it 'inserts in the expected place with a supplied key' do
         subject.insert_after(existing_key: 'baz', new_key: 'quux', value: 'corge')
-        expect(subject.keys).to eq ['wubble','baz','quux','grault']
+        expect(subject.keys).to eq %w[wubble baz quux grault]
       end
       it 'inserts in the expected place with a supplied block' do
-        subject.insert_after(new_key: 'quux', value: 'corge') { |k,v| k.start_with?('g') }
-        expect(subject.keys).to eq ['wubble','baz','quux','grault']
+        subject.insert_after(new_key: 'quux', value: 'corge') { |k, _v| k.start_with?('g') }
+        expect(subject.keys).to eq %w[wubble baz quux grault]
       end
       it 'returns the instance' do
         expect(subject.insert_after(existing_key: 'baz', new_key: 'quux', value: 'corge')).to be subject
@@ -122,18 +121,20 @@ describe IIIF::OrderedHash do
           expect { subject.insert_after(existing_key: 'foo', new_key: 'quux', value: 'corge') }.to raise_error KeyError
         end
         it 'when the supplied new key already exists' do
-          expect { subject.insert_after(existing_key: 'grault', new_key: 'wubble', value: 'corge') }.to raise_error KeyError
+          expect do
+            subject.insert_after(existing_key: 'grault', new_key: 'wubble', value: 'corge')
+          end.to raise_error KeyError
         end
       end
     end
 
     describe '#unshift' do
       it 'adds an entry to the front of the object' do
-        subject.unshift('thud','wibble')
+        subject.unshift('thud', 'wibble')
         expect(subject[subject.keys[0]]).to eq 'wibble'
       end
       it 'returns the instance' do
-        expect(subject.unshift('thud','wibble')).to be subject
+        expect(subject.unshift('thud', 'wibble')).to be subject
       end
     end
 
@@ -149,7 +150,5 @@ describe IIIF::OrderedHash do
         expect(subject.has_key?(:wubble)).to be_falsey
       end
     end
-
   end
 end
-

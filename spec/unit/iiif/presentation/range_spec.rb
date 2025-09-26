@@ -1,6 +1,5 @@
 describe IIIF::Presentation::Range do
-
-  let(:fixed_values) do 
+  let(:fixed_values) do
     {
       '@id' => 'http://www.example.org/iiif/book1/range/r1',
       '@type' => 'sc:Range',
@@ -37,7 +36,4 @@ describe IIIF::Presentation::Range do
 
   describe '#validate' do
   end
-
 end
-
-

@@ -1,22 +1,25 @@
 describe IIIF::V3::Presentation::Annotation do
-
   let(:content_id) { 'http://example.org/iiif/book1/res/tei-text-p1.xml' }
   let(:content_type) { 'dctypes:Text' }
   let(:mimetype) { 'application/tei+xml' }
-  let(:image_2_api_service) { IIIF::V3::Presentation::Service.new({
+  let(:image_2_api_service) do
+    IIIF::V3::Presentation::Service.new({
+                                          'id' => content_id,
+                                          '@id' => content_id,
+                                          'profile' => IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_LEVEL1_PROFILE
+                                        })
+  end
+  let(:img_content_resource) do
+    IIIF::V3::Presentation::ImageResource.new(
       'id' => content_id,
-      '@id' => content_id,
-      'profile' => IIIF::V3::Presentation::Service::IIIF_IMAGE_V2_LEVEL1_PROFILE
-    })}
-  let(:img_content_resource) { IIIF::V3::Presentation::ImageResource.new(
-    'id' => content_id,
-    'type' => content_type,
-    'format' => mimetype,
-    'service' => [image_2_api_service]
-    )}
+      'type' => content_type,
+      'format' => mimetype,
+      'service' => [image_2_api_service]
+    )
+  end
 
   describe '#required_keys' do
-    %w{ type id motivation target }.each do |k|
+    %w[type id motivation target].each do |k|
       it k do
         expect(subject.required_keys).to include(k)
       end
@@ -26,15 +29,15 @@ describe IIIF::V3::Presentation::Annotation do
   describe '#prohibited_keys' do
     it 'contains the expected key names' do
       keys = described_class::PAGING_PROPERTIES +
-        described_class::CONTENT_RESOURCE_PROPERTIES +
-       %w{
-         nav_date
-         viewing_direction
-         start_canvas
-         content_annotations
-       }
-     expect(subject.prohibited_keys).to include(*keys)
-   end
+             described_class::CONTENT_RESOURCE_PROPERTIES +
+             %w[
+               nav_date
+               viewing_direction
+               start_canvas
+               content_annotations
+             ]
+      expect(subject.prohibited_keys).to include(*keys)
+    end
   end
 
   describe '#any_type_keys' do
@@ -76,7 +79,7 @@ describe IIIF::V3::Presentation::Annotation do
     end
     it 'allows subclasses to override type' do
       subclass = Class.new(described_class) do
-        def initialize(hsh={})
+        def initialize(hsh = {})
           hsh = { 'type' => 'a:SubClass' }
           super(hsh)
         end
@@ -115,25 +118,26 @@ describe IIIF::V3::Presentation::Annotation do
     end
 
     describe 'body is a kind of IIIF::V3::Presentation::ImageResource' do
-      let(:img_body_anno) {
+      let(:img_body_anno) do
         subject['id'] = 'http://example.org/iiif/anno/1s'
         subject['target'] = 'foo'
         subject['body'] = img_content_resource
         subject
-      }
+      end
       it 'raises IllegalValueError if motivation isn\'t "painting"' do
         exp_err_msg = "#{described_class} motivation must be 'painting' when body is a kind of IIIF::V3::Presentation::ImageResource"
         img_body_anno['motivation'] = 'foo'
         expect { img_body_anno.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError, exp_err_msg
       end
-      let(:img_resource_without_id) {
+      let(:img_resource_without_id) do
         IIIF::V3::Presentation::ImageResource.new(
           'type' => content_type,
           'format' => mimetype
-        )}
-      let(:http_uri_err_msg) {
+        )
+      end
+      let(:http_uri_err_msg) do
         "when #{described_class} body is a kind of IIIF::V3::Presentation::ImageResource, ImageResource id must be an http(s) URI"
-      }
+      end
       it 'raises IllegalValueError if no id field in ImageResource' do
         img_body_anno.body = img_resource_without_id
         expect { img_body_anno.validate }.to raise_error IIIF::V3::Presentation::IllegalValueError, http_uri_err_msg
@@ -152,19 +156,19 @@ describe IIIF::V3::Presentation::Annotation do
   end
 
   describe 'realistic examples' do
-    let(:anno_id) { 'http://example.org/iiif/annoation/abc666'}
-    let(:target_id) { 'http://example.org/iiif/canvas/abc666'}
+    let(:anno_id) { 'http://example.org/iiif/annoation/abc666' }
+    let(:target_id) { 'http://example.org/iiif/canvas/abc666' }
 
     describe 'stanford (purl code)' do
-      let(:anno) {
+      let(:anno) do
         anno = described_class.new
         anno['id'] = anno_id
         anno['target'] = target_id
         anno.body = img_content_resource
         anno
-      }
+      end
       it 'validates' do
-        expect{anno.validate}.not_to raise_error
+        expect { anno.validate }.not_to raise_error
       end
       it 'has expected required values' do
         expect(anno.id).to eq anno_id
@@ -183,7 +187,7 @@ describe IIIF::V3::Presentation::Annotation do
         let(:img_mime) { 'image/jpeg' }
         let(:img_h) { 2000 }
         let(:img_w) { 1500 }
-        let(:img_hw_resource)  do
+        let(:img_hw_resource) do
           IIIF::V3::Presentation::ImageResource.new(
             'id' => content_id,
             'type' => img_type,
@@ -193,15 +197,15 @@ describe IIIF::V3::Presentation::Annotation do
             'service' => [image_2_api_service]
           )
         end
-        let(:my_anno) {
+        let(:my_anno) do
           anno = described_class.new
           anno['id'] = anno_id
           anno['target'] = target_id
           anno.body = img_hw_resource
           anno
-        }
+        end
         it 'validates' do
-          expect{my_anno.validate}.not_to raise_error
+          expect { my_anno.validate }.not_to raise_error
         end
         it 'has expected additional values' do
           expect(my_anno['body']).to eq img_hw_resource
@@ -210,7 +214,7 @@ describe IIIF::V3::Presentation::Annotation do
         end
 
         describe 'and service with height and width and tiles' do
-          let(:tiles_val) { [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}] }
+          let(:tiles_val) { [{ "width" => 512, "scaleFactors" => [1, 2, 4, 8, 16] }] }
           let(:service) do
             s = image_2_api_service
             s['height'] = 8000
@@ -220,7 +224,7 @@ describe IIIF::V3::Presentation::Annotation do
           end
           it 'validates' do
             img_hw_resource['service'] = service
-            expect{my_anno.validate}.not_to raise_error
+            expect { my_anno.validate }.not_to raise_error
           end
           it "body['service'] has expected additional values'" do
             annotation_service = my_anno['body']['service'].first
@@ -237,19 +241,21 @@ describe IIIF::V3::Presentation::Annotation do
       describe 'anno body is audio' do
         let(:body_id) { 'http://example.org/iiif/foo2.mp3' }
         let(:body_type) { 'Audio' }
-        let(:audio_res) { IIIF::V3::Presentation::Resource.new(
-          'id' => body_id,
-          'type' => body_type
-          )}
-        let(:my_anno) {
+        let(:audio_res) do
+          IIIF::V3::Presentation::Resource.new(
+            'id' => body_id,
+            'type' => body_type
+          )
+        end
+        let(:my_anno) do
           anno = described_class.new
           anno['id'] = anno_id
           anno['target'] = target_id
           anno.body = audio_res
           anno
-        }
+        end
         it 'validates' do
-          expect{my_anno.validate}.not_to raise_error
+          expect { my_anno.validate }.not_to raise_error
         end
         it 'has expected required values' do
           expect(my_anno['type']).to eq 'Annotation'
@@ -268,20 +274,22 @@ describe IIIF::V3::Presentation::Annotation do
         let(:body_id) { 'http://example.org/foo.webm' }
         let(:body_type) { 'Video' }
         let(:body_mime) { 'video/webm' }
-        let(:video_res) { IIIF::V3::Presentation::Resource.new(
-          'id' => body_id,
-          'type' => body_type,
-          'format' => body_mime
-          )}
-        let(:my_anno) {
+        let(:video_res) do
+          IIIF::V3::Presentation::Resource.new(
+            'id' => body_id,
+            'type' => body_type,
+            'format' => body_mime
+          )
+        end
+        let(:my_anno) do
           anno = described_class.new
           anno['id'] = anno_id
           anno['target'] = target_id
           anno.body = video_res
           anno
-        }
+        end
         it 'validates' do
-          expect{my_anno.validate}.not_to raise_error
+          expect { my_anno.validate }.not_to raise_error
         end
         it 'has expected body values' do
           expect(my_anno['body']).to eq video_res
@@ -296,21 +304,23 @@ describe IIIF::V3::Presentation::Annotation do
         let(:body_type) { 'PhysicalObject' }
         let(:body_mime) { 'application/vnd.threejs+json' }
         let(:body_label) { 'Animal Skull' }
-        let(:body_res) { IIIF::V3::Presentation::Resource.new(
-          'id' => body_id,
-          'type' => body_type,
-          'format' => body_mime,
-          'label' => body_label
-          )}
-        let(:my_anno) {
+        let(:body_res) do
+          IIIF::V3::Presentation::Resource.new(
+            'id' => body_id,
+            'type' => body_type,
+            'format' => body_mime,
+            'label' => body_label
+          )
+        end
+        let(:my_anno) do
           anno = described_class.new
           anno['id'] = anno_id
           anno['target'] = target_id
           anno.body = body_res
           anno
-        }
+        end
         it 'validates' do
-          expect{my_anno.validate}.not_to raise_error
+          expect { my_anno.validate }.not_to raise_error
         end
         it 'has expected body values' do
           expect(my_anno['body']).to eq body_res
@@ -325,20 +335,22 @@ describe IIIF::V3::Presentation::Annotation do
         let(:body_id) { 'http://example.org/iiif/some-document.pdf' }
         let(:body_type) { 'Document' }
         let(:body_mime) { 'application/pdf' }
-        let(:body_res) { IIIF::V3::Presentation::Resource.new(
-          'id' => body_id,
-          'type' => body_type,
-          'format' => body_mime
-          )}
-        let(:my_anno) {
+        let(:body_res) do
+          IIIF::V3::Presentation::Resource.new(
+            'id' => body_id,
+            'type' => body_type,
+            'format' => body_mime
+          )
+        end
+        let(:my_anno) do
           anno = described_class.new
           anno['id'] = anno_id
           anno['target'] = target_id
           anno.body = body_res
           anno
-        }
+        end
         it 'validates' do
-          expect{my_anno.validate}.not_to raise_error
+          expect { my_anno.validate }.not_to raise_error
         end
         it 'has expected body values' do
           expect(my_anno['body']).to eq body_res
@@ -352,31 +364,37 @@ describe IIIF::V3::Presentation::Annotation do
         let(:body_type) { 'Video' }
         let(:body1_id) { 'http://example.org/foo.mp4f' }
         let(:body1_mime) { 'video/mp4; codec..xxxxx' }
-        let(:body1_res) { IIIF::V3::Presentation::Resource.new(
-          'id' => body1_id,
-          'type' => body_type,
-          'format' => body1_mime
-          )}
+        let(:body1_res) do
+          IIIF::V3::Presentation::Resource.new(
+            'id' => body1_id,
+            'type' => body_type,
+            'format' => body1_mime
+          )
+        end
         let(:body2_id) { 'http://example.org/foo.webm' }
         let(:body2_mime) { 'video/webm' }
-        let(:body2_res) { IIIF::V3::Presentation::Resource.new(
-          'id' => body2_id,
-          'type' => body_type,
-          'format' => body2_mime
-          )}
-        let(:body_res) { IIIF::V3::Presentation::Choice.new(
-          'items' => [body1_res, body2_res],
-          'choiceHint' => 'client'
-          )}
-        let(:my_anno) {
+        let(:body2_res) do
+          IIIF::V3::Presentation::Resource.new(
+            'id' => body2_id,
+            'type' => body_type,
+            'format' => body2_mime
+          )
+        end
+        let(:body_res) do
+          IIIF::V3::Presentation::Choice.new(
+            'items' => [body1_res, body2_res],
+            'choiceHint' => 'client'
+          )
+        end
+        let(:my_anno) do
           anno = described_class.new
           anno['id'] = anno_id
           anno['target'] = target_id
           anno.body = body_res
           anno
-        }
+        end
         it 'validates' do
-          expect{my_anno.validate}.not_to raise_error
+          expect { my_anno.validate }.not_to raise_error
         end
         it 'has expected body values' do
           expect(my_anno['body']).to eq body_res
@@ -388,5 +406,4 @@ describe IIIF::V3::Presentation::Annotation do
       end
     end
   end
-
 end

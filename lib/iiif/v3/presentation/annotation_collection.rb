@@ -2,19 +2,18 @@ module IIIF
   module V3
     module Presentation
       class AnnotationCollection < IIIF::V3::AbstractResource
-
         TYPE = 'AnnotationCollection'.freeze
 
         def required_keys
-          super + %w{ id }
+          super + %w[id]
         end
 
         def int_only_keys
-          super + %w{ total }
+          super + %w[total]
         end
 
         def array_only_keys
-          super + %w{ content }
+          super + %w[content]
         end
 
         # TODO: paging properties
@@ -27,11 +26,10 @@ module IIIF
         #
         # don't forget to validate
 
-        def initialize(hsh={})
+        def initialize(hsh = {})
           hsh['type'] = TYPE unless hsh.has_key? 'type'
           super(hsh)
         end
-
       end
     end
   end

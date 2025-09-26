@@ -1,5 +1,4 @@
 describe IIIF::V3::Presentation::AnnotationPage do
-
   describe '#required_keys' do
     it 'id' do
       expect(subject.required_keys).to include('id')
@@ -9,17 +8,17 @@ describe IIIF::V3::Presentation::AnnotationPage do
   describe '#prohibited_keys' do
     it 'contains the expected key names' do
       keys = described_class::CONTENT_RESOURCE_PROPERTIES +
-       %w{
-         first
-         last
-         total
-         nav_date
-         viewing_direction
-         start_canvas
-         content_annotations
-       }
-     expect(subject.prohibited_keys).to include(*keys)
-   end
+             %w[
+               first
+               last
+               total
+               nav_date
+               viewing_direction
+               start_canvas
+               content_annotations
+             ]
+      expect(subject.prohibited_keys).to include(*keys)
+    end
   end
 
   describe '#uri_only_keys' do
@@ -46,7 +45,7 @@ describe IIIF::V3::Presentation::AnnotationPage do
     end
     it 'allows subclasses to override type' do
       subclass = Class.new(described_class) do
-        def initialize(hsh={})
+        def initialize(hsh = {})
           hsh = { 'type' => 'a:SubClass' }
           super(hsh)
         end
@@ -81,20 +80,22 @@ describe IIIF::V3::Presentation::AnnotationPage do
 
   describe 'realistic examples' do
     let(:ap_id) { 'http://example.com/iiif3/annotation_page/666' }
-    let(:anno) { IIIF::V3::Presentation::Annotation.new(
-      'id' => 'http://example.com/anno/666',
-      'target' => 'http://example.com/canvas/abc'
-      )}
+    let(:anno) do
+      IIIF::V3::Presentation::Annotation.new(
+        'id' => 'http://example.com/anno/666',
+        'target' => 'http://example.com/canvas/abc'
+      )
+    end
 
     describe 'stanford (purl code)' do
-      let(:anno_page) {
+      let(:anno_page) do
         anno_page = described_class.new
         anno_page['id'] = ap_id
         anno_page.items << anno
         anno_page
-      }
+      end
       it 'validates' do
-        expect{anno_page.validate}.not_to raise_error
+        expect { anno_page.validate }.not_to raise_error
       end
       it 'has expected required values' do
         expect(anno_page.id).to eq ap_id
@@ -106,18 +107,20 @@ describe IIIF::V3::Presentation::AnnotationPage do
     end
 
     describe 'two items' do
-      let(:anno2) { IIIF::V3::Presentation::Annotation.new(
-        'id' => 'http://example.com/anno/333',
-        'target' => 'http://example.com/canvas/abc'
-        )}
-      let(:anno_page) {
+      let(:anno2) do
+        IIIF::V3::Presentation::Annotation.new(
+          'id' => 'http://example.com/anno/333',
+          'target' => 'http://example.com/canvas/abc'
+        )
+      end
+      let(:anno_page) do
         anno_page = described_class.new
         anno_page['id'] = ap_id
         anno_page.items = [anno, anno2]
         anno_page
-      }
+      end
       it 'validates' do
-        expect{anno_page.validate}.not_to raise_error
+        expect { anno_page.validate }.not_to raise_error
       end
       it 'has expected required values' do
         expect(anno_page.id).to eq ap_id

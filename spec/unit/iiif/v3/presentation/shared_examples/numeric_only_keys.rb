@@ -1,7 +1,5 @@
 shared_examples 'it has the appropriate methods for numeric-only keys v3' do
-
   described_class.new.numeric_only_keys.each do |prop|
-
     describe "#{prop}=" do
       before(:all) do
         @ex = 7200.0
@@ -39,7 +37,5 @@ shared_examples 'it has the appropriate methods for numeric-only keys v3' do
         end
       end
     end
-
   end
-
 end

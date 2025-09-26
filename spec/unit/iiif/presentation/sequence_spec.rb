@@ -1,8 +1,7 @@
 describe IIIF::Presentation::Sequence do
-
   let(:subclass_subject) do
     Class.new(IIIF::Presentation::Sequence) do
-      def initialize(hsh={})
+      def initialize(hsh = {})
         hsh = { '@type' => 'a:SubClass' }
         super(hsh)
       end
@@ -18,7 +17,7 @@ describe IIIF::Presentation::Sequence do
       'description' => 'A longer description of this example book. It should give some real information.',
       'thumbnail' => {
         '@id' => 'http://www.example.org/images/book1-page1/full/80,100/0/default.jpg',
-        'service'=> {
+        'service' => {
           '@context' => 'http://iiif.io/api/image/2/context.json',
           '@id' => 'http://www.example.org/images/book1-page1',
           'profile' => 'http://iiif.io/api/image/2/level1.json'
@@ -30,7 +29,7 @@ describe IIIF::Presentation::Sequence do
       'see_also' => 'http://www.example.org/library/catalog/book1.xml',
       'service' => {
         '@context' => 'http://example.org/ns/jsonld/context.json',
-        '@id' =>  'http://example.org/service/example',
+        '@id' => 'http://example.org/service/example',
         'profile' => 'http://example.org/docs/example-service.html'
       },
       'related' => {
@@ -39,18 +38,18 @@ describe IIIF::Presentation::Sequence do
       },
       'within' => 'http://www.example.org/collections/books/',
       # Sequence
-      'metadata' => [{'label'=>'Author', 'value'=>'Anne Author'}],
+      'metadata' => [{ 'label' => 'Author', 'value' => 'Anne Author' }],
       'canvases' => [{
         '@id' => 'http://www.example.org/iiif/book1/canvas/p1',
         '@type' => 'sc:Canvas',
         'label' => 'p. 1',
         'height' => 1000,
         'width' => 750,
-        'images'=>  []
+        'images' => []
       }],
       'viewing_hint' => 'paged',
       'start_canvas' => 'http://www.example.org/iiif/book1/canvas/p2',
-      'viewing_direction' => 'right-to-left',
+      'viewing_direction' => 'right-to-left'
     }
   end
 
@@ -66,19 +65,19 @@ describe IIIF::Presentation::Sequence do
 
   describe '#required_keys' do
     it 'accumulates from the superclass' do
-      expect(subject.required_keys).to eq %w{ @type }
+      expect(subject.required_keys).to eq %w[@type]
     end
   end
 
   describe '#string_only_keys' do
     it 'accumulates from the superclass' do
-      expect(subject.string_only_keys).to eq %w{ viewing_hint start_canvas viewing_direction }
+      expect(subject.string_only_keys).to eq %w[viewing_hint start_canvas viewing_direction]
     end
   end
 
   describe '#array_only_keys' do
     it 'accumulates from the superclass' do
-      expect(subject.array_only_keys).to eq %w{ metadata canvases }
+      expect(subject.array_only_keys).to eq %w[metadata canvases]
     end
   end
 
@@ -104,7 +103,4 @@ describe IIIF::Presentation::Sequence do
       expect { subject.validate }.to raise_error IIIF::Presentation::IllegalValueError
     end
   end
-
-
 end
-

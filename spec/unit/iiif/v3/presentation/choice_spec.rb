@@ -1,17 +1,16 @@
 describe IIIF::V3::Presentation::Choice do
-
   describe '#prohibited_keys' do
     it 'contains the expected key names' do
       keys = described_class::PAGING_PROPERTIES +
-        described_class::CONTENT_RESOURCE_PROPERTIES +
-       %w{
-         nav_date
-         viewing_direction
-         start_canvas
-         content_annotations
-       }
-     expect(subject.prohibited_keys).to include(*keys)
-   end
+             described_class::CONTENT_RESOURCE_PROPERTIES +
+             %w[
+               nav_date
+               viewing_direction
+               start_canvas
+               content_annotations
+             ]
+      expect(subject.prohibited_keys).to include(*keys)
+    end
   end
 
   describe '#any_type_keys' do
@@ -50,7 +49,7 @@ describe IIIF::V3::Presentation::Choice do
     end
     it 'allows subclasses to override type' do
       subclass = Class.new(described_class) do
-        def initialize(hsh={})
+        def initialize(hsh = {})
           hsh = { 'type' => 'a:SubClass' }
           super(hsh)
         end
@@ -77,24 +76,30 @@ describe IIIF::V3::Presentation::Choice do
       let(:item_type) { 'Video' }
       let(:item1_id) { 'http://example.org/foo.mp4f' }
       let(:item1_mime) { 'video/mp4' }
-      let(:item1_res) { IIIF::V3::Presentation::Resource.new(
-        'id' => item1_id,
-        'type' => item_type,
-        'format' => item1_mime
-        )}
+      let(:item1_res) do
+        IIIF::V3::Presentation::Resource.new(
+          'id' => item1_id,
+          'type' => item_type,
+          'format' => item1_mime
+        )
+      end
       let(:item2_id) { 'http://example.org/foo.webm' }
       let(:item2_mime) { 'video/webm' }
-      let(:item2_res) { IIIF::V3::Presentation::Resource.new(
-        'id' => item2_id,
-        'type' => item_type,
-        'format' => item2_mime
-        )}
-      let(:choice) { IIIF::V3::Presentation::Choice.new(
-        'choiceHint' => 'client',
-        'items' => [item1_res, item2_res]
-        )}
+      let(:item2_res) do
+        IIIF::V3::Presentation::Resource.new(
+          'id' => item2_id,
+          'type' => item_type,
+          'format' => item2_mime
+        )
+      end
+      let(:choice) do
+        IIIF::V3::Presentation::Choice.new(
+          'choiceHint' => 'client',
+          'items' => [item1_res, item2_res]
+        )
+      end
       it 'validates' do
-        expect{choice.validate}.not_to raise_error
+        expect { choice.validate }.not_to raise_error
       end
       it 'has expected required values' do
         expect(choice['type']).to eq 'Choice'

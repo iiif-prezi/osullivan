@@ -1,5 +1,4 @@
 RSpec.describe IIIF::Service do
-
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
 
@@ -37,7 +36,8 @@ RSpec.describe IIIF::Service do
 
   describe 'self#from_ordered_hash' do
     subject(:parsed) { described_class.from_ordered_hash(fixture) }
-    let(:fixture) { JSON.parse('{
+    let(:fixture) do
+      JSON.parse('{
         "@context": "http://iiif.io/api/presentation/2/context.json",
         "@id": "http://example.com/manifest",
         "@type": "sc:Manifest",
@@ -83,7 +83,7 @@ RSpec.describe IIIF::Service do
           }
         ]
       }')
-    }
+    end
     it 'doesn\'t raise a NoMethodError when we check the keys' do
       expect { parsed }.to_not raise_error
     end
@@ -107,7 +107,7 @@ RSpec.describe IIIF::Service do
 
     it 'round-trips' do
       fp = '/tmp/osullivan-spec.json'
-      File.open(fp,'w') do |f|
+      File.open(fp, 'w') do |f|
         f.write(parsed.to_json)
       end
       from_file = IIIF::Service.parse('/tmp/osullivan-spec.json')
@@ -143,35 +143,37 @@ RSpec.describe IIIF::Service do
     let(:see_also) { 'http://www.example.org/library/catalog/book1.xml' }
 
     describe 'it puts the json-ld keys at the top' do
-      let(:extra_props) { [ 
-        ['label','foo'], 
-        ['logo','http://example.com/logo.jpg'],
-        ['within','http://example.com/something']
-      ] }
-      let(:sorted_ld_keys) { 
+      let(:extra_props) do
+        [
+          ['label', 'foo'],
+          ['logo', 'http://example.com/logo.jpg'],
+          ['within', 'http://example.com/something']
+        ]
+      end
+      let(:sorted_ld_keys) do
         subject.keys.select { |k| k.start_with?('@') }.sort!
-      }
-      before(:each) { 
-        extra_props.reverse.each do |k,v| 
-          subject.unshift(k,v) 
+      end
+      before(:each) do
+        extra_props.reverse.each do |k, v|
+          subject.unshift(k, v)
         end
-      }
+      end
 
       it 'by default' do
-        (0..extra_props.length-1).each do |i|
+        (0..extra_props.length - 1).each do |i|
           expect(subject.keys[i]).to eq(extra_props[i][0])
         end
         oh = subject.to_ordered_hash
-        (0..sorted_ld_keys.length-1).each do |i|
+        (0..sorted_ld_keys.length - 1).each do |i|
           expect(oh.keys[i]).to eq(sorted_ld_keys[i])
         end
       end
       it 'unless you say not to' do
-        (0..extra_props.length-1).each do |i|
+        (0..extra_props.length - 1).each do |i|
           expect(subject.keys[i]).to eq(extra_props[i][0])
         end
         oh = subject.to_ordered_hash(sort_json_ld_keys: false)
-        (0..extra_props.length-1).each do |i|
+        (0..extra_props.length - 1).each do |i|
           expect(oh.keys[i]).to eq(extra_props[i][0])
         end
       end
@@ -199,5 +201,4 @@ RSpec.describe IIIF::Service do
       expect(ordered_hash.keys.include?('seeAlso')).to be_truthy
     end
   end
-
 end

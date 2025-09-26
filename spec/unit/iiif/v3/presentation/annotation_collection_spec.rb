@@ -1,5 +1,4 @@
 describe IIIF::V3::Presentation::AnnotationCollection do
-
   let(:fixed_values) do
     {
       '@context' => [
@@ -10,10 +9,9 @@ describe IIIF::V3::Presentation::AnnotationCollection do
       'type' => 'AnnotationCollection',
       'label' => 'Diplomatic Transcription',
       'first' => 'http://www.example.org/iiif/book1/list/l1',
-      'last' => 'http://www.example.org/iiif/book1/list/l4',
+      'last' => 'http://www.example.org/iiif/book1/list/l4'
     }
   end
-
 
   describe '#initialize' do
     it 'sets type' do
@@ -32,5 +30,4 @@ describe IIIF::V3::Presentation::AnnotationCollection do
   describe "#{described_class}.define_methods_for_any_type_keys" do
     it_behaves_like 'it has the appropriate methods for any-type keys v3'
   end
-
 end

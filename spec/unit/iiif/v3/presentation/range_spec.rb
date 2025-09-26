@@ -1,5 +1,4 @@
 describe IIIF::V3::Presentation::Range do
-
   let(:fixed_values) do
     {
       'id' => 'http://www.example.org/iiif/book1/range/r1',

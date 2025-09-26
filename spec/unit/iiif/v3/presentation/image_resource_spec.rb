@@ -1,5 +1,4 @@
 describe IIIF::V3::Presentation::ImageResource do
-
   describe '#initialize' do
     it 'sets type to Image' do
       expect(subject['type']).to eq 'Image'
@@ -8,30 +7,30 @@ describe IIIF::V3::Presentation::ImageResource do
 
   describe 'realistic examples' do
     let(:img_id) { 'https://example.org/image/iiif/abc666' }
-    let(:image_v2_service) {
+    let(:image_v2_service) do
       IIIF::V3::Presentation::Service.new(
         '@context' => 'http://iiif.io/api/image/2/context.json',
         '@id' => img_id,
         'id' => img_id,
         'profile' => 'http://iiif.io/api/image/2/level1.json'
       )
-    }
+    end
     let(:img_mimetype) { 'image/jpeg' }
     let(:width) { 999 }
     let(:height) { 666 }
     describe 'stanford' do
       describe 'thumbnail per purl code' do
         let(:thumb_id) { "#{img_id}/full/!400,400/0/default.jpg" }
-        let(:thumb_object) {
+        let(:thumb_object) do
           thumb = IIIF::V3::Presentation::ImageResource.new
           thumb['type'] = 'Image'
           thumb['id'] = thumb_id
           thumb.format = img_mimetype
           thumb.service = [image_v2_service]
           thumb
-        }
+        end
         it 'validates' do
-          expect{thumb_object.validate}.not_to raise_error
+          expect { thumb_object.validate }.not_to raise_error
         end
         it 'has expected required values' do
           expect(thumb_object.type).to eq 'Image'
@@ -44,7 +43,7 @@ describe IIIF::V3::Presentation::ImageResource do
       end
       describe 'full size per purl code' do
         let(:full_id) { "#{img_id}/full/full/0/default.jpg" }
-        let(:image_object) {
+        let(:image_object) do
           img = IIIF::V3::Presentation::ImageResource.new
           img['id'] = full_id
           img.format = img_mimetype
@@ -52,10 +51,10 @@ describe IIIF::V3::Presentation::ImageResource do
           img.width = width
           img.service = [image_v2_service]
           img
-        }
+        end
         describe 'world visible' do
           it 'validates' do
-            expect{image_object.validate}.not_to raise_error
+            expect { image_object.validate }.not_to raise_error
           end
           it 'has expected required values' do
             expect(image_object.type).to eq 'Image'
@@ -79,7 +78,7 @@ describe IIIF::V3::Presentation::ImageResource do
         describe 'requires login' do
           let(:service_label) { 'login message' }
           let(:token_service_id) { 'https://example.org/iiif/token' }
-          let(:login_service) {
+          let(:login_service) do
             IIIF::V3::Presentation::Service.new(
               'id' => 'https://example.org/auth/iiif',
               'profile' => 'http://iiif.io/api/auth/1/login',
@@ -89,14 +88,14 @@ describe IIIF::V3::Presentation::ImageResource do
                 'profile' => 'http://iiif.io/api/auth/1/token'
               }]
             )
-          }
-          let(:image_object_w_login) {
+          end
+          let(:image_object_w_login) do
             img = image_object
             img.service.first['service'] = [login_service]
             img
-          }
+          end
           it 'validates' do
-            expect{image_object_w_login.validate}.not_to raise_error
+            expect { image_object_w_login.validate }.not_to raise_error
           end
           it 'has expected service value' do
             img_service_obj = image_object_w_login.service.first
@@ -124,19 +123,19 @@ describe IIIF::V3::Presentation::ImageResource do
       end
     end
     describe 'image examples from http://prezi3.iiif.io/api/presentation/3.0' do
-      let(:image_object) {
+      let(:image_object) do
         IIIF::V3::Presentation::ImageResource.new({
-          'id' => "#{img_id}/full/full/0/default.jpg",
-          'type' => 'dctypes:Image',
-          'format' => img_mimetype,
-          'height' => height,
-          'width' => width,
-          'service' => [image_v2_service]
-          })
-      }
+                                                    'id' => "#{img_id}/full/full/0/default.jpg",
+                                                    'type' => 'dctypes:Image',
+                                                    'format' => img_mimetype,
+                                                    'height' => height,
+                                                    'width' => width,
+                                                    'service' => [image_v2_service]
+                                                  })
+      end
       describe 'simpler' do
         it 'validates' do
-          expect{image_object.validate}.not_to raise_error
+          expect { image_object.validate }.not_to raise_error
         end
         it 'has expected required values' do
           expect(image_object.id).to eq "#{img_id}/full/full/0/default.jpg"
@@ -165,15 +164,15 @@ describe IIIF::V3::Presentation::ImageResource do
         #       "tiles": [{"width": 512, "scaleFactors": [1,2,4,8,16]}]
         #   }]
         # }
-        let(:img_obj) {
+        let(:img_obj) do
           img = image_object
           img.service.first['height'] = 6666
           img.service.first['width'] = 9999
-          img.service.first['tiles'] = [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
+          img.service.first['tiles'] = [{ "width" => 512, "scaleFactors" => [1, 2, 4, 8, 16] }]
           img
-        }
+        end
         it 'validates' do
-          expect{img_obj.validate}.not_to raise_error
+          expect { img_obj.validate }.not_to raise_error
         end
         it 'has expected service value' do
           service_obj = img_obj.service.first
@@ -181,7 +180,7 @@ describe IIIF::V3::Presentation::ImageResource do
           expect(service_obj.keys.size).to eq 7
           expect(service_obj['height']).to eq 6666
           expect(service_obj['width']).to eq 9999
-          expect(service_obj['tiles']).to eq [{"width" => 512, "scaleFactors" => [1,2,4,8,16]}]
+          expect(service_obj['tiles']).to eq [{ "width" => 512, "scaleFactors" => [1, 2, 4, 8, 16] }]
         end
       end
     end

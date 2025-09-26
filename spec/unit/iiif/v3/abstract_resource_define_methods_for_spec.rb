@@ -2,29 +2,32 @@ class AbstractResourceSubClass < IIIF::V3::AbstractResource
   TYPE = 'Ignore'
   # need a property here for type of key not already initialized in AbstractResource
   def array_only_keys
-    super + %w{ array my_array }
-  end
-  def hash_only_keys
-    super + %w{ hash my_hash }
-  end
-  def int_only_keys
-    super + %w{ int my_int }
-  end
-  def numeric_only_keys
-    super + %w{ num my_num }
-  end
-  def uri_only_keys
-    super + %w{ uri my_uri }
+    super + %w[array my_array]
   end
 
-  def initialize(hsh={})
+  def hash_only_keys
+    super + %w[hash my_hash]
+  end
+
+  def int_only_keys
+    super + %w[int my_int]
+  end
+
+  def numeric_only_keys
+    super + %w[num my_num]
+  end
+
+  def uri_only_keys
+    super + %w[uri my_uri]
+  end
+
+  def initialize(hsh = {})
     hsh = { 'type' => 'a:SubClass' }
     super(hsh)
   end
 end
 
 describe AbstractResourceSubClass do
-
   describe "*define_methods_for_any_type_keys" do
     # shared_example expects fixed_values;  these are roughly based on Stanford purl code
     # (see https://github.com/sul-dlss/purl/blob/master/app/models/iiif3_presentation_manifest.rb)
@@ -36,7 +39,7 @@ describe AbstractResourceSubClass do
           'type' => 'Image',
           'id' => "http://example.org/full/!400,400/0/default.jpg",
           'format' => 'image/jpeg'
-          ),
+        ),
         'attribution' => ['foo'],
         'logo' => {
           'id' => 'https://example.org/default.jpg',
@@ -51,8 +54,8 @@ describe AbstractResourceSubClass do
           'id' => 'http://example.org/whatever',
           'format' => 'application/mods+xml'
         },
-        'related' => ['no', 'idea'],
-        'within' => {'foo' => 'bar'}
+        'related' => %w[no idea],
+        'within' => { 'foo' => 'bar' }
       }
     end
     it_behaves_like 'it has the appropriate methods for any-type keys v3'

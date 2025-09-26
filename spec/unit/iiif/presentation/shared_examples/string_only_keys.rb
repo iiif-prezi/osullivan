@@ -1,9 +1,7 @@
 require 'set'
 
 shared_examples 'it has the appropriate methods for string-only keys' do
-
   described_class.new.string_only_keys.each do |prop|
-
     describe "#{prop}=" do
       it "sets #{prop}" do
         ex = 'foo'
@@ -22,8 +20,5 @@ shared_examples 'it has the appropriate methods for string-only keys' do
         expect(subject.send(prop)).to eq ex
       end
     end
-
   end
-
 end
-

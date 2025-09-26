@@ -1,9 +1,7 @@
 require 'set'
 
 shared_examples 'it has the appropriate methods for abstract_resource_only_keys' do
-
   described_class.new.abstract_resource_only_keys.each do |entry|
-
     describe "#{entry[:key]}=" do
       it "sets #{entry[:key]}" do
         @ex = entry[:type].new
@@ -37,7 +35,5 @@ shared_examples 'it has the appropriate methods for abstract_resource_only_keys'
         end
       end
     end
-
   end
-
 end

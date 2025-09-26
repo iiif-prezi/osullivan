@@ -1,7 +1,5 @@
 shared_examples 'it has the appropriate methods for uri-only keys v3' do
-
   described_class.new.uri_only_keys.each do |prop|
-
     describe "#{prop}=" do
       it "sets #{prop}" do
         ex = 'http://example.org/foo'
@@ -25,7 +23,5 @@ shared_examples 'it has the appropriate methods for uri-only keys v3' do
         expect(subject.send(prop)).to eq ex
       end
     end
-
   end
-
 end

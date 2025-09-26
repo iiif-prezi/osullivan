@@ -1,6 +1,5 @@
 describe IIIF::Presentation::Collection do
-
-  let(:fixed_values) do 
+  let(:fixed_values) do
     {
       '@context' => 'http://iiif.io/api/presentation/2/context.json',
       '@id' => 'http://example.org/iiif/collection/top',
@@ -12,18 +11,15 @@ describe IIIF::Presentation::Collection do
       'collections' => [
         { '@id' => 'http://example.org/iiif/collection/part1',
           '@type' => 'sc:Collection',
-          'label' => 'Sub Collection 1'
-         },
-         { '@id' => 'http://example.org/iiif/collection/part2',
-           '@type' => 'sc:Collection',
-           'label' => 'Sub Collection 2'
-          }
+          'label' => 'Sub Collection 1' },
+        { '@id' => 'http://example.org/iiif/collection/part2',
+          '@type' => 'sc:Collection',
+          'label' => 'Sub Collection 2' }
       ],
       'manifests' => [
         { '@id' => 'http://example.org/iiif/book1/manifest',
           '@type' => 'sc:Manifest',
-          'label' =>  'Book 1'
-        }
+          'label' => 'Book 1' }
       ]
     }
   end
@@ -48,7 +44,4 @@ describe IIIF::Presentation::Collection do
 
   describe '#validate' do
   end
-
 end
-
-

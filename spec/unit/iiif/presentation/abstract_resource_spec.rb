@@ -2,28 +2,26 @@ require 'active_support/inflector'
 require 'json'
 require File.join(File.dirname(__FILE__), '../../../../lib/iiif/hash_behaviours')
 
-
 describe IIIF::Presentation::AbstractResource do
-
   let(:fixtures_dir) { File.join(File.dirname(__FILE__), '../../../fixtures') }
   let(:manifest_from_spec_path) { File.join(fixtures_dir, 'manifests/complete_from_spec.json') }
   let(:abstract_resource_subclass) do
     Class.new(IIIF::Presentation::AbstractResource) do
       include IIIF::HashBehaviours
 
-      def initialize(hsh={})
+      def initialize(hsh = {})
         hsh['@type'] = 'a:SubClass' unless hsh.has_key?('@type')
         super(hsh)
       end
 
       def required_keys
-        super + %w{ @id }
+        super + %w[@id]
       end
     end
   end
 
   subject do
-    instance = abstract_resource_subclass.new 
+    instance = abstract_resource_subclass.new
     instance['@id'] = 'http://example.com/prefix/manifest/123'
     instance
   end
@@ -59,13 +57,15 @@ describe IIIF::Presentation::AbstractResource do
       subject.metadata << {
         'label' => 'Published',
         'value' => [
-          {'@value'=> 'Paris, circa 1400', '@language'=>'en'},
-          {'@value'=> 'Paris, environ 14eme siecle', '@language'=>'fr'}
+          { '@value' => 'Paris, circa 1400', '@language' => 'en' },
+          { '@value' => 'Paris, environ 14eme siecle', '@language' => 'fr' }
         ]
       }
       expect(subject.metadata[0]['label']).to eq('Author')
       expect(subject.metadata[1]['value'].length).to eq(2)
-      expect(subject.metadata[1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
+      expect(subject.metadata[1]['value'].select do |e|
+        e['@language'] == 'fr'
+      end.last['@value']).to eq('Paris, environ 14eme siecle')
     end
 
     it 'roundtrips' do
@@ -76,24 +76,26 @@ describe IIIF::Presentation::AbstractResource do
       subject.metadata << {
         'label' => 'Published',
         'value' => [
-          {'@value'=> 'Paris, circa 1400', '@language'=>'en'},
-          {'@value'=> 'Paris, environ 14eme siecle', '@language'=>'fr'}
+          { '@value' => 'Paris, circa 1400', '@language' => 'en' },
+          { '@value' => 'Paris, environ 14eme siecle', '@language' => 'fr' }
         ]
       }
-      File.open('/tmp/osullivan-spec.json','w') do |f|
+      File.open('/tmp/osullivan-spec.json', 'w') do |f|
         f.write(subject.to_json)
       end
       parsed = subject.class.parse('/tmp/osullivan-spec.json')
       expect(parsed['metadata'][0]['label']).to eq('Author')
       expect(parsed['metadata'][1]['value'].length).to eq(2)
-      expect(parsed['metadata'][1]['value'].select { |e| e['@language'] == 'fr'}.last['@value']).to eq('Paris, environ 14eme siecle')
+      expect(parsed['metadata'][1]['value'].select do |e|
+        e['@language'] == 'fr'
+      end.last['@value']).to eq('Paris, environ 14eme siecle')
       File.delete('/tmp/osullivan-spec.json')
     end
   end
 
   describe '#required_keys' do
     it 'accumulates' do
-      expect(subject.required_keys).to eq %w{ @type @id }
+      expect(subject.required_keys).to eq %w[@type @id]
     end
   end
 
@@ -128,6 +130,4 @@ describe IIIF::Presentation::AbstractResource do
       end
     end
   end
-
 end
-
