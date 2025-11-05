@@ -472,11 +472,12 @@ module IIIF
       end
 
       private
+
       def validate_uri(val, key)
-        unless val.kind_of?(String) && val =~ /\A#{URI::regexp}\z/
-          m = "#{key} value must be a String containing a URI for #{self.class}"
-          raise IIIF::V3::Presentation::IllegalValueError, m
-        end
+        raise ArgumentError if URI(val).scheme.nil?
+      rescue URI::Error, ArgumentError
+        m = "#{key} value must be a String containing a URI for #{self.class}"
+        raise IIIF::V3::Presentation::IllegalValueError, m
       end
 
     end
