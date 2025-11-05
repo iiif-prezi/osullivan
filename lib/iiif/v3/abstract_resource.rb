@@ -447,13 +447,15 @@ module IIIF
 
       def define_accessor_methods(*keys, &validation)
         keys.each do |key|
+          camelized_key = key.camelize(:lower)
+
           # Setter
           define_singleton_method("#{key}=") do |val|
             validation.call(key, val) if block_given?
             self.send('[]=', key, val)
           end
-          if key.camelize(:lower) != key
-            define_singleton_method("#{key.camelize(:lower)}=") do |val|
+          if camelized_key != key
+            define_singleton_method("#{camelized_key}=") do |val|
               validation.call(key, val) if block_given?
               self.send('[]=', key, val)
             end
@@ -463,8 +465,8 @@ module IIIF
             self[key] ||= []
             self[key]
           end
-          if key.camelize(:lower) != key
-            define_singleton_method(key.camelize(:lower)) do
+          if camelized_key != key
+            define_singleton_method(camelized_key) do
               self.send('[]', key)
             end
           end
