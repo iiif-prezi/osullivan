@@ -87,8 +87,10 @@ module IIIF
     # Covert snake_case keys to camelCase
     def camelize_keys
       self.keys.each_with_index do |key, i|
-        if key != key.camelize(:lower)
-          self.insert(i, key.camelize(:lower), self[key])
+        camelized_key = key.camelize(:lower)
+
+        if key != camelized_key
+          self.insert(i, camelized_key, self[key])
           self.delete(key)
         end
       end
