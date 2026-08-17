@@ -50,6 +50,13 @@ module IIIF
 
           Geo::Coord.new(latd: lat_matcher[:degrees], latm: lat_matcher[:minutes], lats: lat_matcher[:seconds], lath: lat_matcher[:hemisphere],
                         lngd: long_matcher[:degrees], lngm: long_matcher[:minutes], lngs: long_matcher[:seconds], lngh: long_matcher[:hemisphere])
+        rescue ArgumentError
+          # Geo::Coord rejects degrees outside the valid range, and hemispheres
+          # that do not belong to the axis they were given for. Both occur in
+          # real MARC coordinate data. Treat them the same way as text that did
+          # not match COORD_REGEX at all, so that #valid? reports false instead
+          # of raising and callers can skip the coordinate.
+          nil
         end
 
         def rect_for(coordinate_parts)
