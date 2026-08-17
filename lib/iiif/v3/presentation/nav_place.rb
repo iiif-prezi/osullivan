@@ -50,6 +50,8 @@ module IIIF
 
           Geo::Coord.new(latd: lat_matcher[:degrees], latm: lat_matcher[:minutes], lats: lat_matcher[:seconds], lath: lat_matcher[:hemisphere],
                         lngd: long_matcher[:degrees], lngm: long_matcher[:minutes], lngs: long_matcher[:seconds], lngh: long_matcher[:hemisphere])
+        rescue ArgumentError
+          nil
         end
 
         def rect_for(coordinate_parts)
