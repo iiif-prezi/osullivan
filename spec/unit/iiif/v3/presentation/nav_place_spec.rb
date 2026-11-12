@@ -44,6 +44,20 @@ describe IIIF::V3::Presentation::NavPlace do
                 ] }
   end
 
+  describe '#initialize' do
+    let(:coordinate_texts) { valid_coordinates }
+
+    [nil, '', '/path', 'example.com', 'ftp://my.server'].each do |value|
+      context "when base_uri is #{value.inspect}" do
+        let(:base_uri) { value }
+
+        it 'raises ArgumentError' do
+          expect { subject }.to raise_error(ArgumentError, /base_uri must be an absolute HTTP\(S\) URI/)
+        end
+      end
+    end
+  end
+
   describe '#build' do
     context 'when coordinates are valid' do
       let(:coordinate_texts) { valid_coordinates }
