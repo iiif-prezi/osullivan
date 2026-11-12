@@ -19,28 +19,28 @@ describe IIIF::V3::Presentation::NavPlace do
                   type: 'Feature',
                   properties: {},
                   geometry: { type: 'Polygon',
-                              coordinates: [[['-23.9', '71.316666'],
-                                              ['53.6', '71.316666'],
-                                              ['53.6', '33.5'],
-                                              ['-23.9', '33.5'],
-                                              ['-23.9', '71.316666']]] } },
+                              coordinates: [[[-23.9, 71.316667],
+                                              [53.6, 71.316667],
+                                              [53.6, 33.5],
+                                              [-23.9, 33.5],
+                                              [-23.9, 71.316667]]] } },
                 { id: 'https://purl.stanford.edu/iiif/feature/2',
                   type: 'Feature',
                   properties: {},
-                  geometry: { type: 'Point', coordinates: ['103.8', '-3.766666'] } },
+                  geometry: { type: 'Point', coordinates: [103.8, -3.766667] } },
                 { id: 'https://purl.stanford.edu/iiif/feature/3',
                   type: 'Feature',
                   properties: {},
-                  geometry: { coordinates: ['103.8', '3.766666'], type: "Point" } },
+                  geometry: { coordinates: [103.8, 3.766667], type: "Point" } },
                 { id: 'https://purl.stanford.edu/iiif/feature/4',
                   type: 'Feature',
                   properties: {},
                   geometry: { type: 'Polygon',
-                              coordinates: [[['-23.9', '71.316666'],
-                                              ['53.6', '71.316666'],
-                                              ['53.6', '33.5'],
-                                              ['-23.9', '33.5'],
-                                              ['-23.9', '71.316666']]] } }
+                              coordinates: [[[-23.9, 71.316667],
+                                              [53.6, 71.316667],
+                                              [53.6, 33.5],
+                                              [-23.9, 33.5],
+                                              [-23.9, 71.316667]]] } }
                 ] }
   end
 
@@ -48,8 +48,10 @@ describe IIIF::V3::Presentation::NavPlace do
     context 'when coordinates are valid' do
       let(:coordinate_texts) { valid_coordinates }
 
+      # Compare as JSON: Ruby's == treats a BigDecimal as equal to a Float, but
+      # a BigDecimal serializes as a string, which GeoJSON does not allow.
       it 'returns navPlace' do
-        expect(subject.build).to eq nav_place
+        expect(JSON.parse(subject.build.to_json)).to eq JSON.parse(nav_place.to_json)
       end
     end
 
