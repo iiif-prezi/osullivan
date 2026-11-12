@@ -86,18 +86,33 @@ module IIIF
         end
 
         def polygon_geometry(rect)
+          west = edge(format(rect.coord1.lng), from: 180.0, to: -180.0)
+          east = edge(format(rect.coord2.lng), from: -180.0, to: 180.0)
+          south, north = [format(rect.coord1.lat), format(rect.coord2.lat)].minmax
+
+          return { type: 'Polygon', coordinates: [ring(west, east, south, north)] } unless west > east
+
+          # A box reads west to east, so a west edge greater than its east edge means
+          # the box crosses the antimeridian. GeoJSON has no wrapping boxes, so such a
+          # box is split there into two polygons (RFC 7946, section 3.1.9).
           {
-            type: 'Polygon',
+            type: 'MultiPolygon',
             coordinates: [
-              [
-                [format(rect.coord1.lng), format(rect.coord1.lat)],
-                [format(rect.coord2.lng), format(rect.coord1.lat)],
-                [format(rect.coord2.lng), format(rect.coord2.lat)],
-                [format(rect.coord1.lng), format(rect.coord2.lat)],
-                [format(rect.coord1.lng), format(rect.coord1.lat)]
-              ]
+              [ring(west, 180.0, south, north)],
+              [ring(-180.0, east, south, north)]
             ]
           }
+        end
+
+        # If a box edge sits right on the antimeridian it could be counted as
+        # 180 or -180; we pick whichever one won't require splitting (see above).
+        def edge(lng, from:, to:)
+          lng == from ? to : lng
+        end
+
+        # Exterior rings run counterclockwise (RFC 7946, section 3.1.6).
+        def ring(west, east, south, north)
+          [[west, south], [east, south], [east, north], [west, north], [west, south]]
         end
 
         # GeoJSON positions are arrays of numbers (RFC 7946, section 3.1.1), so

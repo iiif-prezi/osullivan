@@ -19,11 +19,11 @@ describe IIIF::V3::Presentation::NavPlace do
                   type: 'Feature',
                   properties: {},
                   geometry: { type: 'Polygon',
-                              coordinates: [[[-23.9, 71.316667],
-                                              [53.6, 71.316667],
+                              coordinates: [[[-23.9, 33.5],
                                               [53.6, 33.5],
-                                              [-23.9, 33.5],
-                                              [-23.9, 71.316667]]] } },
+                                              [53.6, 71.316667],
+                                              [-23.9, 71.316667],
+                                              [-23.9, 33.5]]] } },
                 { id: 'https://purl.stanford.edu/iiif/feature/2',
                   type: 'Feature',
                   properties: {},
@@ -36,11 +36,11 @@ describe IIIF::V3::Presentation::NavPlace do
                   type: 'Feature',
                   properties: {},
                   geometry: { type: 'Polygon',
-                              coordinates: [[[-23.9, 71.316667],
-                                              [53.6, 71.316667],
+                              coordinates: [[[-23.9, 33.5],
                                               [53.6, 33.5],
-                                              [-23.9, 33.5],
-                                              [-23.9, 71.316667]]] } }
+                                              [53.6, 71.316667],
+                                              [-23.9, 71.316667],
+                                              [-23.9, 33.5]]] } }
                 ] }
   end
 
@@ -66,6 +66,43 @@ describe IIIF::V3::Presentation::NavPlace do
       # a BigDecimal serializes as a string, which GeoJSON does not allow.
       it 'returns navPlace' do
         expect(JSON.parse(subject.build.to_json)).to eq JSON.parse(nav_place.to_json)
+      end
+    end
+
+    context 'when the north and south edges are given in the reverse order' do
+      let(:coordinate_texts) { ["W 10°00ʹ--E 20°00ʹ/S 5°00ʹ--N 5°00ʹ"] }
+
+      it 'still runs the ring counterclockwise' do
+        expect(JSON.parse(subject.build.to_json)['features'][0]['geometry']).to eq(
+          'type' => 'Polygon',
+          'coordinates' => [[[-10.0, -5.0], [20.0, -5.0], [20.0, 5.0], [-10.0, 5.0], [-10.0, -5.0]]]
+        )
+      end
+    end
+
+    context 'when a box crosses the antimeridian' do
+      let(:coordinate_texts) { ["E 170°00ʹ--W 170°00ʹ/N 10°00ʹ--S 10°00ʹ"] }
+
+      it 'splits it into a MultiPolygon, per the spec' do
+        expect(JSON.parse(subject.build.to_json)['features'][0]['geometry']).to eq(
+          'type' => 'MultiPolygon',
+          'coordinates' => [
+            [[[170.0, -10.0], [180.0, -10.0], [180.0, 10.0], [170.0, 10.0], [170.0, -10.0]]],
+            [[[-180.0, -10.0], [-170.0, -10.0], [-170.0, 10.0], [-180.0, 10.0], [-180.0, -10.0]]]
+          ]
+        )
+      end
+    end
+
+    context 'when a box has an edge on the antimeridian' do
+      let(:coordinate_texts) { ["E 170°00ʹ--W 180°00ʹ/N 10°00ʹ--S 10°00ʹ", "E 180°00ʹ--W 170°00ʹ/N 10°00ʹ--S 10°00ʹ"] }
+
+      it 'makes bounds that do not require splitting' do
+        geometries = JSON.parse(subject.build.to_json)['features'].map { |feature| feature['geometry'] }
+        expect(geometries).to eq [
+          { 'type' => 'Polygon', 'coordinates' => [[[170.0, -10.0], [180.0, -10.0], [180.0, 10.0], [170.0, 10.0], [170.0, -10.0]]] },
+          { 'type' => 'Polygon', 'coordinates' => [[[-180.0, -10.0], [-170.0, -10.0], [-170.0, 10.0], [-180.0, 10.0], [-180.0, -10.0]]] }
+        ]
       end
     end
 
