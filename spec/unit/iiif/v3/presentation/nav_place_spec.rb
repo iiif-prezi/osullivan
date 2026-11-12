@@ -8,7 +8,7 @@ describe IIIF::V3::Presentation::NavPlace do
     ["W 23°54'00\"--E 53°36'00\"/N 71°19'00\"--N 33°30'00\"",
     'E 103°48ʹ/S 3°46ʹ).',
     'X 103°48ʹ/Y 3°46ʹ).',
-    'In decimal degrees: (E 138.0--W 074.0/N 073.0--N 041.2).', # currently invalid therefore doesn't show up in nav_place
+    'In decimal degrees: (E 138.0--W 074.0/N 073.0--N 041.2).',
     '23°54′00″W -- 53°36′00″E / 71°19′00″N -- 33°30′00″N'
     ]
   end
@@ -33,6 +33,20 @@ describe IIIF::V3::Presentation::NavPlace do
                   properties: {},
                   geometry: { coordinates: [103.8, 3.766667], type: "Point" } },
                 { id: 'https://purl.stanford.edu/iiif/feature/4',
+                  type: 'Feature',
+                  properties: {},
+                  geometry: { type: 'MultiPolygon',
+                              coordinates: [[[[138.0, 41.2],
+                                               [180.0, 41.2],
+                                               [180.0, 73.0],
+                                               [138.0, 73.0],
+                                               [138.0, 41.2]]],
+                                            [[[-180.0, 41.2],
+                                               [-74.0, 41.2],
+                                               [-74.0, 73.0],
+                                               [-180.0, 73.0],
+                                               [-180.0, 41.2]]]] } },
+                { id: 'https://purl.stanford.edu/iiif/feature/5',
                   type: 'Feature',
                   properties: {},
                   geometry: { type: 'Polygon',
@@ -103,6 +117,26 @@ describe IIIF::V3::Presentation::NavPlace do
           { 'type' => 'Polygon', 'coordinates' => [[[170.0, -10.0], [180.0, -10.0], [180.0, 10.0], [170.0, 10.0], [170.0, -10.0]]] },
           { 'type' => 'Polygon', 'coordinates' => [[[-180.0, -10.0], [-170.0, -10.0], [-170.0, 10.0], [-180.0, 10.0], [-180.0, -10.0]]] }
         ]
+      end
+    end
+
+    context 'with decimal degrees' do
+      let(:coordinate_texts) { ['E 138.5°/N 35.25°'] }
+
+      it 'reads the whole number' do
+        expect(JSON.parse(subject.build.to_json)['features'][0]['geometry']).to eq(
+          'type' => 'Point', 'coordinates' => [138.5, 35.25]
+        )
+      end
+    end
+
+    context 'with decimal degrees and minutes and seconds' do
+      let(:coordinate_texts) { ['W 122°15.5ʹ/N 37°26ʹ30.5″'] }
+
+      it 'keeps them' do
+        expect(JSON.parse(subject.build.to_json)['features'][0]['geometry']).to eq(
+          'type' => 'Point', 'coordinates' => [-122.258333, 37.441806]
+        )
       end
     end
 

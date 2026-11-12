@@ -7,7 +7,23 @@ module IIIF
       class NavPlace < IIIF::V3::AbstractResource
         Rect = Struct.new(:coord1, :coord2)
 
-        COORD_REGEX = /(?:(?<hemisphere>[NSEW])\s*)?(?<degrees>\d+)[°⁰*](?:\s*(?<minutes>\d+)[\'ʹ′])?(?:\s*(?<seconds>\d+)["ʺ″])?(?:\s*(?<hemisphere>[NSEW]))?/
+        DECIMAL = /\d+(?:\.\d+)?/
+
+        # Matches one coordinate, in either of two forms:
+        # - degrees with a degree sign, optionally followed by minutes and seconds,
+        #   any of which may be decimal, with the hemisphere before or after
+        #   ("W 23°54'00\"", "23°54′00″W", "E 138.5°", "N 37°26ʹ30.5″");
+        # - decimal degrees with no degree sign, which need the hemisphere first
+        #   ("E 138.0").
+        COORD_REGEX = /
+          (?:(?<hemisphere>[NSEW])\s*)?(?<![\d.])(?<degrees>#{DECIMAL})[°⁰*]
+          (?:\s*(?<minutes>#{DECIMAL})[\'ʹ′])?
+          (?:\s*(?<seconds>#{DECIMAL})["ʺ″])?
+          (?:\s*(?<hemisphere>[NSEW]))?
+        |
+          (?<hemisphere>[NSEW])\s*(?<degrees>\d+\.\d+)(?![\d.°⁰*\'ʹ′"ʺ″])
+        /x
+
         # @param [Array<String>] coordinate_texts
         # @param [String] base_uri prefix for the Feature Collection and Feature ids
         def initialize(coordinate_texts:, base_uri:)
