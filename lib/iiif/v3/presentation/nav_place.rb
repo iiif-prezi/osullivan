@@ -95,14 +95,15 @@ module IIIF
           }
         end
 
+        # GeoJSON positions are arrays of numbers (RFC 7946, section 3.1.1), so
+        # coordinates are emitted as Floats rather than strings.
         # @param [BigDecimal] coordinate value from geocoord gem
-        # @return [String] string formatted with max 6 digits after the decimal point
-        # The to_f ensures removal of scientific notation of BigDecimal before converting to a string.
+        # @return [Float] value rounded to at most 6 digits after the decimal point
         # examples:
-        # input value is BigDecimal("-23.9") or "0.239e2", output value is "-23.9" as string
-        # input value is BigDecimal("23.9424213434") or "0.239424213434e2", output value is "23.942421" as string
+        # input value is BigDecimal("-23.9") or "0.239e2", output value is -23.9
+        # input value is BigDecimal("23.9424216434") or "0.239424216434e2", output value is 23.942422
         def format(decimal)
-          decimal.truncate(6).to_f.to_s
+          decimal.round(6).to_f
         end
       end
     end
