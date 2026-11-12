@@ -1,4 +1,5 @@
 require 'geo/coord'
+require 'uri'
 
 module IIIF
   module V3
@@ -7,7 +8,11 @@ module IIIF
         Rect = Struct.new(:coord1, :coord2)
 
         COORD_REGEX = /(?:(?<hemisphere>[NSEW])\s*)?(?<degrees>\d+)[°⁰*](?:\s*(?<minutes>\d+)[\'ʹ′])?(?:\s*(?<seconds>\d+)["ʺ″])?(?:\s*(?<hemisphere>[NSEW]))?/
+        # @param [Array<String>] coordinate_texts
+        # @param [String] base_uri prefix for the Feature Collection and Feature ids
         def initialize(coordinate_texts:, base_uri:)
+          raise ArgumentError, "base_uri must be an absolute HTTP(S) URI, got #{base_uri.inspect}" unless base_uri&.start_with?(/https?:\/\//)
+
           @coordinate_texts = coordinate_texts
           @base_uri = base_uri
         end
