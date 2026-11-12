@@ -1,4 +1,5 @@
 require 'geo/coord'
+require 'uri'
 
 module IIIF
   module V3
@@ -6,8 +7,28 @@ module IIIF
       class NavPlace < IIIF::V3::AbstractResource
         Rect = Struct.new(:coord1, :coord2)
 
-        COORD_REGEX = /(?:(?<hemisphere>[NSEW])\s*)?(?<degrees>\d+)[°⁰*](?:\s*(?<minutes>\d+)[\'ʹ′])?(?:\s*(?<seconds>\d+)["ʺ″])?(?:\s*(?<hemisphere>[NSEW]))?/
+        DECIMAL = /\d+(?:\.\d+)?/
+
+        # Matches one coordinate, in either of two forms:
+        # - degrees with a degree sign, optionally followed by minutes and seconds,
+        #   any of which may be decimal, with the hemisphere before or after
+        #   ("W 23°54'00\"", "23°54′00″W", "E 138.5°", "N 37°26ʹ30.5″");
+        # - decimal degrees with no degree sign, which need the hemisphere first
+        #   ("E 138.0").
+        COORD_REGEX = /
+          (?:(?<hemisphere>[NSEW])\s*)?(?<![\d.])(?<degrees>#{DECIMAL})[°⁰*]
+          (?:\s*(?<minutes>#{DECIMAL})[\'ʹ′])?
+          (?:\s*(?<seconds>#{DECIMAL})["ʺ″])?
+          (?:\s*(?<hemisphere>[NSEW]))?
+        |
+          (?<hemisphere>[NSEW])\s*(?<degrees>\d+\.\d+)(?![\d.°⁰*\'ʹ′"ʺ″])
+        /x
+
+        # @param [Array<String>] coordinate_texts
+        # @param [String] base_uri prefix for the Feature Collection and Feature ids
         def initialize(coordinate_texts:, base_uri:)
+          raise ArgumentError, "base_uri must be an absolute HTTP(S) URI, got #{base_uri.inspect}" unless base_uri&.start_with?(/https?:\/\//)
+
           @coordinate_texts = coordinate_texts
           @base_uri = base_uri
         end
@@ -81,28 +102,44 @@ module IIIF
         end
 
         def polygon_geometry(rect)
+          west = edge(format(rect.coord1.lng), from: 180.0, to: -180.0)
+          east = edge(format(rect.coord2.lng), from: -180.0, to: 180.0)
+          south, north = [format(rect.coord1.lat), format(rect.coord2.lat)].minmax
+
+          return { type: 'Polygon', coordinates: [ring(west, east, south, north)] } unless west > east
+
+          # A box reads west to east, so a west edge greater than its east edge means
+          # the box crosses the antimeridian. GeoJSON has no wrapping boxes, so such a
+          # box is split there into two polygons (RFC 7946, section 3.1.9).
           {
-            type: 'Polygon',
+            type: 'MultiPolygon',
             coordinates: [
-              [
-                [format(rect.coord1.lng), format(rect.coord1.lat)],
-                [format(rect.coord2.lng), format(rect.coord1.lat)],
-                [format(rect.coord2.lng), format(rect.coord2.lat)],
-                [format(rect.coord1.lng), format(rect.coord2.lat)],
-                [format(rect.coord1.lng), format(rect.coord1.lat)]
-              ]
+              [ring(west, 180.0, south, north)],
+              [ring(-180.0, east, south, north)]
             ]
           }
         end
 
+        # If a box edge sits right on the antimeridian it could be counted as
+        # 180 or -180; we pick whichever one won't require splitting (see above).
+        def edge(lng, from:, to:)
+          lng == from ? to : lng
+        end
+
+        # Exterior rings run counterclockwise (RFC 7946, section 3.1.6).
+        def ring(west, east, south, north)
+          [[west, south], [east, south], [east, north], [west, north], [west, south]]
+        end
+
+        # GeoJSON positions are arrays of numbers (RFC 7946, section 3.1.1), so
+        # coordinates are emitted as Floats rather than strings.
         # @param [BigDecimal] coordinate value from geocoord gem
-        # @return [String] string formatted with max 6 digits after the decimal point
-        # The to_f ensures removal of scientific notation of BigDecimal before converting to a string.
+        # @return [Float] value rounded to at most 6 digits after the decimal point
         # examples:
-        # input value is BigDecimal("-23.9") or "0.239e2", output value is "-23.9" as string
-        # input value is BigDecimal("23.9424213434") or "0.239424213434e2", output value is "23.942421" as string
+        # input value is BigDecimal("-23.9") or "0.239e2", output value is -23.9
+        # input value is BigDecimal("23.9424216434") or "0.239424216434e2", output value is 23.942422
         def format(decimal)
-          decimal.truncate(6).to_f.to_s
+          decimal.round(6).to_f
         end
       end
     end

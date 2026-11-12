@@ -8,7 +8,7 @@ describe IIIF::V3::Presentation::NavPlace do
     ["W 23°54'00\"--E 53°36'00\"/N 71°19'00\"--N 33°30'00\"",
     'E 103°48ʹ/S 3°46ʹ).',
     'X 103°48ʹ/Y 3°46ʹ).',
-    'In decimal degrees: (E 138.0--W 074.0/N 073.0--N 041.2).', # currently invalid therefore doesn't show up in nav_place
+    'In decimal degrees: (E 138.0--W 074.0/N 073.0--N 041.2).',
     '23°54′00″W -- 53°36′00″E / 71°19′00″N -- 33°30′00″N'
     ]
   end
@@ -19,37 +19,124 @@ describe IIIF::V3::Presentation::NavPlace do
                   type: 'Feature',
                   properties: {},
                   geometry: { type: 'Polygon',
-                              coordinates: [[['-23.9', '71.316666'],
-                                              ['53.6', '71.316666'],
-                                              ['53.6', '33.5'],
-                                              ['-23.9', '33.5'],
-                                              ['-23.9', '71.316666']]] } },
+                              coordinates: [[[-23.9, 33.5],
+                                              [53.6, 33.5],
+                                              [53.6, 71.316667],
+                                              [-23.9, 71.316667],
+                                              [-23.9, 33.5]]] } },
                 { id: 'https://purl.stanford.edu/iiif/feature/2',
                   type: 'Feature',
                   properties: {},
-                  geometry: { type: 'Point', coordinates: ['103.8', '-3.766666'] } },
+                  geometry: { type: 'Point', coordinates: [103.8, -3.766667] } },
                 { id: 'https://purl.stanford.edu/iiif/feature/3',
                   type: 'Feature',
                   properties: {},
-                  geometry: { coordinates: ['103.8', '3.766666'], type: "Point" } },
+                  geometry: { coordinates: [103.8, 3.766667], type: "Point" } },
                 { id: 'https://purl.stanford.edu/iiif/feature/4',
                   type: 'Feature',
                   properties: {},
+                  geometry: { type: 'MultiPolygon',
+                              coordinates: [[[[138.0, 41.2],
+                                               [180.0, 41.2],
+                                               [180.0, 73.0],
+                                               [138.0, 73.0],
+                                               [138.0, 41.2]]],
+                                            [[[-180.0, 41.2],
+                                               [-74.0, 41.2],
+                                               [-74.0, 73.0],
+                                               [-180.0, 73.0],
+                                               [-180.0, 41.2]]]] } },
+                { id: 'https://purl.stanford.edu/iiif/feature/5',
+                  type: 'Feature',
+                  properties: {},
                   geometry: { type: 'Polygon',
-                              coordinates: [[['-23.9', '71.316666'],
-                                              ['53.6', '71.316666'],
-                                              ['53.6', '33.5'],
-                                              ['-23.9', '33.5'],
-                                              ['-23.9', '71.316666']]] } }
+                              coordinates: [[[-23.9, 33.5],
+                                              [53.6, 33.5],
+                                              [53.6, 71.316667],
+                                              [-23.9, 71.316667],
+                                              [-23.9, 33.5]]] } }
                 ] }
+  end
+
+  describe '#initialize' do
+    let(:coordinate_texts) { valid_coordinates }
+
+    [nil, '', '/path', 'example.com', 'ftp://my.server'].each do |value|
+      context "when base_uri is #{value.inspect}" do
+        let(:base_uri) { value }
+
+        it 'raises ArgumentError' do
+          expect { subject }.to raise_error(ArgumentError, /base_uri must be an absolute HTTP\(S\) URI/)
+        end
+      end
+    end
   end
 
   describe '#build' do
     context 'when coordinates are valid' do
       let(:coordinate_texts) { valid_coordinates }
 
+      # Compare as JSON: Ruby's == treats a BigDecimal as equal to a Float, but
+      # a BigDecimal serializes as a string, which GeoJSON does not allow.
       it 'returns navPlace' do
-        expect(subject.build).to eq nav_place
+        expect(JSON.parse(subject.build.to_json)).to eq JSON.parse(nav_place.to_json)
+      end
+    end
+
+    context 'when the north and south edges are given in the reverse order' do
+      let(:coordinate_texts) { ["W 10°00ʹ--E 20°00ʹ/S 5°00ʹ--N 5°00ʹ"] }
+
+      it 'still runs the ring counterclockwise' do
+        expect(JSON.parse(subject.build.to_json)['features'][0]['geometry']).to eq(
+          'type' => 'Polygon',
+          'coordinates' => [[[-10.0, -5.0], [20.0, -5.0], [20.0, 5.0], [-10.0, 5.0], [-10.0, -5.0]]]
+        )
+      end
+    end
+
+    context 'when a box crosses the antimeridian' do
+      let(:coordinate_texts) { ["E 170°00ʹ--W 170°00ʹ/N 10°00ʹ--S 10°00ʹ"] }
+
+      it 'splits it into a MultiPolygon, per the spec' do
+        expect(JSON.parse(subject.build.to_json)['features'][0]['geometry']).to eq(
+          'type' => 'MultiPolygon',
+          'coordinates' => [
+            [[[170.0, -10.0], [180.0, -10.0], [180.0, 10.0], [170.0, 10.0], [170.0, -10.0]]],
+            [[[-180.0, -10.0], [-170.0, -10.0], [-170.0, 10.0], [-180.0, 10.0], [-180.0, -10.0]]]
+          ]
+        )
+      end
+    end
+
+    context 'when a box has an edge on the antimeridian' do
+      let(:coordinate_texts) { ["E 170°00ʹ--W 180°00ʹ/N 10°00ʹ--S 10°00ʹ", "E 180°00ʹ--W 170°00ʹ/N 10°00ʹ--S 10°00ʹ"] }
+
+      it 'makes bounds that do not require splitting' do
+        geometries = JSON.parse(subject.build.to_json)['features'].map { |feature| feature['geometry'] }
+        expect(geometries).to eq [
+          { 'type' => 'Polygon', 'coordinates' => [[[170.0, -10.0], [180.0, -10.0], [180.0, 10.0], [170.0, 10.0], [170.0, -10.0]]] },
+          { 'type' => 'Polygon', 'coordinates' => [[[-180.0, -10.0], [-170.0, -10.0], [-170.0, 10.0], [-180.0, 10.0], [-180.0, -10.0]]] }
+        ]
+      end
+    end
+
+    context 'with decimal degrees' do
+      let(:coordinate_texts) { ['E 138.5°/N 35.25°'] }
+
+      it 'reads the whole number' do
+        expect(JSON.parse(subject.build.to_json)['features'][0]['geometry']).to eq(
+          'type' => 'Point', 'coordinates' => [138.5, 35.25]
+        )
+      end
+    end
+
+    context 'with decimal degrees and minutes and seconds' do
+      let(:coordinate_texts) { ['W 122°15.5ʹ/N 37°26ʹ30.5″'] }
+
+      it 'keeps them' do
+        expect(JSON.parse(subject.build.to_json)['features'][0]['geometry']).to eq(
+          'type' => 'Point', 'coordinates' => [-122.258333, 37.441806]
+        )
       end
     end
 
