@@ -25,9 +25,9 @@ module IIIF
         /x
 
         # @param [Array<String>] coordinate_texts
-        # @param [String] base_uri prefix for the Feature Collection and Feature ids
-        def initialize(coordinate_texts:, base_uri:)
-          raise ArgumentError, "base_uri must be an absolute HTTP(S) URI, got #{base_uri.inspect}" unless base_uri&.start_with?(/https?:\/\//)
+        # @param [String, nil] base_uri optional prefix for the Feature Collection and Feature ids
+        def initialize(coordinate_texts:, base_uri: nil)
+          raise ArgumentError, "base_uri must be an absolute HTTP(S) URI, got #{base_uri.inspect}" unless base_uri.nil? || base_uri.start_with?(/https?:\/\//)
 
           @coordinate_texts = coordinate_texts
           @base_uri = base_uri
@@ -41,11 +41,9 @@ module IIIF
         def build
           raise ArgumentError.new('invalid coordinates') unless valid?
 
-          {
-            id: "#{base_uri}/feature-collection/1",
-            type: 'FeatureCollection',
-            features: features
-          }
+          with_id("#{base_uri}/feature-collection/1",
+                  type: 'FeatureCollection',
+                  features: features)
         end
 
         private
@@ -85,13 +83,16 @@ module IIIF
 
         def features
           coordinates.map.with_index(1) do |coordinate, index|
-            {
-              id: "#{base_uri}/iiif/feature/#{index}",
-              type: 'Feature',
-              properties: {},
-              geometry: coordinate.is_a?(Rect) ? polygon_geometry(coordinate) : point_geometry(coordinate)
-            }
+            with_id("#{base_uri}/iiif/feature/#{index}",
+                    type: 'Feature',
+                    properties: {},
+                    geometry: coordinate.is_a?(Rect) ? polygon_geometry(coordinate) : point_geometry(coordinate))
           end
+        end
+
+        # The navPlace extension makes ids optional, so leave them out without a base_uri.
+        def with_id(id, resource)
+          base_uri ? { id: id }.merge(resource) : resource
         end
 
         def point_geometry(coord)
