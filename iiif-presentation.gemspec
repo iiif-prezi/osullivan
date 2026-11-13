@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
-  spec.add_development_dependency "coveralls"
+  spec.add_development_dependency "simplecov", "~> 1.3"
   spec.add_development_dependency "webmock"
   spec.add_development_dependency "multi_json"
   spec.add_development_dependency "vcr", "~> 6.4"
