@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
+require File.join(File.dirname(__FILE__), "abstract_resource")
 
 module IIIF
   module Presentation
@@ -9,4 +9,3 @@ module IIIF
     end
   end
 end
-

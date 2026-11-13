@@ -1,6 +1,6 @@
-require 'geo/coord'
-require 'json'
-require 'uri'
+require "geo/coord"
+require "json"
+require "uri"
 
 module IIIF
   module V3
@@ -18,11 +18,11 @@ module IIIF
         #   ("E 138.0").
         COORD_REGEX = /
           (?:(?<hemisphere>[NSEW])\s*)?(?<![\d.])(?<degrees>#{DECIMAL})[°⁰*]
-          (?:\s*(?<minutes>#{DECIMAL})[\'ʹ′])?
+          (?:\s*(?<minutes>#{DECIMAL})['ʹ′])?
           (?:\s*(?<seconds>#{DECIMAL})["ʺ″])?
           (?:\s*(?<hemisphere>[NSEW]))?
         |
-          (?<hemisphere>[NSEW])\s*(?<degrees>\d+\.\d+)(?![\d.°⁰*\'ʹ′"ʺ″])
+          (?<hemisphere>[NSEW])\s*(?<degrees>\d+\.\d+)(?![\d.°⁰*'ʹ′"ʺ″])
         /x
 
         # WKT versions of points and boxes (polygon/multipolygon).
@@ -47,11 +47,11 @@ module IIIF
         end
 
         def build
-          raise ArgumentError.new('invalid coordinates') unless valid?
+          raise ArgumentError.new("invalid coordinates") unless valid?
 
           with_id("#{base_uri}/feature-collection/1",
-                  type: 'FeatureCollection',
-                  features: features)
+            type: "FeatureCollection",
+            features: features)
         end
 
         private
@@ -78,7 +78,7 @@ module IIIF
           return unless long_matcher && lat_matcher
 
           Geo::Coord.new(latd: lat_matcher[:degrees], latm: lat_matcher[:minutes], lats: lat_matcher[:seconds], lath: lat_matcher[:hemisphere],
-                        lngd: long_matcher[:degrees], lngm: long_matcher[:minutes], lngs: long_matcher[:seconds], lngh: long_matcher[:hemisphere])
+            lngd: long_matcher[:degrees], lngm: long_matcher[:minutes], lngs: long_matcher[:seconds], lngh: long_matcher[:hemisphere])
         rescue ArgumentError
           nil
         end
@@ -95,16 +95,16 @@ module IIIF
         # @return [Hash, nil] the GeoJSON geometry, or nil if the WKT isn't one we can use
         def wkt_geometry(text)
           match = text.match(WKT_REGEX)
-          body = match[:body].gsub(/(#{WKT_NUMBER})\s+(#{WKT_NUMBER})/) { "[#{Float($1).round(6)},#{Float($2).round(6)}]" }
-          coordinates = JSON.parse(body.tr('()', '[]'))
+          body = match[:body].gsub(/(#{WKT_NUMBER})\s+(#{WKT_NUMBER})/o) { "[#{Float($1).round(6)},#{Float($2).round(6)}]" }
+          coordinates = JSON.parse(body.tr("()", "[]"))
 
           case match[:type].upcase
-          when 'POINT'
-            { type: 'Point', coordinates: coordinates.first } if coordinates.length == 1 && point?(coordinates.first)
-          when 'POLYGON'
-            { type: 'Polygon', coordinates: oriented(coordinates) } if polygon?(coordinates)
-          when 'MULTIPOLYGON'
-            { type: 'MultiPolygon', coordinates: coordinates.map { |polygon| oriented(polygon) } } if coordinates.any? && coordinates.all? { |polygon| polygon?(polygon) }
+          when "POINT"
+            {type: "Point", coordinates: coordinates.first} if coordinates.length == 1 && point?(coordinates.first)
+          when "POLYGON"
+            {type: "Polygon", coordinates: oriented(coordinates)} if polygon?(coordinates)
+          when "MULTIPOLYGON"
+            {type: "MultiPolygon", coordinates: coordinates.map { |polygon| oriented(polygon) }} if coordinates.any? && coordinates.all? { |polygon| polygon?(polygon) }
           end
         rescue JSON::ParserError, ArgumentError
           nil
@@ -125,16 +125,16 @@ module IIIF
         def oriented(polygon)
           polygon.each_with_index.map do |ring, index|
             area = ring.each_cons(2).sum { |(x1, y1), (x2, y2)| x1 * y2 - x2 * y1 }
-            (area > 0) == index.zero? ? ring : ring.reverse
+            ((area > 0) == index.zero?) ? ring : ring.reverse
           end
         end
 
         def features
           coordinates.map.with_index(1) do |coordinate, index|
             with_id("#{base_uri}/iiif/feature/#{index}",
-                    type: 'Feature',
-                    properties: {},
-                    geometry: geometry_for(coordinate))
+              type: "Feature",
+              properties: {},
+              geometry: geometry_for(coordinate))
           end
         end
 
@@ -148,12 +148,12 @@ module IIIF
 
         # The navPlace extension makes ids optional, so leave them out without a base_uri.
         def with_id(id, resource)
-          base_uri ? { id: id }.merge(resource) : resource
+          base_uri ? {id: id}.merge(resource) : resource
         end
 
         def point_geometry(coord)
           {
-            type: 'Point',
+            type: "Point",
             coordinates: [format(coord.lng), format(coord.lat)]
           }
         end
@@ -163,13 +163,13 @@ module IIIF
           east = edge(format(rect.coord2.lng), from: -180.0, to: 180.0)
           south, north = [format(rect.coord1.lat), format(rect.coord2.lat)].minmax
 
-          return { type: 'Polygon', coordinates: [ring(west, east, south, north)] } unless west > east
+          return {type: "Polygon", coordinates: [ring(west, east, south, north)]} unless west > east
 
           # A box reads west to east, so a west edge greater than its east edge means
           # the box crosses the antimeridian. GeoJSON has no wrapping boxes, so such a
           # box is split there into two polygons (RFC 7946, section 3.1.9).
           {
-            type: 'MultiPolygon',
+            type: "MultiPolygon",
             coordinates: [
               [ring(west, 180.0, south, north)],
               [ring(-180.0, east, south, north)]
@@ -180,7 +180,7 @@ module IIIF
         # If a box edge sits right on the antimeridian it could be counted as
         # 180 or -180; we pick whichever one won't require splitting (see above).
         def edge(lng, from:, to:)
-          lng == from ? to : lng
+          (lng == from) ? to : lng
         end
 
         # Exterior rings run counterclockwise (RFC 7946, section 3.1.6).

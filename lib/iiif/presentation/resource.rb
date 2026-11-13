@@ -1,21 +1,19 @@
-require File.join(File.dirname(__FILE__), 'abstract_resource')
+require File.join(File.dirname(__FILE__), "abstract_resource")
 
 module IIIF
   module Presentation
     class Resource < AbstractResource
-
       def required_keys
-        %w{ @id }
+        %w[@id]
       end
 
       def string_only_keys
-        super + %w{ format }
+        super + %w[format]
       end
 
-      def initialize(hsh={})
-        super(hsh)
+      def initialize(hsh = {})
+        super
       end
-
     end
   end
 end
