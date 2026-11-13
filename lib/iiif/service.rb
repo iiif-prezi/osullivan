@@ -1,8 +1,8 @@
-require File.join(File.dirname(__FILE__), 'hash_behaviours')
-require 'active_support/core_ext/class/subclasses'
-require 'active_support/ordered_hash'
-require 'active_support/inflector'
-require 'json'
+require File.join(File.dirname(__FILE__), "hash_behaviours")
+require "active_support/core_ext/class/subclasses"
+require "active_support/ordered_hash"
+require "active_support/inflector"
+require "json"
 
 module IIIF
   class Service
@@ -10,24 +10,47 @@ module IIIF
 
     # Anything goes! SHOULD have @id and profile, MAY have label
     # Consider subclassing this for typical services...
-    def required_keys; %w{ }; end
-    def any_type_keys; %w{ }; end
-    def string_only_keys; %w{ }; end
-    def array_only_keys; %w{ }; end
-    def abstract_resource_only_keys; %w{ }; end
-    def hash_only_keys; %w{ }; end
-    def int_only_keys; %w{ }; end
-    def numeric_only_keys; %w{ }; end
+    def required_keys
+      %w[]
+    end
 
-    def initialize(hsh={})
+    def any_type_keys
+      %w[]
+    end
+
+    def string_only_keys
+      %w[]
+    end
+
+    def array_only_keys
+      %w[]
+    end
+
+    def abstract_resource_only_keys
+      %w[]
+    end
+
+    def hash_only_keys
+      %w[]
+    end
+
+    def int_only_keys
+      %w[]
+    end
+
+    def numeric_only_keys
+      %w[]
+    end
+
+    def initialize(hsh = {})
       @data = IIIF::OrderedHash[hsh]
-      self.define_methods_for_any_type_keys
-      self.define_methods_for_array_only_keys
-      self.define_methods_for_string_only_keys
-      self.define_methods_for_int_only_keys
-      self.define_methods_for_numeric_only_keys
-      self.define_methods_for_abstract_resource_only_keys
-      self.snakeize_keys
+      define_methods_for_any_type_keys
+      define_methods_for_array_only_keys
+      define_methods_for_string_only_keys
+      define_methods_for_int_only_keys
+      define_methods_for_numeric_only_keys
+      define_methods_for_abstract_resource_only_keys
+      snakeize_keys
     end
 
     # Static methods / alternative constructors
@@ -35,21 +58,21 @@ module IIIF
       # Parse from a file path, string, or existing hash
       def parse(s)
         ordered_hash = nil
-        if s.kind_of?(String) && File.exist?(s)
+        if s.is_a?(String) && File.exist?(s)
           ordered_hash = IIIF::OrderedHash[JSON.parse(IO.read(s))]
-        elsif s.kind_of?(String) && !File.exist?(s)
+        elsif s.is_a?(String) && !File.exist?(s)
           ordered_hash = IIIF::OrderedHash[JSON.parse(s)]
-        elsif s.kind_of?(Hash)
+        elsif s.is_a?(Hash)
           ordered_hash = IIIF::OrderedHash[s]
         else
-          m = '#parse takes a path to a file, a JSON String, or a Hash, '
+          m = "#parse takes a path to a file, a JSON String, or a Hash, "
           m += "argument was a #{s.class}."
-          if s.kind_of?(String)
-            m+= "If you were trying to point to a file, does it exist?"
+          if s.is_a?(String)
+            m += "If you were trying to point to a file, does it exist?"
           end
           raise ArgumentError, m
         end
-        return IIIF::Service.from_ordered_hash(ordered_hash)
+        IIIF::Service.from_ordered_hash(ordered_hash)
       end
     end
 
@@ -60,30 +83,30 @@ module IIIF
       # * type check String-only values
       # * type check Integer-only values
       # * type check AbstractResource-only values
-      self.required_keys.each do |k|
-        unless self.has_key?(k)
+      required_keys.each do |k|
+        unless has_key?(k)
           m = "A(n) #{k} is required for each #{self.class}"
           raise IIIF::Presentation::MissingRequiredKeyError, m
         end
       end
       # Viewing Direction values
-      if self.has_key?('viewing_direction')
-        unless self.legal_viewing_direction_values.include?(self['viewing_direction'])
+      if has_key?("viewing_direction")
+        unless legal_viewing_direction_values.include?(self["viewing_direction"])
           m = "viewingDirection must be one of #{legal_viewing_direction_values}"
           raise IIIF::Presentation::IllegalValueError, m
         end
       end
       # Viewing Hint values
-      if self.has_key?('viewing_hint')
-        unless self.legal_viewing_hint_values.include?(self['viewing_hint'])
-          m = "viewingHint for #{self.class} must be one of #{self.legal_viewing_hint_values}."
+      if has_key?("viewing_hint")
+        unless legal_viewing_hint_values.include?(self["viewing_hint"])
+          m = "viewingHint for #{self.class} must be one of #{legal_viewing_hint_values}."
           raise IIIF::Presentation::IllegalValueError, m
         end
       end
       # Metadata is all hashes
-      if self.has_key?('metadata')
-        unless self['metadata'].all? { |entry| entry.kind_of?(Hash) }
-          m = 'All entries in the metadata list must be a type of Hash'
+      if has_key?("metadata")
+        unless self["metadata"].all? { |entry| entry.is_a?(Hash) }
+          m = "All entries in the metadata list must be a type of Hash"
           raise IIIF::Presentation::IllegalValueError, m
         end
       end
@@ -92,8 +115,8 @@ module IIIF
     # Options
     #  * pretty: (true|false). Should the JSON be pretty-printed? (default: false)
     #  * All options available in #to_ordered_hash
-    def to_json(opts={})
-      hsh = self.to_ordered_hash(opts)
+    def to_json(opts = {})
+      hsh = to_ordered_hash(opts)
       if opts.fetch(:pretty, false)
         JSON.pretty_generate(hsh)
       else
@@ -105,19 +128,19 @@ module IIIF
     #  * force: (true|false). Skips validations.
     #  * sort_json_ld_keys: (true|false). Brings all properties starting with
     #      '@'. Default: true. to the top of the document and sorts them.
-    def to_ordered_hash(opts={})
+    def to_ordered_hash(opts = {})
       force = opts.fetch(:force, false)
       sort_json_ld_keys = opts.fetch(:sort_json_ld_keys, true)
 
       unless force
-        self.validate
+        validate
       end
 
       export_hash = IIIF::OrderedHash.new
 
       if sort_json_ld_keys
-        self.keys.select { |k| k.start_with?('@') }.sort!.each do |k|
-          export_hash[k] = self.data[k]
+        keys.select { |k| k.start_with?("@") }.sort!.each do |k|
+          export_hash[k] = data[k]
         end
       end
 
@@ -126,25 +149,24 @@ module IIIF
         sort_json_ld_keys: sort_json_ld_keys,
         force: force
       }
-      self.keys.each do |k|
-        unless sort_json_ld_keys && k.start_with?('@')
-          if self.data[k].respond_to?(:to_ordered_hash) #.respond_to?(:to_ordered_hash)
-            export_hash[k] = self.data[k].to_ordered_hash(sub_opts)
+      keys.each do |k|
+        unless sort_json_ld_keys && k.start_with?("@")
+          if data[k].respond_to?(:to_ordered_hash) # .respond_to?(:to_ordered_hash)
+            export_hash[k] = data[k].to_ordered_hash(sub_opts)
 
-          elsif self.data[k].kind_of?(Hash)
+          elsif data[k].is_a?(Hash)
             export_hash[k] = IIIF::OrderedHash.new
-            self.data[k].each do |sub_k, v|
-
+            data[k].each do |sub_k, v|
               if v.respond_to?(:to_ordered_hash)
                 export_hash[k][sub_k] = v.to_ordered_hash(sub_opts)
 
-              elsif v.kind_of?(Array)
+              elsif v.is_a?(Array)
                 export_hash[k][sub_k] = []
                 v.each do |member|
-                  if member.respond_to?(:to_ordered_hash)
-                    export_hash[k][sub_k] << member.to_ordered_hash(sub_opts)
+                  export_hash[k][sub_k] << if member.respond_to?(:to_ordered_hash)
+                    member.to_ordered_hash(sub_opts)
                   else
-                    export_hash[k][sub_k] << member
+                    member
                   end
                 end
               else
@@ -152,29 +174,28 @@ module IIIF
               end
             end
 
-          elsif self.data[k].kind_of?(Array)
+          elsif data[k].is_a?(Array)
             export_hash[k] = []
 
-            self.data[k].each do |member|
+            data[k].each do |member|
               if member.respond_to?(:to_ordered_hash)
                 export_hash[k] << member.to_ordered_hash(sub_opts)
 
-              elsif member.kind_of?(Hash)
+              elsif member.is_a?(Hash)
                 hsh = IIIF::OrderedHash.new
                 export_hash[k] << hsh
-                member.each do |sub_k,v|
-
+                member.each do |sub_k, v|
                   if v.respond_to?(:to_ordered_hash)
                     hsh[sub_k] = v.to_ordered_hash(sub_opts)
 
-                  elsif v.kind_of?(Array)
+                  elsif v.is_a?(Array)
                     hsh[sub_k] = []
 
                     v.each do |sub_member|
-                      if sub_member.respond_to?(:to_ordered_hash)
-                        hsh[sub_k] << sub_member.to_ordered_hash(sub_opts)
+                      hsh[sub_k] << if sub_member.respond_to?(:to_ordered_hash)
+                        sub_member.to_ordered_hash(sub_opts)
                       else
-                        hsh[sub_k] << sub_member
+                        sub_member
                       end
                     end
                   else
@@ -188,7 +209,7 @@ module IIIF
               end
             end
           else
-            export_hash[k] = self.data[k]
+            export_hash[k] = data[k]
           end
 
         end
@@ -198,35 +219,35 @@ module IIIF
       export_hash
     end
 
-    def self.from_ordered_hash(hsh, default_klass=IIIF::OrderedHash)
+    def self.from_ordered_hash(hsh, default_klass = IIIF::OrderedHash)
       # Create a new object (new_object)
       type = nil
-      if hsh.has_key?('@type')
-        type = IIIF::Service.get_descendant_class_by_jld_type(hsh['@type'])
+      if hsh.has_key?("@type")
+        type = IIIF::Service.get_descendant_class_by_jld_type(hsh["@type"])
       end
       new_object = type.nil? ? default_klass.new : type.new
 
       hsh.keys.each do |key|
-        new_key = key.underscore == key ? key : key.underscore
-        if hsh[key].kind_of?(Array)
+        new_key = (key.underscore == key) ? key : key.underscore
+        if hsh[key].is_a?(Array)
           new_object[new_key] = []
           hsh[key].each do |member|
-            if new_key == 'service'
-              new_object[new_key] << IIIF::Service.from_ordered_hash(member, IIIF::Presentation::Service)
-            elsif new_key == 'resource'
-              new_object[new_key] << IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
-            elsif member.kind_of?(Hash)
-              new_object[new_key] << IIIF::Service.from_ordered_hash(member)
+            new_object[new_key] << if new_key == "service"
+              IIIF::Service.from_ordered_hash(member, IIIF::Presentation::Service)
+            elsif new_key == "resource"
+              IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
+            elsif member.is_a?(Hash)
+              IIIF::Service.from_ordered_hash(member)
             else
-              new_object[new_key] << member
+              member
               # Again, no nested arrays, right?
             end
           end
-        elsif new_key == 'service'
+        elsif new_key == "service"
           new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Service)
-        elsif new_key == 'resource'
+        elsif new_key == "resource"
           new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key], IIIF::Presentation::Resource)
-        elsif hsh[key].kind_of?(Hash)
+        elsif hsh[key].is_a?(Hash)
           new_object[new_key] = IIIF::Service.from_ordered_hash(hsh[key])
         else
           new_object[new_key] = hsh[key]
@@ -234,8 +255,6 @@ module IIIF
       end
       new_object
     end
-
-    protected
 
     def self.get_descendant_class_by_jld_type(type)
       IIIF::Service.all_service_subclasses.find do |klass|
@@ -248,13 +267,11 @@ module IIIF
       @all_service_subclasses ||= IIIF::Service.descendants.reject(&:singleton_class?)
     end
 
-    def data=(hsh)
-      @data = hsh
-    end
+    protected
 
-    def data
-      @data
-    end
+    attr_writer :data
+
+    attr_reader :data
 
     def define_methods_for_any_type_keys
       define_accessor_methods(*any_type_keys)
@@ -263,14 +280,14 @@ module IIIF
       # an array for empty values.
       any_type_keys.each do |key|
         define_singleton_method(key) do
-          self.send('[]', key)
+          send(:[], key)
         end
       end
     end
 
     def define_methods_for_array_only_keys
       define_accessor_methods(*array_only_keys) do |key, arg|
-        unless arg.kind_of?(Array)
+        unless arg.is_a?(Array)
           m = "#{key} must be an Array."
           raise IIIF::Presentation::IllegalValueError, m
         end
@@ -284,7 +301,7 @@ module IIIF
         type = hsh[:type]
 
         define_accessor_methods(key) do |key, arg|
-          unless arg.kind_of?(type)
+          unless arg.is_a?(type)
             m = "#{key} must be an #{type}."
             raise IIIF::Presentation::IllegalValueError, m
           end
@@ -294,7 +311,7 @@ module IIIF
 
     def define_methods_for_string_only_keys
       define_accessor_methods(*string_only_keys) do |key, arg|
-        unless arg.kind_of?(String)
+        unless arg.is_a?(String)
           m = "#{key} must be an String."
           raise IIIF::Presentation::IllegalValueError, m
         end
@@ -303,7 +320,7 @@ module IIIF
 
     def define_methods_for_int_only_keys
       define_accessor_methods(*int_only_keys) do |key, arg|
-        unless arg.kind_of?(Integer) && arg > 0
+        unless arg.is_a?(Integer) && arg > 0
           m = "#{key} must be a positive Integer."
           raise IIIF::Presentation::IllegalValueError, m
         end
@@ -312,7 +329,7 @@ module IIIF
 
     def define_methods_for_numeric_only_keys
       define_accessor_methods(*numeric_only_keys) do |key, arg|
-        unless arg.kind_of?(Numeric) && arg > 0
+        unless arg.is_a?(Numeric) && arg > 0
           m = "#{key} must be a positive Integer or Float."
           raise IIIF::Presentation::IllegalValueError, m
         end
@@ -326,12 +343,12 @@ module IIIF
         # Setter
         define_singleton_method("#{key}=") do |arg|
           validation.call(key, arg) if block_given?
-          self.send('[]=', key, arg)
+          send(:[]=, key, arg)
         end
         if camelized_key != key
           define_singleton_method("#{camelized_key}=") do |arg|
             validation.call(key, arg) if block_given?
-            self.send('[]=', key, arg)
+            send(:[]=, key, arg)
           end
         end
         # Getter
@@ -341,7 +358,7 @@ module IIIF
         end
         if camelized_key != key
           define_singleton_method(camelized_key) do
-            self.send('[]', key)
+            send(:[], key)
           end
         end
       end

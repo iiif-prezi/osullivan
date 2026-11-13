@@ -1,5 +1,4 @@
-shared_examples 'it has the appropriate methods for any-type keys v3' do
-
+shared_examples "it has the appropriate methods for any-type keys v3" do
   described_class.new.any_type_keys.each do |prop|
     describe "##{prop}=" do
       it "sets self['#{prop}']" do
@@ -16,16 +15,15 @@ shared_examples 'it has the appropriate methods for any-type keys v3' do
 
     describe "##{prop}" do
       it "gets self[#{prop}]" do
-        subject.send("[]=", prop, fixed_values[prop])
-        expect(subject.send("#{prop}")).to eq fixed_values[prop]
+        subject.send(:[]=, prop, fixed_values[prop])
+        expect(subject.send(prop.to_s)).to eq fixed_values[prop]
       end
       if prop.camelize(:lower) != prop
         it "is aliased as ##{prop.camelize(:lower)}" do
-          subject.send("[]=", prop, fixed_values[prop])
-          expect(subject.send("#{prop.camelize(:lower)}")).to eq fixed_values[prop]
+          subject.send(:[]=, prop, fixed_values[prop])
+          expect(subject.send(prop.camelize(:lower).to_s)).to eq fixed_values[prop]
         end
       end
     end
   end
-
 end
