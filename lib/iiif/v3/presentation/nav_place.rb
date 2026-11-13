@@ -1,4 +1,5 @@
 require 'geo/coord'
+require 'json'
 require 'uri'
 
 module IIIF
@@ -24,7 +25,14 @@ module IIIF
           (?<hemisphere>[NSEW])\s*(?<degrees>\d+\.\d+)(?![\d.°⁰*\'ʹ′"ʺ″])
         /x
 
-        # @param [Array<String>] coordinate_texts
+        # WKT versions of points and boxes (polygon/multipolygon).
+        # See: https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
+        WKT_REGEX = /\A\s*(?<type>POINT|POLYGON|MULTIPOLYGON)\s*(?<body>\(.*\))\s*\z/im
+        WKT_NUMBER = /[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[-+]?\d+)?/i
+
+        # @param [Array<String>] coordinate_texts points or boxes, either as text
+        #   ("E 103°48ʹ/S 3°46ʹ", "W 23°54ʹ--E 53°36ʹ/N 71°19ʹ--N 33°30ʹ") or as a WKT
+        #   POINT, POLYGON or MULTIPOLYGON; any that can't be read are skipped
         # @param [String, nil] base_uri optional prefix for the Feature Collection and Feature ids
         def initialize(coordinate_texts:, base_uri: nil)
           raise ArgumentError, "base_uri must be an absolute HTTP(S) URI, got #{base_uri.inspect}" unless base_uri.nil? || base_uri.start_with?(/https?:\/\//)
@@ -52,6 +60,8 @@ module IIIF
 
         def coordinates
           @coordinates ||= coordinate_texts.map do |coordinate_text|
+            next wkt_geometry(coordinate_text) if coordinate_text.match?(WKT_REGEX)
+
             coordinate_parts = coordinate_text.split(%r{ ?--|/})
             case coordinate_parts.length
             when 2
@@ -81,12 +91,58 @@ module IIIF
           Rect.new(coord1, coord2)
         end
 
+        # Turn WKT strings into GeoJSON geometry.
+        # @return [Hash, nil] the GeoJSON geometry, or nil if the WKT isn't one we can use
+        def wkt_geometry(text)
+          match = text.match(WKT_REGEX)
+          body = match[:body].gsub(/(#{WKT_NUMBER})\s+(#{WKT_NUMBER})/) { "[#{Float($1).round(6)},#{Float($2).round(6)}]" }
+          coordinates = JSON.parse(body.tr('()', '[]'))
+
+          case match[:type].upcase
+          when 'POINT'
+            { type: 'Point', coordinates: coordinates.first } if coordinates.length == 1 && point?(coordinates.first)
+          when 'POLYGON'
+            { type: 'Polygon', coordinates: oriented(coordinates) } if polygon?(coordinates)
+          when 'MULTIPOLYGON'
+            { type: 'MultiPolygon', coordinates: coordinates.map { |polygon| oriented(polygon) } } if coordinates.any? && coordinates.all? { |polygon| polygon?(polygon) }
+          end
+        rescue JSON::ParserError, ArgumentError
+          nil
+        end
+
+        def point?(value)
+          value.is_a?(Array) && value.length == 2 && value.all?(Numeric) && value[0].between?(-180, 180) && value[1].between?(-90, 90)
+        end
+
+        def polygon?(value)
+          value.is_a?(Array) && value.any? && value.all? do |ring|
+            ring.is_a?(Array) && ring.length >= 4 && ring.all? { |position| point?(position) } && ring.first == ring.last
+          end
+        end
+
+        # WKT doesn't fix which way rings run, so turn the exterior counterclockwise
+        # and any holes clockwise (RFC 7946, section 3.1.6).
+        def oriented(polygon)
+          polygon.each_with_index.map do |ring, index|
+            area = ring.each_cons(2).sum { |(x1, y1), (x2, y2)| x1 * y2 - x2 * y1 }
+            (area > 0) == index.zero? ? ring : ring.reverse
+          end
+        end
+
         def features
           coordinates.map.with_index(1) do |coordinate, index|
             with_id("#{base_uri}/iiif/feature/#{index}",
                     type: 'Feature',
                     properties: {},
-                    geometry: coordinate.is_a?(Rect) ? polygon_geometry(coordinate) : point_geometry(coordinate))
+                    geometry: geometry_for(coordinate))
+          end
+        end
+
+        def geometry_for(coordinate)
+          case coordinate
+          when Rect then polygon_geometry(coordinate)
+          when Geo::Coord then point_geometry(coordinate)
+          else coordinate # already a GeoJSON geometry, read from WKT
           end
         end
 

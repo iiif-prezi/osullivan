@@ -234,4 +234,65 @@ describe IIIF::V3::Presentation::NavPlace do
       end
     end
   end
+
+  describe 'WKT coordinate texts' do
+    let(:geometries) { JSON.parse(subject.build.to_json)['features'].map { |feature| feature['geometry'] } }
+
+    context 'with a point, a box, and a box split at the antimeridian' do
+      let(:coordinate_texts) do
+        ['POINT(-118.243700 34.052200)',
+         'POLYGON((-23.900000 33.500000, 53.600000 33.500000, 53.600000 71.316667, -23.900000 71.316667, -23.900000 33.500000))',
+         'MULTIPOLYGON(((170.000000 -10.000000, 180.000000 -10.000000, 180.000000 10.000000, 170.000000 10.000000, 170.000000 -10.000000)), ' \
+         '((-180.000000 -10.000000, -170.000000 -10.000000, -170.000000 10.000000, -180.000000 10.000000, -180.000000 -10.000000)))']
+      end
+
+      it 'reads each as its GeoJSON geometry' do
+        expect(geometries).to eq [
+          { 'type' => 'Point', 'coordinates' => [-118.2437, 34.0522] },
+          JSON.parse(nav_place[:features][0][:geometry].to_json),
+          { 'type' => 'MultiPolygon',
+            'coordinates' => [
+              [[[170.0, -10.0], [180.0, -10.0], [180.0, 10.0], [170.0, 10.0], [170.0, -10.0]]],
+              [[[-180.0, -10.0], [-170.0, -10.0], [-170.0, 10.0], [-180.0, 10.0], [-180.0, -10.0]]]
+            ] }
+        ]
+      end
+    end
+
+    context 'when rings run the other way' do
+      let(:coordinate_texts) { ['polygon ((0 0, 0 10, 10 10, 10 0, 0 0), (2 2, 4 2, 4 4, 2 4, 2 2))'] }
+
+      it 'turns the exterior counterclockwise and holes clockwise' do
+        expect(geometries).to eq [
+          { 'type' => 'Polygon',
+            'coordinates' => [
+              [[0.0, 0.0], [10.0, 0.0], [10.0, 10.0], [0.0, 10.0], [0.0, 0.0]],
+              [[2.0, 2.0], [2.0, 4.0], [4.0, 4.0], [4.0, 2.0], [2.0, 2.0]]
+            ] }
+        ]
+      end
+    end
+
+    context 'alongside other coordinate texts' do
+      let(:coordinate_texts) { ['E 103°48ʹ/S 3°46ʹ).', 'POINT(1.5 2.5)'] }
+
+      it 'keeps their order' do
+        expect(geometries).to eq [
+          { 'type' => 'Point', 'coordinates' => [103.8, -3.766667] },
+          { 'type' => 'Point', 'coordinates' => [1.5, 2.5] }
+        ]
+      end
+    end
+
+    context 'when the WKT cannot be used' do
+      let(:coordinate_texts) do
+        ['POINT(200 0)', 'POINT(1 2 3)', 'POINT EMPTY', 'POLYGON((0 0, 1 1))', 'POLYGON((0 0, 1 0, 1 1, 0 1, 0 2))',
+         'POLYGON((0 0, 1 0, 1 1, 0 0', 'MULTIPOLYGON()', 'LINESTRING(0 0, 1 1)']
+      end
+
+      it 'skips it' do
+        expect(subject.valid?).to be false
+      end
+    end
+  end
 end
