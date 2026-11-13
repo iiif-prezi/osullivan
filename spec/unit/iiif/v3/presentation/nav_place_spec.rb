@@ -57,11 +57,15 @@ describe IIIF::V3::Presentation::NavPlace do
                                               [-23.9, 33.5]]] } }
                 ] }
   end
+  let(:nav_place_without_ids) do
+    without_id = ->(resource) { resource.reject { |key, _| key == :id } }
+    without_id.(nav_place).merge(features: nav_place[:features].map(&without_id))
+  end
 
   describe '#initialize' do
     let(:coordinate_texts) { valid_coordinates }
 
-    [nil, '', '/path', 'example.com', 'ftp://my.server'].each do |value|
+    ['', ' ', '/path', 'example.com', 'ftp://my.server'].each do |value|
       context "when base_uri is #{value.inspect}" do
         let(:base_uri) { value }
 
@@ -80,6 +84,14 @@ describe IIIF::V3::Presentation::NavPlace do
       # a BigDecimal serializes as a string, which GeoJSON does not allow.
       it 'returns navPlace' do
         expect(JSON.parse(subject.build.to_json)).to eq JSON.parse(nav_place.to_json)
+      end
+
+      context 'without a base_uri' do
+        let(:subject) { described_class.new(coordinate_texts: coordinate_texts) }
+
+        it 'leaves out the ids' do
+          expect(JSON.parse(subject.build.to_json)).to eq JSON.parse(nav_place_without_ids.to_json)
+        end
       end
     end
 
